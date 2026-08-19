@@ -75,6 +75,28 @@ final class SendCryptoTest extends TestCase
         SendCrypto::deriveSendKey('too-short');
     }
 
+    public function testHashSendPasswordIsDeterministicAndKeyMaterialDependent(): void
+    {
+        $keyMaterial = random_bytes(16);
+
+        $a = SendCrypto::hashSendPassword('correct horse', $keyMaterial);
+        $b = SendCrypto::hashSendPassword('correct horse', $keyMaterial);
+        self::assertSame($a, $b, 'same password + same key material must hash the same way');
+
+        $c = SendCrypto::hashSendPassword('correct horse', random_bytes(16));
+        self::assertNotSame($a, $c, 'the key material salts the hash, so a different one must change it');
+
+        // Standard (padded) base64, not base64url: no '-'/'_' substitution
+        // expected, and a 32-byte SHA-256 output always pads to one '='.
+        self::assertMatchesRegularExpression('/^[A-Za-z0-9+\/]+=$/', $a);
+    }
+
+    public function testHashSendPasswordRejectsWrongLengthKeyMaterial(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        SendCrypto::hashSendPassword('password', 'too-short');
+    }
+
     public function testDeriveSendKeyIsDeriveShareableKeyWithSendSendFixed(): void
     {
         $keyMaterial = random_bytes(16);

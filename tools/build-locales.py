@@ -180,10 +180,23 @@ FR = {
         "l'adresse, pour votre propre lien), {expiration}, {max_access}",
     'Bitwarden API URL is not configured':
         "L'URL de l'API Bitwarden n'est pas configurée",
+    'Bitwarden API client credentials are not configured.':
+        "Les identifiants client de l'API Bitwarden ne sont pas configurés.",
+    'Bitwarden API error: %s': "Erreur de l'API Bitwarden : %s",
     'Bitwarden CLI binary not found or not executable: %s':
         'Binaire Bitwarden CLI introuvable ou non exécutable : %s',
     'Bitwarden Send link created: %s': 'Lien Bitwarden Send créé : %s',
     'Bitwarden connection': 'Connexion à Bitwarden',
+    'Bitwarden did not return KDF parameters.':
+        "Bitwarden n'a pas renvoyé les paramètres KDF.",
+    'Bitwarden did not return a Send id/accessId':
+        "Bitwarden n'a pas renvoyé d'identifiant de Send (id/accessId)",
+    'Bitwarden did not return an access token.':
+        "Bitwarden n'a pas renvoyé de jeton d'accès.",
+    'Bitwarden did not return the account user key.':
+        "Bitwarden n'a pas renvoyé la clé utilisateur du compte.",
+    'Bitwarden identity URL is not configured.':
+        "L'URL d'identité Bitwarden n'est pas configurée.",
     'Cannot reach the Bitwarden API (%s)': "Impossible de joindre l'API Bitwarden (%s)",
     'Client data directory, writable by the web server user.':
         'Répertoire de données du client, accessible en écriture par '
@@ -195,10 +208,14 @@ FR = {
     'Content to share': 'Contenu à partager',
     'Copy link': 'Copier le lien',
     'Could not create the Send: %s': 'Échec de la création du Send : %s',
+    'Could not decrypt the account user key: wrong master password?':
+        'Impossible de déchiffrer la clé utilisateur du compte : mot de passe maître incorrect ?',
     'Could not revoke the link: %s': 'Échec de la révocation du lien : %s',
     'Could not save the configuration.': "Échec de l'enregistrement de la configuration.",
     'Create link': 'Créer le lien',
     'Created by': 'Créé par',
+    'Decrypted user key has an unexpected length.':
+        'La clé utilisateur déchiffrée a une longueur inattendue.',
     'Default expiration (days)': 'Expiration par défaut (jours)',
     'Default maximum views': "Nombre maximal d'ouvertures par défaut",
     'Delete revoked or expired Bitwarden Send entries past the configured retention':
@@ -248,6 +265,8 @@ FR = {
         "Aucune valeur BW_SESSION n'est configurée pour le mode CLI.",
     'No Bitwarden Send link has been created for this item yet.':
         "Aucun lien Bitwarden Send n'a encore été créé pour cet élément.",
+    'No master password is configured for the native driver.':
+        "Aucun mot de passe maître n'est configuré pour le driver natif.",
     'Not set': 'Non renseigné',
     'Numbers': 'Chiffres',
     'Only needed if the vault is locked. Not required if it is already unlocked, '
@@ -319,6 +338,12 @@ FR = {
         "l'option ci-dessus est activée, le technicien peut à la place "
         'choisir un des gabarits de suivi GLPI (Configuration > Gabarits > '
         'Gabarits de suivi) — les mêmes variables y fonctionnent aussi.',
+    'This account uses the Argon2id KDF, which the native driver cannot reproduce '
+    'in PHP. Use a service account configured with PBKDF2, or switch this Send '
+    'driver to "cli".':
+        'Ce compte utilise le KDF Argon2id, que le driver natif ne peut pas '
+        'reproduire en PHP. Utilisez un compte de service configuré en PBKDF2, ou '
+        'basculez ce driver de Send sur « cli ».',
     'This only removes the record from GLPI. This cannot be undone.':
         "Cela supprime uniquement l'enregistrement dans GLPI. Cette action est irréversible.",
     'The service answers but no account is logged in. '

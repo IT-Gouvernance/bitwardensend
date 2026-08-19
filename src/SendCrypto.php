@@ -165,6 +165,25 @@ final class SendCrypto
     }
 
     /**
+     * The value sent to the API as a password-protected Send's "password"
+     * field — never the plaintext password itself.
+     *
+     * Matches SendAccessKey::hash_password_b64() in
+     * bitwarden_send/src/access.rs: PBKDF2-HMAC-SHA256(password, salt =
+     * this Send's own raw 16-byte key material, 100000 iterations),
+     * standard (padded) base64 — not base64url; unlike the key material in
+     * the access URL, this value never goes into a URL.
+     */
+    public static function hashSendPassword(string $password, string $keyMaterial): string
+    {
+        if (strlen($keyMaterial) !== 16) {
+            throw new RuntimeException('Send key material must be 16 bytes.');
+        }
+
+        return base64_encode(hash_pbkdf2('sha256', $password, $keyMaterial, 100000, 32, true));
+    }
+
+    /**
      * 16 bytes of random key material for a new Send.
      *
      * random_bytes(), never rand()/mt_rand()/uniqid(): this becomes the

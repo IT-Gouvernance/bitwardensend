@@ -87,18 +87,111 @@ class NativeSendDriver implements SendDriverInterface
 
     public function testConnection(): string
     {
-        $this->unlockUserKey();
+        $this->authenticate();
         return 'ok';
     }
 
     public function createSend(SendPayload $payload): SendResult
     {
-        throw new RuntimeException('NativeSendDriver::createSend() is not implemented yet.');
+        $session = $this->authenticate();
+        $userEncKey = substr($session['userKey'], 0, 32);
+        $userMacKey = substr($session['userKey'], 32, 32);
+        SendCrypto::zero($session['userKey']);
+
+        $keyMaterial = SendCrypto::randomKeyMaterial();
+        $sendKey = SendCrypto::deriveSendKey($keyMaterial);
+        $sendEncKey = substr($sendKey, 0, 32);
+        $sendMacKey = substr($sendKey, 32, 32);
+        SendCrypto::zero($sendKey);
+
+        $hasPassword = $payload->password !== null && $payload->password !== '';
+
+        $body = [
+            'type' => 0, // text
+            'name' => (string) EncString::encrypt($payload->name, $sendEncKey, $sendMacKey),
+            'notes' => ($payload->notes !== null && $payload->notes !== '')
+                ? (string) EncString::encrypt($payload->notes, $sendEncKey, $sendMacKey)
+                : null,
+            'text' => [
+                'text'   => (string) EncString::encrypt($payload->text, $sendEncKey, $sendMacKey),
+                'hidden' => $payload->hidden,
+            ],
+            'file' => null,
+            'maxAccessCount' => ($payload->maxAccessCount !== null && $payload->maxAccessCount > 0)
+                ? $payload->maxAccessCount
+                : null,
+            'deletionDate'   => $payload->deletionDate,
+            'expirationDate' => $payload->expirationDate,
+            // Never the plaintext password: the real API only ever sees a
+            // PBKDF2 hash of it, salted with this Send's own (not the
+            // user's) key material — see SendCrypto::hashSendPassword(). The
+            // CLI driver can send the password as-is because `bw serve`
+            // itself does this hashing before this plugin's request to it
+            // ever reaches the real Bitwarden API; here, this plugin *is*
+            // that client, so it has to do it.
+            'password'  => $hasPassword ? SendCrypto::hashSendPassword($payload->password, $keyMaterial) : null,
+            'disabled'  => $payload->disabled,
+            'hideEmail' => $payload->hideEmail,
+            'key'       => (string) EncString::encrypt($keyMaterial, $userEncKey, $userMacKey),
+        ];
+        SendCrypto::zero($sendEncKey);
+        SendCrypto::zero($sendMacKey);
+        SendCrypto::zero($userEncKey);
+        SendCrypto::zero($userMacKey);
+
+        $apiUrl = rtrim((string) ($this->conf['native_api_url'] ?? ''), '/');
+        if ($apiUrl === '') {
+            throw new RuntimeException(__('Bitwarden API URL is not configured', 'bitwardensend'));
+        }
+
+        $response = $this->httpRequest(
+            'POST',
+            $apiUrl . '/sends',
+            json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            ['Content-Type: application/json', 'Authorization: Bearer ' . $session['accessToken']]
+        );
+
+        $id       = (string) ($response['id'] ?? '');
+        $accessId = (string) ($response['accessId'] ?? '');
+        if ($id === '' || $accessId === '') {
+            throw new RuntimeException(__('Bitwarden did not return a Send id/accessId', 'bitwardensend'));
+        }
+
+        $webVaultUrl = rtrim((string) ($this->conf['native_web_vault_url'] ?? ''), '/');
+        $accessUrl = $webVaultUrl . '/#/send/' . $accessId . '/' . SendCrypto::base64UrlEncode($keyMaterial);
+
+        return new SendResult(
+            uuid: $id,
+            accessId: $accessId,
+            accessUrl: $accessUrl,
+            deletionDate: isset($response['deletionDate']) ? (string) $response['deletionDate'] : null,
+        );
     }
 
     public function deleteSend(string $uuid): void
     {
-        throw new RuntimeException('NativeSendDriver::deleteSend() is not implemented yet.');
+        if ($uuid === '') {
+            throw new RuntimeException(__('Unknown Send identifier', 'bitwardensend'));
+        }
+
+        // Only the bearer token, not the full authenticate(): revoking
+        // needs no key material at all, and skipping the master-key
+        // derivation avoids paying for a (deliberately expensive,
+        // potentially 600k+ iteration) PBKDF2 run on every revoke for
+        // nothing.
+        $accessToken = $this->requestAccessToken()['accessToken'];
+
+        $apiUrl = rtrim((string) ($this->conf['native_api_url'] ?? ''), '/');
+        if ($apiUrl === '') {
+            throw new RuntimeException(__('Bitwarden API URL is not configured', 'bitwardensend'));
+        }
+
+        $this->httpRequest(
+            'DELETE',
+            $apiUrl . '/sends/' . rawurlencode($uuid),
+            null,
+            ['Authorization: Bearer ' . $accessToken]
+        );
     }
 
     // ------------------------------------------------------------------
@@ -107,17 +200,19 @@ class NativeSendDriver implements SendDriverInterface
 
     /**
      * Authenticate as the configured service account and decrypt its user
-     * key. Returns the 64-byte enc+mac key pair (see SendCrypto::stretchKey())
-     * — everything createSend()/deleteSend() need to encrypt a Send's own
-     * key material for the server.
+     * key. Returns the access token (for the /sends calls that follow) and
+     * the 64-byte user enc+mac key pair (see SendCrypto::stretchKey()) that
+     * encrypts a Send's own key material for the server.
      *
      * Nothing here is cached across calls: each Send operation is
      * infrequent and short-lived enough (a single HTTP request plus some
      * local key derivation) that re-authenticating every time is simpler
      * and safer than managing a token's lifetime across requests, at the
      * cost of one extra round trip per operation.
+     *
+     * @return array{accessToken:string,userKey:string}
      */
-    private function unlockUserKey(): string
+    private function authenticate(): array
     {
         $token = $this->requestAccessToken();
 
@@ -125,13 +220,29 @@ class NativeSendDriver implements SendDriverInterface
 
         $masterPassword = Config::getNativeMasterPassword();
         if ($masterPassword === '') {
-            throw new RuntimeException('No master password is configured for the native driver.');
+            throw new RuntimeException(__(
+                'No master password is configured for the native driver.',
+                'bitwardensend'
+            ));
         }
 
         $email = (string) ($this->conf['native_email'] ?? '');
 
-        $masterKey = SendCrypto::deriveMasterKey($masterPassword, $email, $kdfType, $token['kdfIterations']);
-        SendCrypto::zero($masterPassword);
+        try {
+            $masterKey = SendCrypto::deriveMasterKey($masterPassword, $email, $kdfType, $token['kdfIterations']);
+        } catch (RuntimeException $e) {
+            // SendCrypto has no GLPI dependency at all (see its own class
+            // doc comment) and so cannot call __() itself — translating its
+            // one possible failure (an Argon2id account) here instead.
+            throw new RuntimeException(__(
+                'This account uses the Argon2id KDF, which the native driver cannot reproduce '
+                . 'in PHP. Use a service account configured with PBKDF2, or switch this Send '
+                . 'driver to "cli".',
+                'bitwardensend'
+            ));
+        } finally {
+            SendCrypto::zero($masterPassword);
+        }
 
         $stretchedMasterKey = SendCrypto::stretchKey($masterKey);
         SendCrypto::zero($masterKey);
@@ -148,21 +259,24 @@ class NativeSendDriver implements SendDriverInterface
             // bytes, but re-wrapping keeps that guarantee obviously true
             // here too rather than relying on every future EncString change
             // to preserve it.
-            throw new RuntimeException('Could not decrypt the account user key: wrong master password?');
+            throw new RuntimeException(__(
+                'Could not decrypt the account user key: wrong master password?',
+                'bitwardensend'
+            ));
         } finally {
             SendCrypto::zero($stretchedMasterKey);
         }
 
         if (strlen($userKey) !== 64) {
-            throw new RuntimeException('Decrypted user key has an unexpected length.');
+            throw new RuntimeException(__('Decrypted user key has an unexpected length.', 'bitwardensend'));
         }
 
-        return $userKey;
+        return ['accessToken' => $token['accessToken'], 'userKey' => $userKey];
     }
 
     /**
      * POST {identityUrl}/connect/token with the service account's API key,
-     * returning the fields unlockUserKey() needs. Field names are
+     * returning the fields authenticate() needs. Field names are
      * intentionally read defensively — see the class doc comment.
      *
      * @return array{accessToken:string,kdf:int,kdfIterations:int,key:string}
@@ -171,13 +285,16 @@ class NativeSendDriver implements SendDriverInterface
     {
         $identityUrl = rtrim((string) ($this->conf['native_identity_url'] ?? ''), '/');
         if ($identityUrl === '') {
-            throw new RuntimeException('Bitwarden identity URL is not configured.');
+            throw new RuntimeException(__('Bitwarden identity URL is not configured.', 'bitwardensend'));
         }
 
         $clientId = (string) ($this->conf['native_client_id'] ?? '');
         $clientSecret = Config::getNativeClientSecret();
         if ($clientId === '' || $clientSecret === '') {
-            throw new RuntimeException('Bitwarden API client credentials are not configured.');
+            throw new RuntimeException(__(
+                'Bitwarden API client credentials are not configured.',
+                'bitwardensend'
+            ));
         }
 
         $body = [
@@ -211,13 +328,16 @@ class NativeSendDriver implements SendDriverInterface
         $key           = $response['key'] ?? $response['Key'] ?? null;
 
         if (!is_string($accessToken) || $accessToken === '') {
-            throw new RuntimeException('Bitwarden did not return an access token.');
+            throw new RuntimeException(__('Bitwarden did not return an access token.', 'bitwardensend'));
         }
         if (!is_numeric($kdf) || !is_numeric($kdfIterations)) {
-            throw new RuntimeException('Bitwarden did not return KDF parameters.');
+            throw new RuntimeException(__('Bitwarden did not return KDF parameters.', 'bitwardensend'));
         }
         if (!is_string($key) || $key === '') {
-            throw new RuntimeException('Bitwarden did not return the account user key.');
+            throw new RuntimeException(__(
+                'Bitwarden did not return the account user key.',
+                'bitwardensend'
+            ));
         }
 
         return [
@@ -252,7 +372,7 @@ class NativeSendDriver implements SendDriverInterface
     {
         $handle = curl_init($url);
         if ($handle === false) {
-            throw new RuntimeException('Unable to initialize cURL.');
+            throw new RuntimeException(__('Unable to initialize cURL', 'bitwardensend'));
         }
 
         $options = [
@@ -282,17 +402,23 @@ class NativeSendDriver implements SendDriverInterface
         curl_close($handle);
 
         if ($errno !== 0) {
-            throw new RuntimeException(sprintf('Cannot reach the Bitwarden API (%s)', $error));
+            throw new RuntimeException(sprintf(
+                __('Cannot reach the Bitwarden API (%s)', 'bitwardensend'),
+                $error
+            ));
         }
 
         $decoded = json_decode((string) $raw, true);
         if (!is_array($decoded)) {
-            throw new RuntimeException(sprintf('Unexpected response from the Bitwarden API (HTTP %d)', $code));
+            throw new RuntimeException(sprintf(
+                __('Unexpected response from the Bitwarden API (HTTP %d)', 'bitwardensend'),
+                $code
+            ));
         }
 
         if ($code < 200 || $code >= 300) {
             $message = (string) ($decoded['error_description'] ?? $decoded['message'] ?? $decoded['error'] ?? $code);
-            throw new RuntimeException(sprintf('Bitwarden API error: %s', $message));
+            throw new RuntimeException(sprintf(__('Bitwarden API error: %s', 'bitwardensend'), $message));
         }
 
         return $decoded;
