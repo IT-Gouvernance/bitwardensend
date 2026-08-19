@@ -1,0 +1,267 @@
+{#
+ -------------------------------------------------------------------------
+ Bitwarden Send plugin for GLPI
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of Bitwarden Send.
+
+ Bitwarden Send is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Bitwarden Send is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Bitwarden Send. If not, see <https://www.gnu.org/licenses/>.
+ -------------------------------------------------------------------------
+
+ @copyright Copyright (C) 2026 by IT Gouvernance.
+ @license   GPLv3+ https://www.gnu.org/licenses/gpl-3.0.html
+ @link      https://github.com/IT-Gouvernance/bitwardensend/
+ -------------------------------------------------------------------------
+#}
+{#
+   The actual Send creation fields, shared between the two places this form
+   is shown: the "Bitwarden Sends" tab's own modal (form.html.twig) and the
+   timeline's inline answer action (answer_form.html.twig). Both build the
+   same `subitem` shape before including this — see either caller.
+
+   Deliberately not the <form> tag itself, the CSRF/itemtype/items_id hidden
+   fields, or the submit button: those differ slightly (or are placed
+   differently) between the two callers.
+#}
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+<div class="mb-3">
+   <label class="form-label" for="bws_name">
+      {{ __('Send name', 'bitwardensend') }}
+      <i class="ti ti-info-circle text-secondary ms-1"
+         title="{{ __('Only visible in your Bitwarden vault.', 'bitwardensend') }}"></i>
+   </label>
+   <input type="text" id="bws_name" name="name" class="form-control"
+          value="{{ subitem.default_name }}" maxlength="200">
+</div>
+
+<div class="mb-4">
+   <label class="form-label required" for="bws_secret">
+      {{ __('Content to share', 'bitwardensend') }}
+      <i class="ti ti-info-circle text-secondary ms-1"
+         title="{{ __('Stored encrypted in Bitwarden. GLPI only keeps the link and its metadata.', 'bitwardensend') }}"></i>
+   </label>
+   <textarea id="bws_secret" name="secret" class="form-control font-monospace" rows="4"
+             required autocomplete="off" spellcheck="false"></textarea>
+
+   {% if subitem.conf.password_generator_enabled %}
+      <div class="mt-2">
+         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="bws_generate_secret">
+               <i class="ti ti-refresh me-1"></i>{{ __('Generate a password', 'bitwardensend') }}
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
+                    data-bs-target="#bws_secret_gen_options"
+                    title="{{ __('Password generator options', 'bitwardensend') }}">
+               <i class="ti ti-adjustments-horizontal"></i>
+            </button>
+         </div>
+
+         <div class="collapse mt-2" id="bws_secret_gen_options">
+            <div class="d-flex flex-wrap align-items-end gap-3">
+               <div>
+                  <label class="form-label mb-1" for="bws_secret_gen_length">{{ __('Length', 'bitwardensend') }}</label>
+                  <input type="number" id="bws_secret_gen_length" class="form-control form-control-sm bws-generator-length"
+                         min="4" max="128" value="20">
+               </div>
+
+               <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_upper" checked>
+                  <label class="form-check-label" for="bws_secret_gen_upper">{{ __('Uppercase', 'bitwardensend') }} (A-Z)</label>
+               </div>
+               <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_lower" checked>
+                  <label class="form-check-label" for="bws_secret_gen_lower">{{ __('Lowercase', 'bitwardensend') }} (a-z)</label>
+               </div>
+               <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_numbers" checked>
+                  <label class="form-check-label" for="bws_secret_gen_numbers">{{ __('Numbers', 'bitwardensend') }} (0-9)</label>
+               </div>
+               <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_symbols">
+                  <label class="form-check-label" for="bws_secret_gen_symbols">{{ __('Symbols', 'bitwardensend') }} (!@#)</label>
+               </div>
+            </div>
+         </div>
+      </div>
+   {% endif %}
+</div>
+
+<hr class="my-4">
+
+<div class="mb-4">
+   <h3 class="card-title">
+      <i class="ti ti-adjustments me-2 text-secondary"></i>{{ __('Link options', 'bitwardensend') }}
+   </h3>
+
+   <div class="row g-3 mb-3">
+      <div class="col-md-6">
+         <label class="form-label" for="bws_days">{{ __('Expires in', 'bitwardensend') }}</label>
+         <select id="bws_days" name="deletion_days" class="form-select">
+            {% for days in [1, 2, 3, 7, 14, 30] %}
+               <option value="{{ days }}" {{ days == subitem.conf.default_deletion_days ? 'selected' : '' }}>
+                  {{ days }} {{ days > 1 ? __('days', 'bitwardensend') : __('day', 'bitwardensend') }}
+               </option>
+            {% endfor %}
+         </select>
+      </div>
+
+      <div class="col-md-6">
+         <label class="form-label" for="bws_max_access">
+            {{ __('Maximum number of views', 'bitwardensend') }}
+            <i class="ti ti-info-circle text-secondary ms-1"
+               title="{{ __('0 means unlimited until expiration.', 'bitwardensend') }}"></i>
+         </label>
+         <input type="number" id="bws_max_access" name="max_access_count" class="form-control"
+                min="0" max="100" value="{{ subitem.conf.default_max_access_count }}">
+      </div>
+   </div>
+
+   <details class="mb-3">
+      <summary class="bws-details-summary text-secondary">
+         <i class="ti ti-adjustments-horizontal me-1"></i>{{ __('Advanced options', 'bitwardensend') }}
+      </summary>
+
+      <div class="mb-3 mt-3">
+         <label class="form-label" for="bws_password">{{ __('Link password (optional)', 'bitwardensend') }}</label>
+         <div class="input-group">
+            <input type="text" id="bws_password" name="password" class="form-control"
+                   autocomplete="off" placeholder="{{ __('Leave empty to require none', 'bitwardensend') }}">
+            {% if subitem.conf.password_generator_enabled %}
+               <button type="button" class="btn btn-outline-secondary" id="bws_generate_password"
+                       title="{{ __('Generate a random password', 'bitwardensend') }}">
+                  <i class="ti ti-refresh"></i>
+               </button>
+            {% endif %}
+         </div>
+         <div class="form-hint">
+            {{ __('Send it over another channel, by phone or text message for instance.', 'bitwardensend') }}
+         </div>
+      </div>
+
+      <div class="list-group list-group-flush border rounded">
+         <label class="list-group-item d-flex align-items-center justify-content-between">
+            <span class="form-check-label me-3">{{ __('Hide the text by default when opened', 'bitwardensend') }}</span>
+            <span class="form-check form-switch mb-0">
+               <input type="checkbox" class="form-check-input" role="switch" name="hidden" value="1" checked>
+            </span>
+         </label>
+         <label class="list-group-item d-flex align-items-center justify-content-between">
+            <span class="form-check-label me-3">{{ __('Hide my email address from the recipient', 'bitwardensend') }}</span>
+            <span class="form-check form-switch mb-0">
+               <input type="checkbox" class="form-check-input" role="switch" name="hide_email" value="1"
+                      {{ subitem.conf.default_hide_email ? 'checked' : '' }}>
+            </span>
+         </label>
+      </div>
+   </details>
+</div>
+
+<hr class="my-4">
+
+<div class="mb-4">
+   <h3 class="card-title">
+      <i class="ti ti-message-2 me-2 text-secondary"></i>{{ __('Followup configuration', 'bitwardensend') }}
+   </h3>
+
+   {% set followup_shown = subitem.force_followup|default(false) or subitem.conf.add_followup %}
+   <div class="list-group list-group-flush border rounded mb-3">
+      {% if subitem.force_followup|default(false) %}
+         {# The whole point of using the timeline's own "answer" area is to post
+            a followup — nothing to toggle, unlike the tab's modal below. #}
+         <input type="hidden" name="add_followup" value="1">
+      {% else %}
+         <label class="list-group-item d-flex align-items-center justify-content-between">
+            <span class="form-check-label me-3">{{ __('Post the link as a followup', 'bitwardensend') }}</span>
+            <span class="form-check form-switch mb-0">
+               <input type="checkbox" class="form-check-input" role="switch"
+                      name="add_followup" value="1" id="bws_add_followup" {{ subitem.conf.add_followup ? 'checked' : '' }}>
+            </span>
+         </label>
+      {% endif %}
+   </div>
+
+   <div id="bws_followup_block"
+        class="{{ followup_shown ? '' : 'bws-d-none' }}"
+        data-bws-unlimited="{{ __('an unlimited number of', 'bitwardensend') }}"
+        data-bws-link-placeholder="{{ __('the link (created once you submit)', 'bitwardensend') }}">
+      <label class="form-label" for="bws_followup">
+         {{ __('Followup text', 'bitwardensend') }}
+         <i class="ti ti-info-circle text-secondary ms-1"
+            title="{{ __('Available variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}', 'bitwardensend') }}"></i>
+      </label>
+
+      <div class="d-flex flex-wrap align-items-start gap-2">
+         <div class="flex-grow-1 bws-min-width-0">
+            {{ fields.textareaField('followup_content', subitem.conf.followup_template, '', {
+               id: 'bws_followup',
+               enable_richtext: true,
+               enable_fileupload: false,
+               no_label: true,
+               full_width: true,
+               rows: 7,
+               rand: 1,
+               statusbar: false,
+            }) }}
+         </div>
+
+         {# A compact column of icon + control rows next to the text, matching
+            how GLPI's own followup form places its own row of similar
+            controls (category, target, private, pending) beside the text
+            rather than above/below it as a full-width field each. #}
+         <div class="d-flex flex-column gap-2 pt-1">
+            {% if subitem.followup_templates|length %}
+               <div class="bws-side-control d-flex align-items-center gap-1">
+                  <i class="ti ti-stack-2 text-secondary"
+                     title="{{ __('Use a GLPI followup template', 'bitwardensend') }}"></i>
+                  <select id="bws_followup_template" class="form-select form-select-sm"
+                          data-bws-confirm-replace="{{ __('Replace the current text? Your changes will be lost.', 'bitwardensend') }}">
+                     <option value="" data-bws-content="{{ subitem.conf.followup_template }}">
+                        {{ __('Plugin default template', 'bitwardensend') }}
+                     </option>
+                     <optgroup label="{{ __('GLPI followup templates', 'bitwardensend') }}">
+                        {% for tpl in subitem.followup_templates %}
+                           <option value="{{ tpl.id }}" data-bws-content="{{ tpl.content }}">
+                              {{ tpl.name }}
+                           </option>
+                        {% endfor %}
+                     </optgroup>
+                  </select>
+               </div>
+            {% endif %}
+
+            {# No separate bws-d-none binding needed here: a child of
+               #bws_followup_block now, hiding that ancestor already hides
+               this. #}
+            <div id="bws_followup_private_row" class="bws-side-control d-flex align-items-center gap-1"
+                 title="{{ __('Private followup (hidden from the requester)', 'bitwardensend') }}">
+               <i class="ti ti-eye-off text-secondary"></i>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="followup_is_private" value="1" {{ subitem.conf.followup_is_private ? 'checked' : '' }}>
+               </span>
+            </div>
+         </div>
+      </div>
+
+      <details class="mt-2">
+         <summary class="bws-details-summary text-secondary small">
+            <i class="ti ti-eye me-1"></i>{{ __('Preview') }}
+         </summary>
+         <div id="bws_followup_preview" class="border rounded p-2 small bg-body-tertiary mt-2"></div>
+      </details>
+   </div>
+</div>

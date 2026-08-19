@@ -1,0 +1,120 @@
+{#
+ -------------------------------------------------------------------------
+ Bitwarden Send plugin for GLPI
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of Bitwarden Send.
+
+ Bitwarden Send is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Bitwarden Send is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Bitwarden Send. If not, see <https://www.gnu.org/licenses/>.
+ -------------------------------------------------------------------------
+
+ @copyright Copyright (C) 2026 by IT Gouvernance.
+ @license   GPLv3+ https://www.gnu.org/licenses/gpl-3.0.html
+ @link      https://github.com/IT-Gouvernance/bitwardensend/
+ -------------------------------------------------------------------------
+#}
+{#
+   Rendered inline in the timeline's answer row (next to Followup/Task/
+   Solution/...), included by GLPI core's answer.html.twig for the entry
+   registered in Send::getTimelineAnswerActions(). GLPI passes this
+   template two variables: `item` (the Ticket/Change/Problem) and
+   `subitem` (whatever this plugin put in that entry's own 'item' key —
+   here, a plain data holder, not a real GLPI entity; see that method for
+   why). Closing this block is handled by GLPI's own collapse toggle in
+   the surrounding markup, not by this template.
+
+   The actual fields are shared with the "Bitwarden Sends" tab's own modal
+   (front-ends differ, form is the same) — see _send_form_fields.html.twig.
+
+   Unlike that modal (opened from a button in list.html.twig, which already
+   includes assets.html.twig), this form is part of the ticket's own initial
+   page — nothing else guarantees the plugin's CSS/JS got loaded before it
+   renders, so it is included here explicitly. Idempotent either way (see
+   assets.html.twig's own loaded-guard).
+#}
+{% include '@bitwardensend/assets.html.twig' %}
+<form method="post"
+      action="{{ path('plugins/bitwardensend/front/send.form.php') }}"
+      class="plugin-bitwardensend-form">
+
+   <input type="hidden" name="_glpi_csrf_token" value="{{ subitem.csrf_token }}">
+   <input type="hidden" name="itemtype" value="{{ subitem.itemtype }}">
+   <input type="hidden" name="items_id" value="{{ subitem.items_id }}">
+
+   {% include '@bitwardensend/_send_form_fields.html.twig' %}
+
+   <div class="d-flex justify-content-end gap-2">
+      <button type="submit" name="create_send" value="1" class="btn btn-primary">
+         <i class="ti ti-send me-1"></i>{{ __('Create link', 'bitwardensend') }}
+      </button>
+   </div>
+</form>
+
+<script>
+   window.pluginBitwardensendUpdateFollowupPreview();
+   window.pluginBitwardensendStartFollowupPreviewPolling();
+
+   // GLPI opens this whole form via Bootstrap collapse on the surrounding
+   // "new-PluginBitwardensendSend-block" element (see
+   // Send::getTimelineAnswerActions — that id comes from the 'class' this
+   // plugin registers there). Without this, the browser tends to land the
+   // viewport on whatever part of the newly-expanded, fairly tall form ends
+   // up under the click point — usually its bottom half, not its start.
+   //
+   // A single scroll attempt, however it was timed, still landed low in the
+   // form (confirmed: the "show" class does flip correctly on open) — the
+   // likely culprit is the followup field's TinyMCE editor initializing
+   // asynchronously further down the form and nudging the scroll position
+   // once its iframe swaps in, after any one-shot attempt already ran.
+   // Re-asserting the scroll for a few seconds wins that race regardless of
+   // exactly when TinyMCE (or anything else) settles, instead of guessing.
+   (function () {
+      var answerBlock = document.getElementById('new-PluginBitwardensendSend-block');
+      if (!answerBlock) {
+         return;
+      }
+
+      var reassertScrollToStart = function () {
+         // First attempt right away — setInterval's own first tick only
+         // fires after its delay, which would otherwise leave the scroll
+         // doing nothing for the first 400ms after the click.
+         answerBlock.scrollIntoView({ block: 'start', behavior: 'smooth' });
+         var attempts = 1;
+         var interval = window.setInterval(function () {
+            answerBlock.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            attempts++;
+            if (attempts >= 6) {
+               window.clearInterval(interval);
+            }
+         }, 400);
+      };
+
+      // Primary path, if this collapse is in fact driven through Bootstrap's
+      // own JS component.
+      answerBlock.addEventListener('shown.bs.collapse', reassertScrollToStart);
+
+      // Fallback: watch the "show" class itself rather than trust that event
+      // firing, for whatever actually toggles this collapse open.
+      var wasShown = answerBlock.classList.contains('show');
+      new MutationObserver(function () {
+         var isShown = answerBlock.classList.contains('show');
+         if (isShown && !wasShown) {
+            reassertScrollToStart();
+         }
+         wasShown = isShown;
+      }).observe(answerBlock, { attributes: true, attributeFilter: ['class'] });
+   })();
+</script>

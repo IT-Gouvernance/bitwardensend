@@ -1,0 +1,143 @@
+/**
+ * -------------------------------------------------------------------------
+ * Bitwarden Send plugin for GLPI
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of Bitwarden Send.
+ *
+ * Bitwarden Send is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Bitwarden Send is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Bitwarden Send. If not, see <https://www.gnu.org/licenses/>.
+ * -------------------------------------------------------------------------
+ *
+ * @copyright Copyright (C) 2026 by IT Gouvernance.
+ * @license   GPLv3+ https://www.gnu.org/licenses/gpl-3.0.html
+ * @link      https://github.com/IT-Gouvernance/bitwardensend/
+ * -------------------------------------------------------------------------
+ */
+
+.plugin-bitwardensend-form textarea[name="secret"] {
+   font-size: 0.875rem;
+}
+
+.plugin-bitwardensend-list table td {
+   vertical-align: middle;
+}
+
+/*
+ * The <summary> of a native <details> disclosure ("Advanced options" in the
+ * Send creation form) isn't a link or button, so it needs an explicit
+ * pointer cursor to read as clickable.
+ */
+.bws-details-summary {
+   cursor: pointer;
+}
+
+/*
+ * Hides the "Post the link as a followup" dependents (the template
+ * selector, the private-followup switch, the followup text area — all
+ * children of this block, so hiding it hides them too). Scoped by id, not
+ * just a class, so the specificity reliably beats Bootstrap/Tabler's own
+ * "d-flex" utility class, which is itself !important — a plain
+ * `style="display: none"` (inline, or set from JS) loses that fight and the
+ * element stays visibly flexed regardless.
+ */
+#bws_followup_block.bws-d-none {
+   display: none !important;
+}
+
+/*
+ * Lets the followup textarea/TinyMCE editor actually shrink instead of
+ * overflowing next to the icon+control column beside it: flex items default
+ * to min-width: auto, which for a wide element like this ignores
+ * flex-grow's shrinking and pushes past the container instead. The
+ * flex-basis is a floor on top of that: below it (combined with the
+ * sidebar's own width) the row wraps — see the "flex-wrap" on its parent —
+ * so the editor drops to full width instead of keeping the sidebar beside
+ * it and squeezing the rich text toolbar down to a handful of buttons plus
+ * a "more items" overflow.
+ */
+.bws-min-width-0 {
+   flex: 1 1 22rem;
+   min-width: 0;
+}
+
+/*
+ * The icon + control rows in that column (template picker, private-followup
+ * switch) — echoes GLPI's own similarly-placed controls next to a
+ * followup's text. A <select>'s natural width follows its longest option
+ * (a GLPI template's name can be long), so it needs its own cap or it would
+ * push the column wide enough to squeeze the textarea instead.
+ */
+.bws-side-control select {
+   max-width: 10rem;
+}
+
+.bws-side-control i {
+   flex-shrink: 0;
+}
+
+/*
+ * The "Content to share" generator's length field — a plain number input
+ * would otherwise stretch as wide as its .form-control siblings, dwarfing
+ * what is normally a 2-3 digit value.
+ */
+.bws-generator-length {
+   max-width: 6rem;
+}
+
+/*
+ * The timeline's answer button for this action is generated entirely by
+ * GLPI itself (see Send::getTimelineAnswerActions) — it otherwise falls back
+ * to GLPI's plain default button color, unlike Followup/Task/Solution/...,
+ * which each get their own. Targeted by its data-bs-target, not a CSS class:
+ * that attribute value is this plugin's own (built from the 'class' key
+ * returned by getTimelineAnswerActions), so it is certain to match.
+ *
+ * GLPI reuses that same data-bs-target on the open panel's own "close"
+ * button (class "close-itil-answer", confirmed live) to collapse it again —
+ * :not(.close-itil-answer) keeps that one in its normal ghost/secondary
+ * style instead of painting it as if it were the primary action too.
+ */
+.btn[data-bs-target="#new-PluginBitwardensendSend-block"]:not(.close-itil-answer) {
+   background-color: #175dda;
+   border-color: #175dda;
+   color: #fff;
+}
+
+.btn[data-bs-target="#new-PluginBitwardensendSend-block"]:not(.close-itil-answer):hover,
+.btn[data-bs-target="#new-PluginBitwardensendSend-block"]:not(.close-itil-answer):focus {
+   background-color: #124bb0;
+   border-color: #124bb0;
+   color: #fff;
+}
+
+/*
+ * Same button, collapsed into the "Answer" split dropdown once there is not
+ * enough room for every action as its own pill: there it is some other
+ * element sharing the same data-bs-target (a list row, not a .btn), styled
+ * with a pale tint rather than the solid color above — :not(.btn) catches
+ * that regardless of its actual tag/class, which was not confirmed against
+ * a live instance.
+ */
+[data-bs-target="#new-PluginBitwardensendSend-block"]:not(.btn) {
+   background-color: #dbe7fb !important;
+   color: #0f3f96 !important;
+}
+
+[data-bs-target="#new-PluginBitwardensendSend-block"]:not(.btn):hover,
+[data-bs-target="#new-PluginBitwardensendSend-block"]:not(.btn):focus {
+   background-color: #c3d8f9 !important;
+   color: #0f3f96 !important;
+}

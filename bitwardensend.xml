@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+   <name>Bitwarden Send</name>
+   <key>bitwardensend</key>
+   <state>beta</state>
+   <logo>https://raw.githubusercontent.com/IT-Gouvernance/bitwardensend/main/bitwardensend.png</logo>
+   <description>
+      <short>
+         <en>Share a secret on a ticket through a Bitwarden Send link</en>
+         <fr>Partager un secret sur un ticket via un lien Bitwarden Send</fr>
+      </short>
+      <long>
+         <en>Adds a button to the ITIL timeline that lets a technician share a secret (password, key, token...) through a Bitwarden Send link, and posts that link as a followup. Supports both the bw serve local API and direct CLI invocation, rich text followups with a live preview, automatic cleanup of old entries, and dedicated rights.</en>
+         <fr>Ajoute un bouton dans la timeline ITIL permettant à un technicien de partager un secret (mot de passe, clé, jeton...) via un lien Bitwarden Send, publié ensuite en suivi. Prend en charge l'API locale bw serve et l'invocation directe du CLI, les suivis en texte enrichi avec aperçu en direct, le nettoyage automatique des anciennes entrées, et des droits dédiés.</fr>
+      </long>
+   </description>
+   <homepage>https://github.com/IT-Gouvernance/bitwardensend</homepage>
+   <download>https://github.com/IT-Gouvernance/bitwardensend/releases</download>
+   <issues>https://github.com/IT-Gouvernance/bitwardensend/issues</issues>
+   <readme>https://raw.githubusercontent.com/IT-Gouvernance/bitwardensend/main/README.md</readme>
+   <authors>
+      <author>IT Gouvernance</author>
+   </authors>
+   <versions>
+   </versions>
+   <langs>
+      <lang>en_GB</lang>
+      <lang>fr_FR</lang>
+      <lang>fr_BE</lang>
+      <lang>fr_CA</lang>
+   </langs>
+   <license>GPL v3+</license>
+   <tags>
+      <en>
+         <tag>bitwarden</tag>
+         <tag>password</tag>
+         <tag>secret</tag>
+         <tag>send</tag>
+      </en>
+      <fr>
+         <tag>bitwarden</tag>
+         <tag>mot de passe</tag>
+         <tag>secret</tag>
+         <tag>envoi</tag>
+      </fr>
+   </tags>
+   <screenshots>
+      <screenshot>https://raw.githubusercontent.com/IT-Gouvernance/bitwardensend/main/screenshots/bitwardensend_config.png</screenshot>
+      <screenshot>https://raw.githubusercontent.com/IT-Gouvernance/bitwardensend/main/screenshots/bitwardensend_timeline.png</screenshot>
+   </screenshots>
+</root>

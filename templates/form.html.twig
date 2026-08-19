@@ -1,0 +1,67 @@
+{#
+ -------------------------------------------------------------------------
+ Bitwarden Send plugin for GLPI
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of Bitwarden Send.
+
+ Bitwarden Send is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Bitwarden Send is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Bitwarden Send. If not, see <https://www.gnu.org/licenses/>.
+ -------------------------------------------------------------------------
+
+ @copyright Copyright (C) 2026 by IT Gouvernance.
+ @license   GPLv3+ https://www.gnu.org/licenses/gpl-3.0.html
+ @link      https://github.com/IT-Gouvernance/bitwardensend/
+ -------------------------------------------------------------------------
+#}
+{#
+   Modal form opened from the "Bitwarden Sends" tab's own "New Bitwarden
+   Send" button (list.html.twig), via Send::showCreateForm(). The timeline
+   itself no longer uses this: since GLPI >= 10, that goes through the
+   inline answer_form.html.twig instead (see Send::getTimelineAnswerActions).
+
+   The actual fields are shared between both — see _send_form_fields.html.twig.
+   Wrapped into the same `subitem` shape that method builds, so both callers
+   feed that shared partial identically.
+#}
+{% set subitem = {
+   'default_name':       default_name,
+   'conf':                conf,
+   'followup_templates': followup_templates,
+   'force_followup':     force_followup,
+} %}
+<form method="post"
+      action="{{ path('plugins/bitwardensend/front/send.form.php') }}"
+      class="plugin-bitwardensend-form">
+
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token }}">
+   <input type="hidden" name="itemtype" value="{{ itemtype }}">
+   <input type="hidden" name="items_id" value="{{ items_id }}">
+
+   {% include '@bitwardensend/_send_form_fields.html.twig' %}
+
+   <div class="d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+         {{ __('Cancel') }}
+      </button>
+      <button type="submit" name="create_send" value="1" class="btn btn-primary">
+         <i class="ti ti-send me-1"></i>{{ __('Create link', 'bitwardensend') }}
+      </button>
+   </div>
+</form>
+
+{# Initial render for the glpi_ajax_dialog path (innerHTML injection is handled
+   separately in pluginBitwardensendDialog's fallback branch). #}
+<script>window.pluginBitwardensendUpdateFollowupPreview();</script>

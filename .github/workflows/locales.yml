@@ -1,0 +1,63 @@
+name: Rebuild translation catalogs
+
+# Regenerates locales/*.pot, *.po and *.mo from the __()/_n() calls found in
+# PHP/Twig/JS sources. tools/build-locales.py already fails the job (with the
+# list of missing strings in the logs) if a new __() call has no entry in the
+# FR dictionary, so a stale or incomplete catalog can never be committed
+# automatically.
+#
+# Manual only (workflow_dispatch): run it by hand — e.g. `gh workflow run
+# locales.yml --ref <branch>` or "Run workflow" in the Actions UI — whenever
+# a change touches translated strings. It only PUSHES the regenerated
+# catalog when run on the default branch; on any other branch it still
+# builds and fails the same way, but never commits back.
+#
+# release.yml (the version-bump release workflow) is also manual only, so
+# there is no automatic ordering between the two: run this one first when a
+# release also needs an up-to-date catalog.
+
+on:
+  workflow_dispatch: {}
+
+# Guards against triggering this twice on the same branch before the first
+# run's commit-back step finishes — only the latest run's catalog state
+# matters, so a superseded run is cancelled instead of racing the newer
+# one's own push.
+concurrency:
+  group: locales-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-locales:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Rebuild catalogs
+        run: python3 tools/build-locales.py
+
+      - name: Commit updated catalogs
+        if: github.ref_name == github.event.repository.default_branch
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
+        run: |
+          if git diff --quiet -- locales/; then
+            echo "Locales already up to date, nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add locales/
+          git commit -m "chore(locales): rebuild translation catalogs"
+          git push origin "HEAD:$TARGET_BRANCH"

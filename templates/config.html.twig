@@ -1,0 +1,262 @@
+{#
+ -------------------------------------------------------------------------
+ Bitwarden Send plugin for GLPI
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of Bitwarden Send.
+
+ Bitwarden Send is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Bitwarden Send is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Bitwarden Send. If not, see <https://www.gnu.org/licenses/>.
+ -------------------------------------------------------------------------
+
+ @copyright Copyright (C) 2026 by IT Gouvernance.
+ @license   GPLv3+ https://www.gnu.org/licenses/gpl-3.0.html
+ @link      https://github.com/IT-Gouvernance/bitwardensend/
+ -------------------------------------------------------------------------
+#}
+{% include '@bitwardensend/assets.html.twig' %}
+<form method="post" action="{{ path('plugins/bitwardensend/front/config.form.php') }}">
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token }}">
+
+   <div class="card-body">
+
+      <div class="mb-4">
+         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <h3 class="card-title mb-0">
+               <i class="ti ti-plug-connected me-2 text-secondary"></i>{{ __('Bitwarden connection', 'bitwardensend') }}
+            </h3>
+            <span class="badge bg-blue-lt">
+               {{ conf.backend == 'serve' ? __('Local API (bw serve) — recommended', 'bitwardensend') : __('Command line binary (bw)', 'bitwardensend') }}
+            </span>
+         </div>
+
+         <div class="row mb-3">
+            <label class="col-form-label col-md-4" for="cfg_backend">{{ __('Access mode', 'bitwardensend') }}</label>
+            <div class="col-md-8">
+               <select id="cfg_backend" name="backend" class="form-select">
+                  <option value="serve" {{ conf.backend == 'serve' ? 'selected' : '' }}>
+                     {{ __('Local API (bw serve) — recommended', 'bitwardensend') }}
+                  </option>
+                  <option value="cli" {{ conf.backend == 'cli' ? 'selected' : '' }}>
+                     {{ __('Command line binary (bw)', 'bitwardensend') }}
+                  </option>
+               </select>
+            </div>
+         </div>
+
+         <div data-bws-mode="serve">
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_api_url">{{ __('Local API URL', 'bitwardensend') }}</label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}">
+                  <div class="form-hint">{{ __('For example http://127.0.0.1:8087 — never expose this port publicly.', 'bitwardensend') }}</div>
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_timeout">{{ __('Timeout (seconds)', 'bitwardensend') }}</label>
+               <div class="col-md-8">
+                  <input type="number" id="cfg_timeout" name="timeout" class="form-control" min="1" max="120" value="{{ conf.timeout }}">
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_master">
+                  <i class="ti ti-lock me-1 text-secondary"></i>{{ __('Master password', 'bitwardensend') }}
+                  <i class="ti ti-info-circle text-secondary ms-1"
+                     title="{{ __('Only needed if the vault is locked. Not required if it is already unlocked, for example if you unlocked it yourself on the server.', 'bitwardensend') }}"></i>
+               </label>
+               <div class="col-md-8">
+                  <input type="password" id="cfg_master" name="master_password" class="form-control"
+                         autocomplete="new-password"
+                         placeholder="{{ has_master_password ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                  <div class="form-hint">
+                     {{ __('Encrypted with the GLPI key. Used to unlock the vault automatically. Leave empty if you unlock the service yourself.', 'bitwardensend') }}
+                  </div>
+                  {% if has_master_password %}
+                     <label class="form-check mt-1">
+                        <input type="checkbox" class="form-check-input" name="clear_master_password" value="1">
+                        <span class="form-check-label">{{ __('Delete the stored password', 'bitwardensend') }}</span>
+                     </label>
+                  {% endif %}
+               </div>
+            </div>
+         </div>
+
+         <div data-bws-mode="cli">
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_cli_path">{{ __('Path to the bw binary', 'bitwardensend') }}</label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}">
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_appdata">BITWARDENCLI_APPDATA_DIR</label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_appdata" name="cli_appdata_dir" class="form-control" value="{{ conf.cli_appdata_dir }}">
+                  <div class="form-hint">{{ __('Client data directory, writable by the web server user.', 'bitwardensend') }}</div>
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_session">
+                  <i class="ti ti-lock me-1 text-secondary"></i>BW_SESSION
+               </label>
+               <div class="col-md-8">
+                  <input type="password" id="cfg_session" name="cli_session" class="form-control"
+                         autocomplete="new-password"
+                         placeholder="{{ has_cli_session ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                  <div class="form-hint">{{ __('Encrypted with the GLPI key.', 'bitwardensend') }}</div>
+                  {% if has_cli_session %}
+                     <label class="form-check mt-1">
+                        <input type="checkbox" class="form-check-input" name="clear_cli_session" value="1">
+                        <span class="form-check-label">{{ __('Delete the stored session', 'bitwardensend') }}</span>
+                     </label>
+                  {% endif %}
+               </div>
+            </div>
+         </div>
+
+         <div class="row">
+            <label class="col-form-label col-md-4" for="cfg_send_base">{{ __('Send link base URL', 'bitwardensend') }}</label>
+            <div class="col-md-8">
+               <input type="text" id="cfg_send_base" name="send_base_url" class="form-control" value="{{ conf.send_base_url }}">
+               <div class="form-hint">
+                  {{ __('Only used when the API does not return the access URL. Cloud: https://send.bitwarden.com/# — self-hosted: https://vault.example.com/#/send/', 'bitwardensend') }}
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="mb-4">
+         <h3 class="card-title">
+            <i class="ti ti-adjustments me-2 text-secondary"></i>{{ __('Link defaults', 'bitwardensend') }}
+         </h3>
+
+         <div class="row g-3 mb-3">
+            <div class="col-md-6">
+               <label class="form-label" for="cfg_days">{{ __('Default expiration (days)', 'bitwardensend') }}</label>
+               <input type="number" id="cfg_days" name="default_deletion_days" class="form-control"
+                      min="1" max="31" value="{{ conf.default_deletion_days }}">
+            </div>
+            <div class="col-md-6">
+               <label class="form-label" for="cfg_access">{{ __('Default maximum views', 'bitwardensend') }}</label>
+               <input type="number" id="cfg_access" name="default_max_access_count" class="form-control"
+                      min="0" max="100" value="{{ conf.default_max_access_count }}">
+               <div class="form-hint">{{ __('0 means unlimited until expiration.', 'bitwardensend') }}</div>
+            </div>
+         </div>
+
+         <div class="list-group list-group-flush border rounded">
+            <label class="list-group-item d-flex align-items-center justify-content-between">
+               <span class="form-check-label me-3">{{ __('Hide the sender email address by default', 'bitwardensend') }}</span>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="default_hide_email" value="1" {{ conf.default_hide_email ? 'checked' : '' }}>
+               </span>
+            </label>
+            <label class="list-group-item d-flex align-items-center justify-content-between">
+               <span class="form-check-label me-3">{{ __('Show a random password generator on the creation form', 'bitwardensend') }}</span>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="password_generator_enabled" value="1" {{ conf.password_generator_enabled ? 'checked' : '' }}>
+               </span>
+            </label>
+         </div>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="mb-4">
+         <h3 class="card-title">
+            <i class="ti ti-message-2 me-2 text-secondary"></i>{{ __('Followup configuration', 'bitwardensend') }}
+         </h3>
+
+         <div class="list-group list-group-flush border rounded mb-2">
+            <label class="list-group-item d-flex align-items-center justify-content-between">
+               <span class="form-check-label me-3">{{ __('Post the link as a followup by default', 'bitwardensend') }}</span>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="add_followup" value="1" {{ conf.add_followup ? 'checked' : '' }}>
+               </span>
+            </label>
+            <label class="list-group-item d-flex align-items-center justify-content-between">
+               <span class="form-check-label me-3">{{ __('Private followup by default', 'bitwardensend') }}</span>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="followup_is_private" value="1" {{ conf.followup_is_private ? 'checked' : '' }}>
+               </span>
+            </label>
+            <label class="list-group-item d-flex align-items-center justify-content-between">
+               <span class="form-check-label me-3">{{ __('Keep the link in the GLPI database', 'bitwardensend') }}</span>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="store_access_url" value="1" {{ conf.store_access_url ? 'checked' : '' }}>
+               </span>
+            </label>
+            <label class="list-group-item d-flex align-items-center justify-content-between">
+               <span class="form-check-label me-3">{{ __('Allow choosing a GLPI followup template when creating a Send', 'bitwardensend') }}</span>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="allow_glpi_followup_templates" value="1"
+                         {{ conf.allow_glpi_followup_templates ? 'checked' : '' }}>
+               </span>
+            </label>
+         </div>
+         <div class="form-hint mb-3">
+            {{ __('When disabled, GLPI only keeps metadata: the link then exists in the followup only.', 'bitwardensend') }}
+         </div>
+
+         <label class="form-label" for="cfg_template">{{ __('Followup template', 'bitwardensend') }}</label>
+         <textarea id="cfg_template" name="followup_template" class="form-control" rows="8">{{ conf.followup_template }}</textarea>
+         <div class="form-hint">
+            {{ __('Variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}', 'bitwardensend') }}
+            {{ __('This is the default text proposed when creating a Send. If the option above is enabled, the technician can instead pick one of the GLPI followup templates (Setup > Templates > Followup templates) — the same variables also work in those.', 'bitwardensend') }}
+         </div>
+      </div>
+
+      <div class="alert alert-info d-flex align-items-center mb-0">
+         <i class="ti ti-info-circle me-2"></i>
+         <div>
+            {{ __('Automatic deletion of revoked or expired entries is configured on the automatic action', 'bitwardensend') }}
+            {% if cleanup_cron_url %}
+               <a href="{{ cleanup_cron_url }}">{{ cleanup_cron_name }}</a>
+            {% else %}
+               <strong>{{ cleanup_cron_name }}</strong>
+            {% endif %}
+            {{ __('(Setup > Automatic actions).', 'bitwardensend') }}
+         </div>
+      </div>
+
+   </div>
+
+   {% if can_update %}
+      <div class="card-footer d-flex justify-content-between">
+         <button type="submit" name="test" value="1" class="btn btn-outline-secondary">
+            <i class="ti ti-plug-connected me-1"></i>{{ __('Test connection', 'bitwardensend') }}
+         </button>
+         <button type="submit" name="update" value="1" class="btn btn-primary">
+            <i class="ti ti-device-floppy me-1"></i>{{ __('Save') }}
+         </button>
+      </div>
+   {% endif %}
+</form>
+
+{# Runs after the form exists in the DOM, so the initial state is applied whether the
+   tab was loaded with the page or injected by AJAX. #}
+<script>pluginBitwardensendToggleBackend();</script>

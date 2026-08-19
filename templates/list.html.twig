@@ -1,0 +1,134 @@
+{#
+ -------------------------------------------------------------------------
+ Bitwarden Send plugin for GLPI
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of Bitwarden Send.
+
+ Bitwarden Send is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Bitwarden Send is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Bitwarden Send. If not, see <https://www.gnu.org/licenses/>.
+ -------------------------------------------------------------------------
+
+ @copyright Copyright (C) 2026 by IT Gouvernance.
+ @license   GPLv3+ https://www.gnu.org/licenses/gpl-3.0.html
+ @link      https://github.com/IT-Gouvernance/bitwardensend/
+ -------------------------------------------------------------------------
+#}
+{% include '@bitwardensend/assets.html.twig' %}
+<div class="plugin-bitwardensend-list">
+
+   {% if can_create %}
+      <div class="mb-3">
+         <button type="button" class="btn btn-primary"
+                 onclick="pluginBitwardensendDialog('{{ item.getType() }}', {{ item.getID() }});">
+            <i class="ti ti-shield-lock me-1"></i>{{ __('New Bitwarden Send', 'bitwardensend') }}
+         </button>
+      </div>
+   {% endif %}
+
+   {% if sends is empty %}
+      <div class="alert alert-info">
+         {{ __('No Bitwarden Send link has been created for this item yet.', 'bitwardensend') }}
+      </div>
+   {% else %}
+      <div class="table-responsive border rounded">
+         <table class="table table-hover mb-0">
+            <thead>
+               <tr>
+                  <th class="text-secondary">{{ __('Name') }}</th>
+                  <th class="text-secondary">{{ __('Created by', 'bitwardensend') }}</th>
+                  <th class="text-secondary">{{ __('Creation date') }}</th>
+                  <th class="text-secondary">{{ __('Expiration', 'bitwardensend') }}</th>
+                  <th class="text-secondary">{{ __('Max views', 'bitwardensend') }}</th>
+                  <th class="text-secondary">{{ __('Status') }}</th>
+                  <th></th>
+               </tr>
+            </thead>
+            <tbody>
+            {% for send in sends %}
+               <tr class="{{ (send.is_revoked or send.is_expired) ? 'text-muted' : '' }}">
+                  <td>
+                     {{ send.name }}
+                     {% if send.is_password_protected %}
+                        <i class="ti ti-key ms-1" title="{{ __('Password protected', 'bitwardensend') }}"></i>
+                     {% endif %}
+                     {% if send.access_url %}
+                        <button type="button" class="btn btn-sm btn-icon btn-ghost-secondary ms-1"
+                                onclick="pluginBitwardensendCopy(this, '{{ send.access_url|e('js') }}');"
+                                title="{{ __('Copy link', 'bitwardensend') }}">
+                           <i class="ti ti-copy"></i>
+                        </button>
+                     {% endif %}
+                  </td>
+                  <td>{{ send.user_name }}</td>
+                  <td>{{ send.date_creation_display }}</td>
+                  <td>{{ send.deletion_date_display }}</td>
+                  <td>{{ send.max_access_count ?: __('Unlimited', 'bitwardensend') }}</td>
+                  <td>
+                     {% if send.is_revoked %}
+                        <span class="badge bg-secondary">{{ __('Revoked', 'bitwardensend') }}</span>
+                     {% elseif send.is_expired %}
+                        <span class="badge bg-orange-lt">{{ __('Expired', 'bitwardensend') }}</span>
+                     {% else %}
+                        <span class="badge bg-green">{{ __('Active', 'bitwardensend') }}</span>
+                     {% endif %}
+                  </td>
+                  <td class="text-end">
+                     <div class="d-flex justify-content-end gap-1">
+                        {% if not send.is_revoked and not send.is_expired %}
+                           <form method="post" action="{{ path('plugins/bitwardensend/front/send.form.php') }}"
+                                 class="d-inline">
+                              <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token }}">
+                              <input type="hidden" name="id" value="{{ send.id }}">
+                              {# Carried as a hidden field rather than the button value, so the
+                                 form can be submitted from JavaScript without losing it. #}
+                              <input type="hidden" name="revoke" value="1">
+                              <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                      title="{{ __('Revoke', 'bitwardensend') }}"
+                                      data-bws-title="{{ __('Revoke this link?', 'bitwardensend') }}"
+                                      data-bws-message="{{ __('The link will no longer be viewable. This cannot be undone.', 'bitwardensend') }}"
+                                      data-bws-confirm="{{ __('Revoke', 'bitwardensend') }}"
+                                      data-bws-cancel="{{ __('Cancel') }}"
+                                      onclick="pluginBitwardensendConfirm(this);">
+                                 <i class="ti ti-ban"></i>
+                              </button>
+                           </form>
+                        {% endif %}
+                        {% if can_purge and (send.is_revoked or send.is_expired) %}
+                           <form method="post" action="{{ path('plugins/bitwardensend/front/send.form.php') }}"
+                                 class="d-inline">
+                              <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token }}">
+                              <input type="hidden" name="id" value="{{ send.id }}">
+                              <input type="hidden" name="purge" value="1">
+                              <button type="button" class="btn btn-sm btn-icon btn-outline-secondary"
+                                      title="{{ __('Delete') }}"
+                                      data-bws-title="{{ __('Delete this entry?', 'bitwardensend') }}"
+                                      data-bws-message="{{ __('This only removes the record from GLPI. This cannot be undone.', 'bitwardensend') }}"
+                                      data-bws-confirm="{{ __('Delete') }}"
+                                      data-bws-cancel="{{ __('Cancel') }}"
+                                      onclick="pluginBitwardensendConfirm(this);">
+                                 <i class="ti ti-trash"></i>
+                              </button>
+                           </form>
+                        {% endif %}
+                     </div>
+                  </td>
+               </tr>
+            {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   {% endif %}
+</div>
