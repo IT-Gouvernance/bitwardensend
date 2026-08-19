@@ -75,7 +75,8 @@ class Profile extends \Profile
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if ($item instanceof \Profile && !$item->isNewItem() && Session::haveRight('profile', READ)) {
+        if ($item instanceof \Profile && !$item->isNewItem() && Session::haveRight('profile', READ)
+            && self::isCentralInterface($item)) {
             return self::createTabEntry(Send::getTypeName(0), 0, self::class, Send::getIcon());
         }
         return '';
@@ -83,10 +84,23 @@ class Profile extends \Profile
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof \Profile && !$item->isNewItem()) {
+        if ($item instanceof \Profile && !$item->isNewItem() && self::isCentralInterface($item)) {
             self::showForProfile((int) $item->getID());
         }
         return true;
+    }
+
+    /**
+     * These rights only ever matter for the "central" interface: the plugin's own
+     * tab and timeline action are never rendered under the simplified/self-service
+     * ("helpdesk") interface, no matter what a profile is granted there — GLPI does
+     * not surface plugin tabs on that interface. Showing this rights tab on a
+     * helpdesk profile would just be a control with no visible effect once
+     * assigned.
+     */
+    private static function isCentralInterface(\Profile $profile): bool
+    {
+        return ($profile->fields['interface'] ?? 'central') === 'central';
     }
 
     /**

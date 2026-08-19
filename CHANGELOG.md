@@ -65,3 +65,10 @@ Initial release.
   (consistent styling, no plugin CSS needed) and its form opens inline in the timeline
   instead of a popup. The "Bitwarden Sends" tab keeps its own popup-based creation
   button as a second entry point to the same form.
+- The Revoke icon in the "Bitwarden Sends" tab showed up regardless of rights (the
+  server already blocked the action itself); it now only appears when the profile has
+  the UPDATE right, matching how the Delete icon already behaved for PURGE.
+- The plugin's rights tab on Administration > Profiles showed up for simplified
+  ("helpdesk") interface profiles too, even though this plugin's tab and timeline
+  action never render under that interface — any rights granted there could never
+  have a visible effect. That tab is now limited to "central" interface profiles.
