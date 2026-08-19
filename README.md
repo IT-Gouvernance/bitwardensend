@@ -26,11 +26,24 @@ Release history: see [CHANGELOG.md](CHANGELOG.md).
 - Dedicated right `plugin_bitwardensend_send` (Administration > Profiles).
 - Configuration secrets encrypted with the GLPI key.
 
+## Send driver
+
+The plugin creates Sends through one of two drivers, chosen on the configuration page:
+
+- **CLI** (default) — drives the official `bw` client, either through its local API
+  (`bw serve`) or by invoking the binary directly. Requires shell/system access on the
+  GLPI server to install and run that client — see "Server prerequisites" below.
+- **Native** — talks to the Bitwarden API directly in PHP, with no external binary at
+  all. The only option on hosts where the CLI driver's shell access is not available,
+  e.g. GLPI Cloud. See "Native driver" below for its own setup and one real limitation
+  (PBKDF2-only accounts).
+
 ## Server prerequisites
 
 Bitwarden does not expose Send creation through its public organization API, so the
-plugin drives the official `bw` client, either through the **local API** (recommended)
-or by invoking the binary directly.
+CLI driver drives the official `bw` client, either through the **local API**
+(recommended) or by invoking the binary directly. Skip this whole section if you are
+using the native driver instead.
 
 ```bash
 # 1. Install the client
@@ -74,6 +87,26 @@ sudo systemctl enable --now bw-serve
 Port 8087 must **never** be reachable from outside the host: anyone who reaches it
 controls the vault with no authentication.
 
+## Native driver
+
+No server-side installation: everything below is entered directly on the plugin's
+configuration page.
+
+1. Create a **dedicated** Bitwarden service account for this plugin — never your own.
+   GLPI stores this account's credentials (encrypted with the GLPI key), so it needs to
+   be one you can revoke independently of any real person's account.
+2. Set that account's KDF to **PBKDF2** (not Argon2id) when creating it. This is a hard
+   requirement, not a preference: PHP's `sodium` extension cannot reproduce Bitwarden's
+   Argon2id key derivation (it salts with a 32-byte value; PHP's Argon2id function
+   accepts only 16), so an Argon2id account simply cannot work with this driver. There
+   is no workaround short of the CLI driver.
+3. Generate that account's API key (client ID + secret) from its Bitwarden settings.
+4. On the plugin's configuration page, set **Send driver** to "Native (PHP only)" and
+   fill in the API client ID/secret, the account's email and master password, and the
+   Identity/API/Web vault URLs (pre-filled for Bitwarden's cloud — adjust all three for
+   a self-hosted server or Vaultwarden).
+5. **Test connection**.
+
 ## Plugin installation
 
 Download the latest release archive (`glpi-bitwardensend-<version>.tar.bz2`, from the
@@ -94,16 +127,21 @@ Setup > General > **Bitwarden Send** tab:
 
 | Setting | Purpose |
 |---|---|
-| Access mode | `serve` (local HTTP API) or `cli` (binary invocation) |
-| Local API URL | `http://127.0.0.1:8087` |
-| Master password | optional, encrypted; enables automatic vault unlocking |
-| BW_SESSION | CLI mode only, encrypted |
-| Send link base URL | fallback when the API does not return the access URL |
+| Send driver | `cli` (default) or `native` — see "Send driver" above |
+| Access mode | CLI driver only: `serve` (local HTTP API) or `cli` (binary invocation) |
+| Local API URL | CLI driver, `serve` mode: `http://127.0.0.1:8087` |
+| Master password | CLI driver, optional, encrypted; enables automatic vault unlocking |
+| BW_SESSION | CLI driver, `cli` mode only, encrypted |
+| Send link base URL | CLI driver: fallback when the API does not return the access URL |
+| Identity/API/Web vault URL | Native driver: Bitwarden endpoints — pre-filled for the cloud |
+| API client ID/secret, account email, master password | Native driver's service account — see "Native driver" above |
 | Link defaults | expiration, max views, followup behaviour, template |
 | Allow GLPI followup templates | lets technicians pick one of GLPI's own followup templates instead of the template above |
 
-**Test connection** reports the vault status (`unlocked`, `locked`,
-`unauthenticated`) and attempts an unlock when a master password is stored.
+**Test connection**: for the CLI driver, reports the vault status (`unlocked`,
+`locked`, `unauthenticated`) and attempts an unlock when a master password is stored;
+for the native driver, authenticates and unlocks the account key, reporting success or
+the specific failure (e.g. wrong master password, unreachable API).
 
 Then grant the right in Administration > Profiles > *your profile* > the plugin's
 rights tab. Note that "See the Bitwarden Sends tab" needs to stay checked for the other
@@ -131,8 +169,11 @@ Bitwarden Send**, like any other GLPI scheduled action:
 - Turn off "Keep the link in the GLPI database" so GLPI stores metadata only. Copying
   the link from the tab is then no longer possible.
 - A master password stored in GLPI grants access to the service account vault: use a
-  dedicated account holding nothing beyond what is needed.
+  dedicated account holding nothing beyond what is needed. This applies to both
+  drivers — the native driver's own service account needs the same isolation.
 - **File** Sends are not supported in this version (text only).
+- The native driver only supports service accounts using the PBKDF2 KDF — see "Native
+  driver" above for why.
 
 ## Rich text followup
 
