@@ -1,0 +1,25 @@
+{
+    "name": "it-gouvernance/bitwardensend",
+    "description": "Bitwarden Send plugin for GLPI",
+    "license": "GPL-3.0-or-later",
+    "type": "glpi-plugin",
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "GlpiPlugin\\Bitwardensend\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GlpiPlugin\\Bitwardensend\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Runs the plugin's standalone unit tests — the cryptographic primitives
+ only (EncString, SendCrypto). These have no GLPI dependency at all (no
+ $DB, no Session, no bootstrap), unlike the rest of the plugin, so they can
+ run with nothing more than `composer install && vendor/bin/phpunit`.
+
+ The integration test (a real Send created and read back against a live
+ Bitwarden account) also lives under tests/ so it runs with the same
+ command, but it is opt-in: it calls markTestSkipped() in its own setUp()
+ unless the environment variables it needs are set — see that file's own
+ header for how to run it for real. It is not excluded from this config;
+ skipping is the test's own responsibility so running it locally is just
+ a matter of exporting those variables, no separate command needed.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="crypto">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
