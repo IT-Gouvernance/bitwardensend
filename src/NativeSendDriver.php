@@ -402,7 +402,21 @@ class NativeSendDriver implements SendDriverInterface
         if ($body !== null) {
             $options[CURLOPT_POSTFIELDS] = $body;
         }
-        $options[CURLOPT_HTTPHEADER] = array_merge(['Accept: application/json'], $headers);
+        $options[CURLOPT_HTTPHEADER] = array_merge(
+            [
+                'Accept: application/json',
+                // Confirmed required against a live account: without it, the
+                // API refuses the request outright ("No client version
+                // header found, required to prevent encryption errors").
+                // Bitwarden's own clients use their real release version
+                // here (format yyyy.mm.r); this plugin is not one of them,
+                // so this is just a recent-looking value to satisfy whatever
+                // minimum-version gate is behind that check — bump it if a
+                // future server rejects it as too old.
+                'Bitwarden-Client-Version: 2025.6.0',
+            ],
+            $headers
+        );
 
         curl_setopt_array($handle, $options);
 

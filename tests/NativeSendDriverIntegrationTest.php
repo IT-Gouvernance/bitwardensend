@@ -198,7 +198,12 @@ final class NativeSendDriverIntegrationTest extends TestCase
             CURLOPT_TIMEOUT        => 15,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+            // Same requirement as NativeSendDriver's own httpRequest() — see
+            // its comment for why this specific value.
+            CURLOPT_HTTPHEADER     => [
+                'Accept: application/json',
+                'Bitwarden-Client-Version: 2025.6.0',
+            ],
         ]);
         $raw = curl_exec($handle);
         $code = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
