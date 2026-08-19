@@ -93,6 +93,14 @@ class Config extends CommonDBTM
             'followup_template'              => Send::getDefaultFollowupTemplate(),
             'allow_glpi_followup_templates'  => 1,
             'password_generator_enabled'     => 1,
+            'send_driver'                    => 'cli',
+            'native_identity_url'            => 'https://identity.bitwarden.com',
+            'native_api_url'                 => 'https://api.bitwarden.com',
+            'native_web_vault_url'           => 'https://vault.bitwarden.com',
+            'native_client_id'               => '',
+            'native_email'                   => '',
+            'native_client_secret'           => '',
+            'native_master_password'         => '',
         ];
 
         $row = [];
@@ -128,6 +136,28 @@ class Config extends CommonDBTM
     public static function getCliSession(): string
     {
         return self::decrypt((string) (self::getConfig()['cli_session'] ?? ''));
+    }
+
+    /**
+     * Decrypted API client secret for the native driver's service account.
+     */
+    public static function getNativeClientSecret(): string
+    {
+        return self::decrypt((string) (self::getConfig()['native_client_secret'] ?? ''));
+    }
+
+    /**
+     * Decrypted master password for the native driver's service account.
+     *
+     * A distinct secret from master_password above: that one unlocks
+     * whatever account the CLI/`bw serve` is already logged into on the
+     * server, this one belongs to the account the native driver
+     * authenticates as itself — the two drivers are not assumed to share
+     * an account.
+     */
+    public static function getNativeMasterPassword(): string
+    {
+        return self::decrypt((string) (self::getConfig()['native_master_password'] ?? ''));
     }
 
     private static function decrypt(string $value): string
@@ -176,6 +206,13 @@ class Config extends CommonDBTM
             'followup_template'             => (string) ($input['followup_template'] ?? ''),
             'allow_glpi_followup_templates' => !empty($input['allow_glpi_followup_templates']) ? 1 : 0,
             'password_generator_enabled'    => !empty($input['password_generator_enabled']) ? 1 : 0,
+            'send_driver'                   => in_array($input['send_driver'] ?? 'cli', ['cli', 'native'], true)
+                                                 ? $input['send_driver'] : 'cli',
+            'native_identity_url'           => rtrim(trim((string) ($input['native_identity_url'] ?? '')), '/'),
+            'native_api_url'                => rtrim(trim((string) ($input['native_api_url'] ?? '')), '/'),
+            'native_web_vault_url'          => rtrim(trim((string) ($input['native_web_vault_url'] ?? '')), '/'),
+            'native_client_id'              => trim((string) ($input['native_client_id'] ?? '')),
+            'native_email'                  => trim((string) ($input['native_email'] ?? '')),
             'date_mod'                      => $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s'),
         ];
 
@@ -186,11 +223,23 @@ class Config extends CommonDBTM
         if (($input['cli_session'] ?? '') !== '') {
             $fields['cli_session'] = self::encrypt((string) $input['cli_session']);
         }
+        if (($input['native_client_secret'] ?? '') !== '') {
+            $fields['native_client_secret'] = self::encrypt((string) $input['native_client_secret']);
+        }
+        if (($input['native_master_password'] ?? '') !== '') {
+            $fields['native_master_password'] = self::encrypt((string) $input['native_master_password']);
+        }
         if (!empty($input['clear_master_password'])) {
             $fields['master_password'] = '';
         }
         if (!empty($input['clear_cli_session'])) {
             $fields['cli_session'] = '';
+        }
+        if (!empty($input['clear_native_client_secret'])) {
+            $fields['native_client_secret'] = '';
+        }
+        if (!empty($input['clear_native_master_password'])) {
+            $fields['native_master_password'] = '';
         }
 
         if (self::countRows() === 0) {
@@ -252,13 +301,15 @@ class Config extends CommonDBTM
         $conf = self::getConfig(true);
 
         TemplateRenderer::getInstance()->display('@bitwardensend/config.html.twig', [
-            'conf'                => $conf,
-            'has_master_password' => self::getMasterPassword() !== '',
-            'has_cli_session'     => self::getCliSession() !== '',
-            'cleanup_cron_url'    => Send::getCleanupCronUrl(),
-            'cleanup_cron_name'   => Send::getTypeName(1) . ' — cleanup',
-            'csrf_token'          => Session::getNewCSRFToken(),
-            'can_update'          => Session::haveRight('config', UPDATE),
+            'conf'                          => $conf,
+            'has_master_password'           => self::getMasterPassword() !== '',
+            'has_cli_session'               => self::getCliSession() !== '',
+            'has_native_client_secret'      => self::getNativeClientSecret() !== '',
+            'has_native_master_password'    => self::getNativeMasterPassword() !== '',
+            'cleanup_cron_url'              => Send::getCleanupCronUrl(),
+            'cleanup_cron_name'             => Send::getTypeName(1) . ' — cleanup',
+            'csrf_token'                    => Session::getNewCSRFToken(),
+            'can_update'                    => Session::haveRight('config', UPDATE),
         ]);
     }
 

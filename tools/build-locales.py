@@ -167,7 +167,11 @@ FR = {
         '(Configuration > Actions automatiques).',
     '0 means unlimited until expiration.':
         "0 signifie illimité jusqu'à l'expiration.",
+    'API URL': "URL de l'API",
+    'API client ID': "ID client de l'API",
+    'API client secret': "Secret client de l'API",
     'Access mode': "Mode d'accès",
+    'Account email': 'E-mail du compte',
     'Active': 'Actif',
     'Advanced options': 'Options avancées',
     'Allow choosing a GLPI followup template when creating a Send':
@@ -198,6 +202,7 @@ FR = {
     'Bitwarden identity URL is not configured.':
         "L'URL d'identité Bitwarden n'est pas configurée.",
     'Cannot reach the Bitwarden API (%s)': "Impossible de joindre l'API Bitwarden (%s)",
+    'CLI / bw serve': 'CLI / bw serve',
     'Client data directory, writable by the web server user.':
         'Répertoire de données du client, accessible en écriture par '
         "l'utilisateur du serveur web.",
@@ -221,6 +226,7 @@ FR = {
     'Delete revoked or expired Bitwarden Send entries past the configured retention':
         "Supprime les entrées Bitwarden Send révoquées ou expirées au-delà de la durée de rétention configurée",
     'Delete the stored password': 'Supprimer le mot de passe enregistré',
+    'Delete the stored secret': 'Supprimer le secret enregistré',
     'Delete the stored session': 'Supprimer la session enregistrée',
     'Delete this entry?': 'Supprimer cette entrée ?',
     'Encrypted with the GLPI key. Used to unlock the vault automatically. '
@@ -228,6 +234,8 @@ FR = {
         'Chiffré avec la clé GLPI. Sert à déverrouiller automatiquement le coffre. '
         'Laissez vide si vous déverrouillez le service vous-même.',
     'Encrypted with the GLPI key.': 'Chiffré avec la clé GLPI.',
+    'Encrypted with the GLPI key. PBKDF2 accounts only — see the README.':
+        'Chiffré avec la clé GLPI. Comptes PBKDF2 uniquement — voir le README.',
     'Expiration': 'Expiration',
     'Expired': 'Expiré',
     'Expires in': 'Expire dans',
@@ -237,6 +245,10 @@ FR = {
     'For example http://127.0.0.1:8087 — never expose this port publicly.':
         "Par exemple http://127.0.0.1:8087 — n'exposez jamais ce port publiquement.",
     'GLPI followup templates': 'Gabarits de suivi GLPI',
+    'GLPI will store this account\'s credentials (encrypted). Use a dedicated, '
+    'revocable service account — never your own.':
+        'GLPI conservera les identifiants de ce compte (chiffrés). Utilisez un '
+        'compte de service dédié et révocable — jamais le vôtre.',
     'Generate a password': 'Générer un mot de passe',
     'Generate a random password': 'Générer un mot de passe aléatoire',
     TPL_EN: TPL_FR,
@@ -246,6 +258,7 @@ FR = {
         "Masquer par défaut l'adresse e-mail de l'expéditeur",
     'Hide the text by default when opened':
         "Masquer le texte par défaut à l'ouverture",
+    'Identity URL': "URL d'identité",
     'Item not found or access denied.': 'Élément introuvable ou accès refusé.',
     'Keep the link in the GLPI database': 'Conserver le lien dans la base GLPI',
     'Leave empty to require none': "Laissez vide pour n'en exiger aucun",
@@ -260,6 +273,12 @@ FR = {
     'Master password': 'Mot de passe maître',
     'Max views': 'Ouvertures max.',
     'Maximum number of views': "Nombre maximal d'ouvertures",
+    'Native (PHP only)': 'Natif (PHP uniquement)',
+    'Native works without shell access on the server (e.g. GLPI Cloud) but only '
+    'supports service accounts using the PBKDF2 KDF — see the README.':
+        "Le mode natif fonctionne sans accès shell au serveur (par exemple GLPI "
+        "Cloud), mais ne prend en charge que les comptes de service en KDF "
+        'PBKDF2 — voir le README.',
     'New Bitwarden Send': 'Nouveau Bitwarden Send',
     'No BW_SESSION value is configured for CLI mode.':
         "Aucune valeur BW_SESSION n'est configurée pour le mode CLI.",
@@ -305,6 +324,9 @@ FR = {
     'The link will no longer be viewable. This cannot be undone.':
         'Le lien ne sera plus consultable. Cette action est irréversible.',
     'Revoked': 'Révoqué',
+    'Self-hosted or Vaultwarden: adjust these three URLs.':
+        'Auto-hébergé ou Vaultwarden : ajustez ces trois URL.',
+    'Send driver': 'Driver de Send',
     'Send it over another channel, by phone or text message for instance.':
         'Transmettez-le par un autre canal, par téléphone ou SMS par exemple.',
     'Send link base URL': 'URL de base des liens Send',
@@ -374,6 +396,7 @@ FR = {
     'own link), {expiration}, {max_access}':
         'Variables : {url} (lien prêt à cliquer), {url_raw} (juste l\'adresse, pour '
         "votre propre lien), {expiration}, {max_access}",
+    'Web vault URL': 'URL du coffre web',
     'When disabled, GLPI only keeps metadata: '
     'the link then exists in the followup only.':
         'Désactivé, GLPI ne conserve que les métadonnées : '

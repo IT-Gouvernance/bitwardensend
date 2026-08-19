@@ -57,6 +57,7 @@ if (isset($_POST['test'])) {
 
         switch ($status) {
             case 'unlocked':
+            case 'ok':
                 Session::addMessageAfterRedirect(
                     __('Connected, vault unlocked. The plugin is ready to use.', 'bitwardensend'),
                     true,

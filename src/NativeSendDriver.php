@@ -42,10 +42,9 @@ use RuntimeException;
  *
  * Config field names (native_identity_url, native_api_url, ...) and the
  * Config::getNativeClientSecret()/getNativeMasterPassword() decrypting
- * getters this class calls are wired up in Config.php together with the
- * rest of the native driver's configuration screen — see that commit for
- * the schema. Until then this class exists but nothing constructs it
- * through the normal config flow.
+ * getters this class defaults its two secret constructor parameters to
+ * are wired up in Config.php together with the rest of the native driver's
+ * configuration screen — see that commit for the schema.
  *
  * The /connect/token response field names below (Key, Kdf, KdfIterations,
  * access_token, ...) could not be confirmed against a live call during
@@ -61,13 +60,25 @@ class NativeSendDriver implements SendDriverInterface
 {
     /** @var array<string,mixed> */
     private array $conf;
+    private string $clientSecret;
+    private string $masterPassword;
 
     /**
+     * $clientSecret/$masterPassword default to Config's own decrypting
+     * getters (the normal path, used by SendDriverFactory) but can be
+     * passed explicitly instead — the only way this class touches GLPI at
+     * all is through those two getters and Config::getConfig(), so
+     * supplying all three directly (as the opt-in integration test does,
+     * from plain environment variables) makes this class fully usable with
+     * no GLPI bootstrap.
+     *
      * @param array<string,mixed>|null $conf
      */
-    public function __construct(?array $conf = null)
+    public function __construct(?array $conf = null, ?string $clientSecret = null, ?string $masterPassword = null)
     {
         $this->conf = $conf ?? Config::getConfig();
+        $this->clientSecret = $clientSecret ?? Config::getNativeClientSecret();
+        $this->masterPassword = $masterPassword ?? Config::getNativeMasterPassword();
     }
 
     public function isAvailable(): bool
@@ -82,7 +93,7 @@ class NativeSendDriver implements SendDriverInterface
             }
         }
 
-        return Config::getNativeClientSecret() !== '' && Config::getNativeMasterPassword() !== '';
+        return $this->clientSecret !== '' && $this->masterPassword !== '';
     }
 
     public function testConnection(): string
@@ -218,7 +229,7 @@ class NativeSendDriver implements SendDriverInterface
 
         $kdfType = ((int) $token['kdf']) === 0 ? 'pbkdf2' : 'argon2id';
 
-        $masterPassword = Config::getNativeMasterPassword();
+        $masterPassword = $this->masterPassword;
         if ($masterPassword === '') {
             throw new RuntimeException(__(
                 'No master password is configured for the native driver.',
@@ -289,7 +300,7 @@ class NativeSendDriver implements SendDriverInterface
         }
 
         $clientId = (string) ($this->conf['native_client_id'] ?? '');
-        $clientSecret = Config::getNativeClientSecret();
+        $clientSecret = $this->clientSecret;
         if ($clientId === '' || $clientSecret === '') {
             throw new RuntimeException(__(
                 'Bitwarden API client credentials are not configured.',

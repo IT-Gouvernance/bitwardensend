@@ -368,6 +368,27 @@
    };
 
    /**
+    * Show only the connection fields for the selected Send driver (cli vs
+    * native) — same mechanism as pluginBitwardensendToggleBackend() above,
+    * a separate attribute/select pair since the two choices are
+    * independent (backend only matters within the "cli" driver).
+    */
+   window.pluginBitwardensendToggleSendDriver = function () {
+      var select = document.getElementById('cfg_send_driver');
+      if (!select) {
+         return;
+      }
+
+      var driver = select.value;
+      var rows = document.querySelectorAll('[data-bws-driver]');
+
+      Array.prototype.forEach.call(rows, function (row) {
+         var applies = row.getAttribute('data-bws-driver').split(/\s+/);
+         row.style.display = applies.indexOf(driver) === -1 ? 'none' : '';
+      });
+   };
+
+   /**
     * Copy a link to the clipboard.
     */
    window.pluginBitwardensendCopy = function (button, value) {
@@ -653,6 +674,11 @@
 
       if (event.target.id === 'cfg_backend') {
          window.pluginBitwardensendToggleBackend();
+         return;
+      }
+
+      if (event.target.id === 'cfg_send_driver') {
+         window.pluginBitwardensendToggleSendDriver();
          return;
       }
 
