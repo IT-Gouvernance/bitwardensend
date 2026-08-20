@@ -434,16 +434,27 @@ class NativeSendDriver implements SendDriverInterface
         }
 
         $decoded = json_decode((string) $raw, true);
+
+        if ($code < 200 || $code >= 300) {
+            $message = is_array($decoded)
+                ? (string) ($decoded['error_description'] ?? $decoded['message'] ?? $decoded['error'] ?? $code)
+                : (string) $code;
+            throw new RuntimeException(sprintf(__('Bitwarden API error: %s', 'bitwardensend'), $message));
+        }
+
+        // Some successful responses have no body at all (e.g. DELETE
+        // /sends/{id} returns HTTP 200/204 with nothing to decode) — that is
+        // not an error, callers that need fields (createSend, the token
+        // endpoint) already check for them explicitly below.
+        if ($raw === '' || $raw === false) {
+            return [];
+        }
+
         if (!is_array($decoded)) {
             throw new RuntimeException(sprintf(
                 __('Unexpected response from the Bitwarden API (HTTP %d)', 'bitwardensend'),
                 $code
             ));
-        }
-
-        if ($code < 200 || $code >= 300) {
-            $message = (string) ($decoded['error_description'] ?? $decoded['message'] ?? $decoded['error'] ?? $code);
-            throw new RuntimeException(sprintf(__('Bitwarden API error: %s', 'bitwardensend'), $message));
         }
 
         return $decoded;
