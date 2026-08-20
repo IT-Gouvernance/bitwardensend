@@ -78,12 +78,6 @@ function plugin_bitwardensend_install(): bool
         $DB->doQuery($query);
     }
 
-    // No upgrade path between beta versions: the CREATE TABLE above already
-    // carries every column, and betas are meant to be uninstalled/reinstalled
-    // rather than migrated in place. A real migration step (Migration::addField()
-    // and friends) belongs here again once the plugin reaches a stable 1.0.0
-    // that third parties actually upgrade between releases.
-
     $sends_table = Send::getTable();
     if (!$DB->tableExists($sends_table)) {
         $query = "CREATE TABLE `$sends_table` (
