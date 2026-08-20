@@ -208,6 +208,8 @@
          var applies = row.getAttribute('data-bws-mode').split(/\s+/);
          row.style.display = applies.indexOf(mode) === -1 ? 'none' : '';
       });
+
+      window.pluginBitwardensendUpdateRequiredFields();
    };
 
    /**
@@ -228,6 +230,31 @@
       Array.prototype.forEach.call(rows, function (row) {
          var applies = row.getAttribute('data-bws-driver').split(/\s+/);
          row.style.display = applies.indexOf(driver) === -1 ? 'none' : '';
+      });
+
+      window.pluginBitwardensendUpdateRequiredFields();
+   };
+
+   /**
+    * Keep the "required" property in sync with actual visibility.
+    *
+    * A field can carry the HTML required attribute while sitting inside a
+    * data-bws-mode/data-bws-driver row that is currently display:none — the
+    * browser still counts it during constraint validation (display:none does
+    * NOT exempt a field from that, only e.g. type="hidden" or disabled do),
+    * but can't focus it to report the error, so it just logs "An invalid
+    * form control is not focusable" to the console and silently refuses to
+    * submit. Fields opt in with data-bws-required="1" (or "0" for a secret
+    * that is only required until a value is already stored server-side);
+    * this runs after every visibility change so only the fields actually
+    * showing on screen can ever carry "required".
+    */
+   window.pluginBitwardensendUpdateRequiredFields = function () {
+      var fields = document.querySelectorAll('[data-bws-required]');
+
+      Array.prototype.forEach.call(fields, function (field) {
+         var wanted = field.getAttribute('data-bws-required') === '1';
+         field.required = wanted && field.offsetParent !== null;
       });
    };
 

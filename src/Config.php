@@ -181,6 +181,64 @@ class Config extends CommonDBTM
     }
 
     /**
+     * Check that every field the currently selected driver/mode actually
+     * needs at runtime is filled in, so a broken configuration is caught
+     * on the config page instead of surfacing later as a Send failure.
+     *
+     * Mirrors the checks NativeSendDriver and CliSendDriver already do at
+     * runtime — kept in sync manually since the two live in different
+     * classes and one cannot depend on the other's internals.
+     *
+     * @param array<string,mixed> $input
+     * @return list<string> translated labels of the missing fields, empty when input is valid
+     */
+    public static function validateInput(array $input): array
+    {
+        $errors = [];
+
+        $driver = in_array($input['send_driver'] ?? 'cli', ['cli', 'native'], true)
+            ? $input['send_driver'] : 'cli';
+
+        if ($driver === 'cli') {
+            $backend = in_array($input['backend'] ?? 'serve', ['serve', 'cli'], true)
+                ? $input['backend'] : 'serve';
+
+            if ($backend === 'serve' && trim((string) ($input['api_url'] ?? '')) === '') {
+                $errors[] = __('Local API URL', 'bitwardensend');
+            }
+            if ($backend === 'cli' && trim((string) ($input['cli_path'] ?? '')) === '') {
+                $errors[] = __('Path to the bw binary', 'bitwardensend');
+            }
+            return $errors;
+        }
+
+        $requiredNative = [
+            'native_identity_url'  => __('Identity URL', 'bitwardensend'),
+            'native_api_url'       => __('API URL', 'bitwardensend'),
+            'native_web_vault_url' => __('Web vault URL', 'bitwardensend'),
+            'native_client_id'     => __('API client ID', 'bitwardensend'),
+            'native_email'         => __('Account email', 'bitwardensend'),
+        ];
+        foreach ($requiredNative as $field => $label) {
+            if (trim((string) ($input[$field] ?? '')) === '') {
+                $errors[] = $label;
+            }
+        }
+
+        $hasClientSecret = self::getNativeClientSecret() !== '' && empty($input['clear_native_client_secret']);
+        if (trim((string) ($input['native_client_secret'] ?? '')) === '' && !$hasClientSecret) {
+            $errors[] = __('API client secret', 'bitwardensend');
+        }
+
+        $hasMasterPassword = self::getNativeMasterPassword() !== '' && empty($input['clear_native_master_password']);
+        if (trim((string) ($input['native_master_password'] ?? '')) === '' && !$hasMasterPassword) {
+            $errors[] = __('Master password', 'bitwardensend');
+        }
+
+        return $errors;
+    }
+
+    /**
      * Save the configuration coming from the form.
      *
      * @param array<string,mixed> $input
