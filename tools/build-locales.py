@@ -202,7 +202,7 @@ FR = {
     'Bitwarden identity URL is not configured.':
         "L'URL d'identité Bitwarden n'est pas configurée.",
     'Cannot reach the Bitwarden API (%s)': "Impossible de joindre l'API Bitwarden (%s)",
-    'CLI / bw serve': 'CLI / bw serve',
+    'CLI / bw serve — recommended': 'CLI / bw serve — recommandé',
     'Client data directory, writable by the web server user.':
         'Répertoire de données du client, accessible en écriture par '
         "l'utilisateur du serveur web.",
