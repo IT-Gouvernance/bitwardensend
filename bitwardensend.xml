@@ -27,6 +27,11 @@
          <compatibility>~11.0</compatibility>
          <download_url>https://github.com/IT-Gouvernance/bitwardensend/releases/download/v1.0.0-beta1/glpi-bitwardensend-1.0.0-beta1.tar.bz2</download_url>
       </version>
+      <version>
+         <num>1.0.0-beta2</num>
+         <compatibility>~11.0</compatibility>
+         <download_url>https://github.com/IT-Gouvernance/bitwardensend/releases/download/v1.0.0-beta2/glpi-bitwardensend-1.0.0-beta2.tar.bz2</download_url>
+      </version>
    </versions>
    <langs>
       <lang>en_GB</lang>
