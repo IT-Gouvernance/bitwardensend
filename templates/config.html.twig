@@ -38,104 +38,241 @@
                <i class="ti ti-plug-connected me-2 text-secondary"></i>{{ __('Bitwarden connection', 'bitwardensend') }}
             </h3>
             <span class="badge bg-blue-lt">
-               {{ conf.backend == 'serve' ? __('Local API (bw serve) — recommended', 'bitwardensend') : __('Command line binary (bw)', 'bitwardensend') }}
+               {% if conf.send_driver == 'native' %}
+                  {{ __('Native (PHP only)', 'bitwardensend') }}
+               {% elseif conf.backend == 'serve' %}
+                  {{ __('Local API (bw serve) — recommended', 'bitwardensend') }}
+               {% else %}
+                  {{ __('Command line binary (bw)', 'bitwardensend') }}
+               {% endif %}
             </span>
          </div>
 
          <div class="row mb-3">
-            <label class="col-form-label col-md-4" for="cfg_backend">{{ __('Access mode', 'bitwardensend') }}</label>
+            <label class="col-form-label col-md-4" for="cfg_send_driver">
+               <i class="ti ti-route me-1 text-secondary"></i>{{ __('Send driver', 'bitwardensend') }}
+            </label>
             <div class="col-md-8">
-               <select id="cfg_backend" name="backend" class="form-select">
-                  <option value="serve" {{ conf.backend == 'serve' ? 'selected' : '' }}>
-                     {{ __('Local API (bw serve) — recommended', 'bitwardensend') }}
+               <select id="cfg_send_driver" name="send_driver" class="form-select">
+                  <option value="cli" {{ conf.send_driver == 'cli' ? 'selected' : '' }}>
+                     {{ __('CLI / bw serve — recommended', 'bitwardensend') }}
                   </option>
-                  <option value="cli" {{ conf.backend == 'cli' ? 'selected' : '' }}>
-                     {{ __('Command line binary (bw)', 'bitwardensend') }}
+                  <option value="native" {{ conf.send_driver == 'native' ? 'selected' : '' }}>
+                     {{ __('Native (PHP only)', 'bitwardensend') }}
                   </option>
                </select>
+               <div class="form-hint" data-bws-driver="native">
+                  {{ __('Native works without shell access on the server (e.g. GLPI Cloud) but only supports service accounts using the PBKDF2 KDF — see the README.', 'bitwardensend') }}
+               </div>
             </div>
          </div>
 
-         <div data-bws-mode="serve">
+         <div data-bws-driver="cli">
             <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_api_url">{{ __('Local API URL', 'bitwardensend') }}</label>
-               <div class="col-md-8">
-                  <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}">
-                  <div class="form-hint">{{ __('For example http://127.0.0.1:8087 — never expose this port publicly.', 'bitwardensend') }}</div>
-               </div>
-            </div>
-
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_timeout">{{ __('Timeout (seconds)', 'bitwardensend') }}</label>
-               <div class="col-md-8">
-                  <input type="number" id="cfg_timeout" name="timeout" class="form-control" min="1" max="120" value="{{ conf.timeout }}">
-               </div>
-            </div>
-
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_master">
-                  <i class="ti ti-lock me-1 text-secondary"></i>{{ __('Master password', 'bitwardensend') }}
-                  <i class="ti ti-info-circle text-secondary ms-1"
-                     title="{{ __('Only needed if the vault is locked. Not required if it is already unlocked, for example if you unlocked it yourself on the server.', 'bitwardensend') }}"></i>
+               <label class="col-form-label col-md-4" for="cfg_backend">
+                  <i class="ti ti-adjustments-horizontal me-1 text-secondary"></i>{{ __('Access mode', 'bitwardensend') }}
                </label>
                <div class="col-md-8">
-                  <input type="password" id="cfg_master" name="master_password" class="form-control"
-                         autocomplete="new-password"
-                         placeholder="{{ has_master_password ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
-                  <div class="form-hint">
-                     {{ __('Encrypted with the GLPI key. Used to unlock the vault automatically. Leave empty if you unlock the service yourself.', 'bitwardensend') }}
+                  <select id="cfg_backend" name="backend" class="form-select">
+                     <option value="serve" {{ conf.backend == 'serve' ? 'selected' : '' }}>
+                        {{ __('Local API (bw serve) — recommended', 'bitwardensend') }}
+                     </option>
+                     <option value="cli" {{ conf.backend == 'cli' ? 'selected' : '' }}>
+                        {{ __('Command line binary (bw)', 'bitwardensend') }}
+                     </option>
+                  </select>
+               </div>
+            </div>
+
+            <div data-bws-mode="serve">
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_api_url">
+                     <i class="ti ti-link me-1 text-secondary"></i>{{ __('Local API URL', 'bitwardensend') }}
+                  </label>
+                  <div class="col-md-8">
+                     <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}">
+                     <div class="form-hint">{{ __('For example http://127.0.0.1:8087 — never expose this port publicly.', 'bitwardensend') }}</div>
                   </div>
-                  {% if has_master_password %}
+               </div>
+
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_timeout">
+                     <i class="ti ti-clock me-1 text-secondary"></i>{{ __('Timeout (seconds)', 'bitwardensend') }}
+                  </label>
+                  <div class="col-md-8">
+                     <input type="number" id="cfg_timeout" name="timeout" class="form-control" min="1" max="120" value="{{ conf.timeout }}">
+                  </div>
+               </div>
+
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_master">
+                     <i class="ti ti-lock me-1 text-secondary"></i>{{ __('Master password', 'bitwardensend') }}
+                     <i class="ti ti-info-circle text-secondary ms-1"
+                        title="{{ __('Only needed if the vault is locked. Not required if it is already unlocked, for example if you unlocked it yourself on the server.', 'bitwardensend') }}"></i>
+                  </label>
+                  <div class="col-md-8">
+                     <input type="password" id="cfg_master" name="master_password" class="form-control"
+                            autocomplete="new-password"
+                            placeholder="{{ has_master_password ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                     <div class="form-hint">
+                        {{ __('Encrypted with the GLPI key. Used to unlock the vault automatically. Leave empty if you unlock the service yourself.', 'bitwardensend') }}
+                     </div>
+                     {% if has_master_password %}
+                        <label class="form-check mt-1">
+                           <input type="checkbox" class="form-check-input" name="clear_master_password" value="1">
+                           <span class="form-check-label">{{ __('Delete the stored password', 'bitwardensend') }}</span>
+                        </label>
+                     {% endif %}
+                  </div>
+               </div>
+            </div>
+
+            <div data-bws-mode="cli">
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_cli_path">
+                     <i class="ti ti-terminal-2 me-1 text-secondary"></i>{{ __('Path to the bw binary', 'bitwardensend') }}
+                  </label>
+                  <div class="col-md-8">
+                     <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}">
+                  </div>
+               </div>
+
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_appdata">
+                     <i class="ti ti-folder me-1 text-secondary"></i>BITWARDENCLI_APPDATA_DIR
+                  </label>
+                  <div class="col-md-8">
+                     <input type="text" id="cfg_appdata" name="cli_appdata_dir" class="form-control" value="{{ conf.cli_appdata_dir }}">
+                     <div class="form-hint">{{ __('Client data directory, writable by the web server user.', 'bitwardensend') }}</div>
+                  </div>
+               </div>
+
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_session">
+                     <i class="ti ti-lock me-1 text-secondary"></i>BW_SESSION
+                  </label>
+                  <div class="col-md-8">
+                     <input type="password" id="cfg_session" name="cli_session" class="form-control"
+                            autocomplete="new-password"
+                            placeholder="{{ has_cli_session ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                     <div class="form-hint">{{ __('Encrypted with the GLPI key.', 'bitwardensend') }}</div>
+                     {% if has_cli_session %}
+                        <label class="form-check mt-1">
+                           <input type="checkbox" class="form-check-input" name="clear_cli_session" value="1">
+                           <span class="form-check-label">{{ __('Delete the stored session', 'bitwardensend') }}</span>
+                        </label>
+                     {% endif %}
+                  </div>
+               </div>
+            </div>
+
+            <div class="row">
+               <label class="col-form-label col-md-4" for="cfg_send_base">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Send link base URL', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_send_base" name="send_base_url" class="form-control" value="{{ conf.send_base_url }}">
+                  <div class="form-hint">
+                     {{ __('Only used when the API does not return the access URL. Cloud: https://send.bitwarden.com/# — self-hosted: https://vault.example.com/#/send/', 'bitwardensend') }}
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <div data-bws-driver="native">
+            <div class="alert alert-warning d-flex align-items-center mb-3">
+               <i class="ti ti-alert-triangle me-2"></i>
+               <div>
+                  {{ __('GLPI will store this account\'s credentials (encrypted). Use a dedicated, revocable service account — never your own.', 'bitwardensend') }}
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_native_identity_url">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Identity URL', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_native_identity_url" name="native_identity_url" class="form-control"
+                         value="{{ conf.native_identity_url }}">
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_native_api_url">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('API URL', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_native_api_url" name="native_api_url" class="form-control"
+                         value="{{ conf.native_api_url }}">
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_native_web_vault_url">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Web vault URL', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
+                         value="{{ conf.native_web_vault_url }}">
+                  <div class="form-hint">
+                     {{ __('Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}
+                  </div>
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_native_client_id">
+                  <i class="ti ti-id me-1 text-secondary"></i>{{ __('API client ID', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_native_client_id" name="native_client_id" class="form-control"
+                         value="{{ conf.native_client_id }}">
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_native_client_secret">
+                  <i class="ti ti-lock me-1 text-secondary"></i>{{ __('API client secret', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="password" id="cfg_native_client_secret" name="native_client_secret" class="form-control"
+                         autocomplete="new-password"
+                         placeholder="{{ has_native_client_secret ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                  <div class="form-hint">{{ __('Encrypted with the GLPI key.', 'bitwardensend') }}</div>
+                  {% if has_native_client_secret %}
                      <label class="form-check mt-1">
-                        <input type="checkbox" class="form-check-input" name="clear_master_password" value="1">
+                        <input type="checkbox" class="form-check-input" name="clear_native_client_secret" value="1">
+                        <span class="form-check-label">{{ __('Delete the stored secret', 'bitwardensend') }}</span>
+                     </label>
+                  {% endif %}
+               </div>
+            </div>
+
+            <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_native_email">
+                  <i class="ti ti-mail me-1 text-secondary"></i>{{ __('Account email', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="text" id="cfg_native_email" name="native_email" class="form-control"
+                         value="{{ conf.native_email }}">
+               </div>
+            </div>
+
+            <div class="row">
+               <label class="col-form-label col-md-4" for="cfg_native_master_password">
+                  <i class="ti ti-lock me-1 text-secondary"></i>{{ __('Master password', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <input type="password" id="cfg_native_master_password" name="native_master_password" class="form-control"
+                         autocomplete="new-password"
+                         placeholder="{{ has_native_master_password ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                  <div class="form-hint">{{ __('Encrypted with the GLPI key. PBKDF2 accounts only — see the README.', 'bitwardensend') }}</div>
+                  {% if has_native_master_password %}
+                     <label class="form-check mt-1">
+                        <input type="checkbox" class="form-check-input" name="clear_native_master_password" value="1">
                         <span class="form-check-label">{{ __('Delete the stored password', 'bitwardensend') }}</span>
                      </label>
                   {% endif %}
-               </div>
-            </div>
-         </div>
-
-         <div data-bws-mode="cli">
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_cli_path">{{ __('Path to the bw binary', 'bitwardensend') }}</label>
-               <div class="col-md-8">
-                  <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}">
-               </div>
-            </div>
-
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_appdata">BITWARDENCLI_APPDATA_DIR</label>
-               <div class="col-md-8">
-                  <input type="text" id="cfg_appdata" name="cli_appdata_dir" class="form-control" value="{{ conf.cli_appdata_dir }}">
-                  <div class="form-hint">{{ __('Client data directory, writable by the web server user.', 'bitwardensend') }}</div>
-               </div>
-            </div>
-
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_session">
-                  <i class="ti ti-lock me-1 text-secondary"></i>BW_SESSION
-               </label>
-               <div class="col-md-8">
-                  <input type="password" id="cfg_session" name="cli_session" class="form-control"
-                         autocomplete="new-password"
-                         placeholder="{{ has_cli_session ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
-                  <div class="form-hint">{{ __('Encrypted with the GLPI key.', 'bitwardensend') }}</div>
-                  {% if has_cli_session %}
-                     <label class="form-check mt-1">
-                        <input type="checkbox" class="form-check-input" name="clear_cli_session" value="1">
-                        <span class="form-check-label">{{ __('Delete the stored session', 'bitwardensend') }}</span>
-                     </label>
-                  {% endif %}
-               </div>
-            </div>
-         </div>
-
-         <div class="row">
-            <label class="col-form-label col-md-4" for="cfg_send_base">{{ __('Send link base URL', 'bitwardensend') }}</label>
-            <div class="col-md-8">
-               <input type="text" id="cfg_send_base" name="send_base_url" class="form-control" value="{{ conf.send_base_url }}">
-               <div class="form-hint">
-                  {{ __('Only used when the API does not return the access URL. Cloud: https://send.bitwarden.com/# — self-hosted: https://vault.example.com/#/send/', 'bitwardensend') }}
                </div>
             </div>
          </div>
@@ -150,12 +287,16 @@
 
          <div class="row g-3 mb-3">
             <div class="col-md-6">
-               <label class="form-label" for="cfg_days">{{ __('Default expiration (days)', 'bitwardensend') }}</label>
+               <label class="form-label" for="cfg_days">
+                  <i class="ti ti-calendar-time me-1 text-secondary"></i>{{ __('Default expiration (days)', 'bitwardensend') }}
+               </label>
                <input type="number" id="cfg_days" name="default_deletion_days" class="form-control"
                       min="1" max="31" value="{{ conf.default_deletion_days }}">
             </div>
             <div class="col-md-6">
-               <label class="form-label" for="cfg_access">{{ __('Default maximum views', 'bitwardensend') }}</label>
+               <label class="form-label" for="cfg_access">
+                  <i class="ti ti-eye me-1 text-secondary"></i>{{ __('Default maximum views', 'bitwardensend') }}
+               </label>
                <input type="number" id="cfg_access" name="default_max_access_count" class="form-control"
                       min="0" max="100" value="{{ conf.default_max_access_count }}">
                <div class="form-hint">{{ __('0 means unlimited until expiration.', 'bitwardensend') }}</div>
@@ -164,14 +305,18 @@
 
          <div class="list-group list-group-flush border rounded">
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Hide the sender email address by default', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-mail-off me-1 text-secondary"></i>{{ __('Hide the sender email address by default', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="default_hide_email" value="1" {{ conf.default_hide_email ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Show a random password generator on the creation form', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-key me-1 text-secondary"></i>{{ __('Show a random password generator on the creation form', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="password_generator_enabled" value="1" {{ conf.password_generator_enabled ? 'checked' : '' }}>
@@ -189,28 +334,36 @@
 
          <div class="list-group list-group-flush border rounded mb-2">
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Post the link as a followup by default', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-send me-1 text-secondary"></i>{{ __('Post the link as a followup by default', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="add_followup" value="1" {{ conf.add_followup ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Private followup by default', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-eye-off me-1 text-secondary"></i>{{ __('Private followup by default', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="followup_is_private" value="1" {{ conf.followup_is_private ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Keep the link in the GLPI database', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-database me-1 text-secondary"></i>{{ __('Keep the link in the GLPI database', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="store_access_url" value="1" {{ conf.store_access_url ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Allow choosing a GLPI followup template when creating a Send', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-stack-2 me-1 text-secondary"></i>{{ __('Allow choosing a GLPI followup template when creating a Send', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="allow_glpi_followup_templates" value="1"
@@ -222,7 +375,9 @@
             {{ __('When disabled, GLPI only keeps metadata: the link then exists in the followup only.', 'bitwardensend') }}
          </div>
 
-         <label class="form-label" for="cfg_template">{{ __('Followup template', 'bitwardensend') }}</label>
+         <label class="form-label" for="cfg_template">
+            <i class="ti ti-file-text me-1 text-secondary"></i>{{ __('Followup template', 'bitwardensend') }}
+         </label>
          <textarea id="cfg_template" name="followup_template" class="form-control" rows="8">{{ conf.followup_template }}</textarea>
          <div class="form-hint">
             {{ __('Variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}', 'bitwardensend') }}
@@ -259,4 +414,7 @@
 
 {# Runs after the form exists in the DOM, so the initial state is applied whether the
    tab was loaded with the page or injected by AJAX. #}
-<script>pluginBitwardensendToggleBackend();</script>
+<script>
+   pluginBitwardensendToggleBackend();
+   pluginBitwardensendToggleSendDriver();
+</script>

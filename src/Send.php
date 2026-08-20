@@ -418,15 +418,16 @@ class Send extends CommonDBTM
         }
 
         try {
-            $client = new Client($conf);
-            $result = $client->createTextSend($name, $secret, [
-                'hidden'           => !empty($input['hidden']),
-                'max_access_count' => $max_access,
-                'deletion_date'    => $deletion_date,
-                'password'         => $password,
-                'hide_email'       => !empty($input['hide_email']),
-                'notes'            => sprintf('GLPI %s #%d', $itemtype, $items_id),
-            ]);
+            $result = SendDriverFactory::create($conf)->createSend(new SendPayload(
+                name: $name,
+                text: $secret,
+                notes: sprintf('GLPI %s #%d', $itemtype, $items_id),
+                hidden: !empty($input['hidden']),
+                maxAccessCount: $max_access,
+                deletionDate: $deletion_date,
+                password: $password,
+                hideEmail: !empty($input['hide_email']),
+            ));
         } catch (\Throwable $e) {
             Toolbox::logDebug('[bitwardensend] ' . $e->getMessage());
             Session::addMessageAfterRedirect(
@@ -444,9 +445,9 @@ class Send extends CommonDBTM
             'items_id'              => $items_id,
             'users_id'              => (int) Session::getLoginUserID(),
             'entities_id'           => (int) ($item->fields['entities_id'] ?? 0),
-            'send_uuid'             => $result['uuid'],
-            'access_id'             => $result['access_id'],
-            'access_url'            => !empty($conf['store_access_url']) ? $result['access_url'] : null,
+            'send_uuid'             => $result->uuid,
+            'access_id'             => $result->accessId,
+            'access_url'            => !empty($conf['store_access_url']) ? $result->accessUrl : null,
             'deletion_date'         => date('Y-m-d H:i:s', $expiration_ts),
             'max_access_count'      => $max_access > 0 ? $max_access : null,
             'is_password_protected' => $password !== '' ? 1 : 0,
@@ -457,7 +458,7 @@ class Send extends CommonDBTM
             self::addFollowup(
                 $item,
                 (string) ($input['followup_content'] ?? ''),
-                $result['access_url'],
+                $result->accessUrl,
                 $expiration_ts,
                 $max_access,
                 !empty($input['followup_is_private'])
@@ -467,8 +468,8 @@ class Send extends CommonDBTM
         Session::addMessageAfterRedirect(
             sprintf(
                 __('Bitwarden Send link created: %s', 'bitwardensend'),
-                '<a href="' . htmlspecialchars($result['access_url'], ENT_QUOTES) . '" target="_blank" rel="noopener">'
-                . htmlspecialchars($result['access_url'], ENT_QUOTES) . '</a>'
+                '<a href="' . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '" target="_blank" rel="noopener">'
+                . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '</a>'
             ),
             false,
             INFO
@@ -556,7 +557,7 @@ class Send extends CommonDBTM
     public function revoke(): bool
     {
         try {
-            (new Client())->deleteSend((string) $this->fields['send_uuid']);
+            SendDriverFactory::create()->deleteSend((string) $this->fields['send_uuid']);
         } catch (\Throwable $e) {
             Toolbox::logDebug('[bitwardensend] ' . $e->getMessage());
             Session::addMessageAfterRedirect(

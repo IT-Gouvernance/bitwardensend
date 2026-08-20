@@ -27,11 +27,26 @@ Historique des versions : voir [CHANGELOG.md](CHANGELOG.md).
 - Droit dédié `plugin_bitwardensend_send` (Administration > Profils).
 - Secrets de configuration chiffrés avec la clé GLPI.
 
+## Driver de Send
+
+Le plugin crée les Sends via l'un de ces deux drivers, choisi sur la page de
+configuration :
+
+- **CLI** (par défaut) — pilote le client officiel `bw`, soit via son API locale
+  (`bw serve`), soit en invoquant directement le binaire. Nécessite un accès
+  système/shell sur le serveur GLPI pour installer et lancer ce client — voir
+  « Prérequis serveur » ci-dessous.
+- **Natif** — dialogue directement avec l'API Bitwarden en PHP, sans aucun binaire
+  externe. La seule option sur les hébergements où l'accès shell du driver CLI n'est
+  pas disponible, par exemple GLPI Cloud. Voir « Driver natif » ci-dessous pour sa
+  configuration et une vraie limitation (comptes PBKDF2 uniquement).
+
 ## Prérequis serveur
 
 Bitwarden n'expose pas la création de Send via son API publique d'organisation ; le
-plugin pilote donc le client officiel `bw`, soit via son **API locale** (recommandé),
-soit en invoquant directement le binaire.
+driver CLI pilote donc le client officiel `bw`, soit via son **API locale**
+(recommandé), soit en invoquant directement le binaire. Ignorez toute cette section si
+vous utilisez le driver natif.
 
 ```bash
 # 1. Installer le client
@@ -75,6 +90,27 @@ sudo systemctl enable --now bw-serve
 Le port 8087 ne doit **jamais** être accessible depuis l'extérieur de la machine :
 quiconque l'atteint contrôle le coffre sans aucune authentification.
 
+## Driver natif
+
+Aucune installation côté serveur : tout se saisit directement sur la page de
+configuration du plugin.
+
+1. Créez un compte de service Bitwarden **dédié** à ce plugin — jamais le vôtre. GLPI
+   conserve les identifiants de ce compte (chiffrés avec la clé GLPI), il doit donc
+   pouvoir être révoqué indépendamment de tout compte d'une vraie personne.
+2. Configurez le KDF de ce compte en **PBKDF2** (pas Argon2id) à sa création. C'est une
+   contrainte technique, pas une préférence : l'extension `sodium` de PHP ne peut pas
+   reproduire la dérivation de clé Argon2id de Bitwarden (elle sale avec une valeur de 32
+   octets ; la fonction Argon2id de PHP n'en accepte que 16), donc un compte en Argon2id
+   ne peut simplement pas fonctionner avec ce driver. Aucun contournement possible en
+   dehors du driver CLI.
+3. Générez la clé API de ce compte (ID client + secret) depuis ses réglages Bitwarden.
+4. Sur la page de configuration du plugin, réglez **Driver de Send** sur « Natif (PHP
+   uniquement) » et renseignez l'ID/secret client de l'API, l'e-mail et le mot de passe
+   maître du compte, ainsi que les URL d'identité/API/coffre web (pré-remplies pour le
+   cloud Bitwarden — ajustez les trois pour un serveur auto-hébergé ou Vaultwarden).
+5. **Tester la connexion**.
+
 ## Installation du plugin
 
 Téléchargez la dernière archive de release (`glpi-bitwardensend-<version>.tar.bz2`,
@@ -97,16 +133,21 @@ Configuration > Général > onglet **Bitwarden Send** :
 
 | Réglage | Rôle |
 |---|---|
-| Mode d'accès | `serve` (API HTTP locale) ou `cli` (invocation du binaire) |
-| URL de l'API locale | `http://127.0.0.1:8087` |
-| Mot de passe maître | optionnel, chiffré ; permet le déverrouillage automatique du coffre |
-| BW_SESSION | mode CLI uniquement, chiffré |
-| URL de base des liens Send | repli quand l'API ne renvoie pas le lien d'accès |
+| Driver de Send | `cli` (par défaut) ou `native` — voir « Driver de Send » ci-dessus |
+| Mode d'accès | Driver CLI uniquement : `serve` (API HTTP locale) ou `cli` (invocation du binaire) |
+| URL de l'API locale | Driver CLI, mode `serve` : `http://127.0.0.1:8087` |
+| Mot de passe maître | Driver CLI, optionnel, chiffré ; permet le déverrouillage automatique du coffre |
+| BW_SESSION | Driver CLI, mode `cli` uniquement, chiffré |
+| URL de base des liens Send | Driver CLI : repli quand l'API ne renvoie pas le lien d'accès |
+| URL d'identité/API/coffre web | Driver natif : points d'accès Bitwarden — pré-remplis pour le cloud |
+| ID/secret client de l'API, e-mail, mot de passe maître | Compte de service du driver natif — voir « Driver natif » ci-dessus |
 | Valeurs par défaut des liens | expiration, vues max, comportement du suivi, modèle |
 | Autoriser les gabarits de suivi GLPI | permet aux techniciens de choisir un gabarit de suivi GLPI à la place du modèle ci-dessus |
 
-**Tester la connexion** indique le statut du coffre (`unlocked`, `locked`,
-`unauthenticated`) et tente un déverrouillage si un mot de passe maître est enregistré.
+**Tester la connexion** : pour le driver CLI, indique le statut du coffre (`unlocked`,
+`locked`, `unauthenticated`) et tente un déverrouillage si un mot de passe maître est
+enregistré ; pour le driver natif, s'authentifie et déverrouille la clé du compte, en
+signalant le succès ou l'échec précis (mauvais mot de passe maître, API inaccessible...).
 
 Accordez ensuite le droit dans Administration > Profils > *votre profil* > l'onglet des
 droits du plugin. À noter : « Voir l'onglet Bitwarden Sends » doit rester coché pour que
@@ -135,9 +176,12 @@ autre action planifiée GLPI :
 - Désactivez « Conserver le lien dans la base GLPI » pour que GLPI ne garde que les
   métadonnées. Copier le lien depuis l'onglet n'est alors plus possible.
 - Un mot de passe maître stocké dans GLPI donne accès au coffre du compte de service :
-  utilisez un compte dédié ne contenant rien de plus que le nécessaire.
+  utilisez un compte dédié ne contenant rien de plus que le nécessaire. Ça vaut pour les
+  deux drivers — le compte de service du driver natif a besoin de la même isolation.
 - Les Sends de type **fichier** ne sont pas pris en charge dans cette version (texte
   uniquement).
+- Le driver natif ne prend en charge que les comptes de service en KDF PBKDF2 — voir
+  « Driver natif » ci-dessus pour la raison.
 
 ## Suivi en texte enrichi
 

@@ -1,0 +1,53 @@
+name: Unit tests
+
+# Runs the plugin's standalone PHP unit tests (EncString, SendCrypto — the
+# cryptographic primitives behind the native Send driver). These have no
+# GLPI dependency at all, so `composer install && phpunit` is enough; no
+# GLPI instance is set up here.
+#
+# Manual only (workflow_dispatch), like locales.yml and release.yml on this
+# repo — run it by hand, e.g. `gh workflow run tests.yml --ref <branch>` or
+# "Run workflow" in the Actions UI, after a change to src/EncString.php,
+# src/SendCrypto.php, or anything under tests/.
+#
+# The opt-in integration test (tests/NativeSendDriverIntegrationTest.php)
+# creates a real Send against an actual Bitwarden account and needs the
+# BW_TEST_* secrets below to run at all — it skips itself otherwise, so this
+# workflow works with none of them configured. To exercise it in CI, add
+# those seven as repository secrets (Settings > Secrets and variables >
+# Actions) using a disposable Bitwarden account created solely for this,
+# never a real one.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: openssl, sodium, mbstring, curl
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run tests
+        env:
+          BW_TEST_IDENTITY_URL: ${{ secrets.BW_TEST_IDENTITY_URL }}
+          BW_TEST_API_URL: ${{ secrets.BW_TEST_API_URL }}
+          BW_TEST_WEB_VAULT_URL: ${{ secrets.BW_TEST_WEB_VAULT_URL }}
+          BW_TEST_CLIENT_ID: ${{ secrets.BW_TEST_CLIENT_ID }}
+          BW_TEST_CLIENT_SECRET: ${{ secrets.BW_TEST_CLIENT_SECRET }}
+          BW_TEST_EMAIL: ${{ secrets.BW_TEST_EMAIL }}
+          BW_TEST_MASTER_PASSWORD: ${{ secrets.BW_TEST_MASTER_PASSWORD }}
+        run: vendor/bin/phpunit

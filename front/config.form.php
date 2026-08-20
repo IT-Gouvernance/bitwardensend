@@ -29,8 +29,8 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Bitwardensend\Client;
 use GlpiPlugin\Bitwardensend\Config;
+use GlpiPlugin\Bitwardensend\SendDriverFactory;
 
 if (!defined('GLPI_ROOT')) {
     include('../../../inc/includes.php');
@@ -53,10 +53,11 @@ if (isset($_POST['update'])) {
 
 if (isset($_POST['test'])) {
     try {
-        $status = (new Client())->testConnection();
+        $status = SendDriverFactory::create()->testConnection();
 
         switch ($status) {
             case 'unlocked':
+            case 'ok':
                 Session::addMessageAfterRedirect(
                     __('Connected, vault unlocked. The plugin is ready to use.', 'bitwardensend'),
                     true,

@@ -66,10 +66,45 @@ function plugin_bitwardensend_install(): bool
             `followup_template` text,
             `allow_glpi_followup_templates` tinyint NOT NULL DEFAULT 1,
             `password_generator_enabled` tinyint NOT NULL DEFAULT 1,
+            `send_driver` varchar(10) NOT NULL DEFAULT 'cli',
+            `native_identity_url` varchar(255) NOT NULL DEFAULT 'https://identity.bitwarden.com',
+            `native_api_url` varchar(255) NOT NULL DEFAULT 'https://api.bitwarden.com',
+            `native_web_vault_url` varchar(255) NOT NULL DEFAULT 'https://vault.bitwarden.com',
+            `native_client_id` varchar(255) NOT NULL DEFAULT '',
+            `native_email` varchar(255) NOT NULL DEFAULT '',
+            `native_client_secret` text,
+            `native_master_password` text,
             `date_mod` timestamp NULL DEFAULT NULL,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=$charset COLLATE=$collation ROW_FORMAT=DYNAMIC;";
         $DB->doQuery($query);
+    }
+
+    // Existing installs (v1.0.0-beta1 and earlier, before these columns
+    // existed): the CREATE TABLE above only runs once, so a field added
+    // after that first release needs its own migration step to reach them.
+    // addField() is a no-op once the column is already there (fresh
+    // installs get it straight from the CREATE TABLE above), so this is
+    // safe to keep here permanently.
+    if ($DB->tableExists($config_table)) {
+        $migration->addField($config_table, 'send_driver', 'string', ['value' => 'cli']);
+        $migration->addField(
+            $config_table,
+            'native_identity_url',
+            'string',
+            ['value' => 'https://identity.bitwarden.com']
+        );
+        $migration->addField($config_table, 'native_api_url', 'string', ['value' => 'https://api.bitwarden.com']);
+        $migration->addField(
+            $config_table,
+            'native_web_vault_url',
+            'string',
+            ['value' => 'https://vault.bitwarden.com']
+        );
+        $migration->addField($config_table, 'native_client_id', 'string', ['value' => '']);
+        $migration->addField($config_table, 'native_email', 'string', ['value' => '']);
+        $migration->addField($config_table, 'native_client_secret', 'text');
+        $migration->addField($config_table, 'native_master_password', 'text');
     }
 
     $sends_table = Send::getTable();
