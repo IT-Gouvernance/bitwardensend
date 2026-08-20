@@ -1,4 +1,4 @@
-name: Rebuild translation catalogs
+name: Rebuild translation
 
 # Regenerates locales/*.pot, *.po and *.mo from the __()/_n() calls found in
 # PHP/Twig/JS sources. tools/build-locales.py already fails the job (with the
@@ -59,5 +59,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add locales/
-          git commit -m "chore(locales): rebuild translation catalogs"
+          git commit -m "chore(locales): rebuild translation"
           git push origin "HEAD:$TARGET_BRANCH"
