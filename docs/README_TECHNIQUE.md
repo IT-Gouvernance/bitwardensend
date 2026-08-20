@@ -6,9 +6,11 @@ Bitwarden Send et publie ce lien en suivi sur le ticket.
 
 Conçu pour GLPI 11.
 
-*(English: see [README.md](README.md).)*
+*(English: see [README_TECHNICAL.md](README_TECHNICAL.md).)*
 
-Historique des versions : voir [CHANGELOG.md](CHANGELOG.md).
+Pour un aperçu des fonctionnalités avec captures d'écran, voir le [README principal](../README.md) (en anglais pour le moment).
+
+Historique des versions : voir [CHANGELOG.md](../CHANGELOG.md).
 
 ## Ce que fait le plugin
 
