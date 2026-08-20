@@ -295,6 +295,7 @@ class Send extends CommonDBTM
             'item'       => $item,
             'sends'      => $sends,
             'can_create' => self::canCreate(),
+            'can_update' => self::canUpdate(),
             'can_purge'  => self::canPurge(),
             'csrf_token' => Session::getNewCSRFToken(),
         ]);

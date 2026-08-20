@@ -87,7 +87,7 @@
                   </td>
                   <td class="text-end">
                      <div class="d-flex justify-content-end gap-1">
-                        {% if not send.is_revoked and not send.is_expired %}
+                        {% if can_update and not send.is_revoked and not send.is_expired %}
                            <form method="post" action="{{ path('plugins/bitwardensend/front/send.form.php') }}"
                                  class="d-inline">
                               <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token }}">
