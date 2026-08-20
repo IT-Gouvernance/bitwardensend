@@ -207,6 +207,8 @@ FR = {
         'Répertoire de données du client, accessible en écriture par '
         "l'utilisateur du serveur web.",
     'Command line binary (bw)': 'Binaire en ligne de commande (bw)',
+    'Configuration not saved: required fields are missing: %s':
+        "Configuration non enregistrée : champs obligatoires manquants : %s",
     'Configuration saved.': 'Configuration enregistrée.',
     'Connected, vault unlocked. The plugin is ready to use.':
         'Connexion établie, coffre déverrouillé. Le plugin est opérationnel.',

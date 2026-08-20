@@ -43,7 +43,18 @@ Session::checkRight('config', UPDATE);
 // Session::checkCSRF() again here would always fail.
 
 if (isset($_POST['update'])) {
-    if (Config::saveFromInput($_POST)) {
+    $missingFields = Config::validateInput($_POST);
+
+    if (!empty($missingFields)) {
+        Session::addMessageAfterRedirect(
+            sprintf(
+                __('Configuration not saved: required fields are missing: %s', 'bitwardensend'),
+                implode(', ', $missingFields)
+            ),
+            false,
+            ERROR
+        );
+    } elseif (Config::saveFromInput($_POST)) {
         Session::addMessageAfterRedirect(__('Configuration saved.', 'bitwardensend'), true, INFO);
     } else {
         Session::addMessageAfterRedirect(__('Could not save the configuration.', 'bitwardensend'), false, ERROR);

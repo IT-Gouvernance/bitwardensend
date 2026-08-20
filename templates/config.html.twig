@@ -88,9 +88,10 @@
                <div class="row mb-3">
                   <label class="col-form-label col-md-4" for="cfg_api_url">
                      <i class="ti ti-link me-1 text-secondary"></i>{{ __('Local API URL', 'bitwardensend') }}
+                     <span class="text-danger">*</span>
                   </label>
                   <div class="col-md-8">
-                     <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}">
+                     <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}" required>
                      <div class="form-hint">{{ __('For example http://127.0.0.1:8087 — never expose this port publicly.', 'bitwardensend') }}</div>
                   </div>
                </div>
@@ -131,9 +132,10 @@
                <div class="row mb-3">
                   <label class="col-form-label col-md-4" for="cfg_cli_path">
                      <i class="ti ti-terminal-2 me-1 text-secondary"></i>{{ __('Path to the bw binary', 'bitwardensend') }}
+                     <span class="text-danger">*</span>
                   </label>
                   <div class="col-md-8">
-                     <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}">
+                     <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}" required>
                   </div>
                </div>
 
@@ -190,30 +192,33 @@
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_identity_url">
                   <i class="ti ti-link me-1 text-secondary"></i>{{ __('Identity URL', 'bitwardensend') }}
+                  <span class="text-danger">*</span>
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_identity_url" name="native_identity_url" class="form-control"
-                         value="{{ conf.native_identity_url }}">
+                         value="{{ conf.native_identity_url }}" required>
                </div>
             </div>
 
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_api_url">
                   <i class="ti ti-link me-1 text-secondary"></i>{{ __('API URL', 'bitwardensend') }}
+                  <span class="text-danger">*</span>
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_api_url" name="native_api_url" class="form-control"
-                         value="{{ conf.native_api_url }}">
+                         value="{{ conf.native_api_url }}" required>
                </div>
             </div>
 
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_web_vault_url">
                   <i class="ti ti-link me-1 text-secondary"></i>{{ __('Web vault URL', 'bitwardensend') }}
+                  <span class="text-danger">*</span>
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
-                         value="{{ conf.native_web_vault_url }}">
+                         value="{{ conf.native_web_vault_url }}" required>
                   <div class="form-hint">
                      {{ __('Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}
                   </div>
@@ -223,21 +228,24 @@
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_client_id">
                   <i class="ti ti-id me-1 text-secondary"></i>{{ __('API client ID', 'bitwardensend') }}
+                  <span class="text-danger">*</span>
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_client_id" name="native_client_id" class="form-control"
-                         value="{{ conf.native_client_id }}">
+                         value="{{ conf.native_client_id }}" required>
                </div>
             </div>
 
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_client_secret">
                   <i class="ti ti-lock me-1 text-secondary"></i>{{ __('API client secret', 'bitwardensend') }}
+                  {% if not has_native_client_secret %}<span class="text-danger">*</span>{% endif %}
                </label>
                <div class="col-md-8">
                   <input type="password" id="cfg_native_client_secret" name="native_client_secret" class="form-control"
                          autocomplete="new-password"
-                         placeholder="{{ has_native_client_secret ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                         placeholder="{{ has_native_client_secret ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}"
+                         {{ has_native_client_secret ? '' : 'required' }}>
                   <div class="form-hint">{{ __('Encrypted with the GLPI key.', 'bitwardensend') }}</div>
                   {% if has_native_client_secret %}
                      <label class="form-check mt-1">
@@ -251,21 +259,24 @@
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_email">
                   <i class="ti ti-mail me-1 text-secondary"></i>{{ __('Account email', 'bitwardensend') }}
+                  <span class="text-danger">*</span>
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_email" name="native_email" class="form-control"
-                         value="{{ conf.native_email }}">
+                         value="{{ conf.native_email }}" required>
                </div>
             </div>
 
             <div class="row">
                <label class="col-form-label col-md-4" for="cfg_native_master_password">
                   <i class="ti ti-lock me-1 text-secondary"></i>{{ __('Master password', 'bitwardensend') }}
+                  {% if not has_native_master_password %}<span class="text-danger">*</span>{% endif %}
                </label>
                <div class="col-md-8">
                   <input type="password" id="cfg_native_master_password" name="native_master_password" class="form-control"
                          autocomplete="new-password"
-                         placeholder="{{ has_native_master_password ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}">
+                         placeholder="{{ has_native_master_password ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}"
+                         {{ has_native_master_password ? '' : 'required' }}>
                   <div class="form-hint">{{ __('Encrypted with the GLPI key. PBKDF2 accounts only — see the README.', 'bitwardensend') }}</div>
                   {% if has_native_master_password %}
                      <label class="form-check mt-1">
