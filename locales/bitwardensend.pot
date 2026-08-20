@@ -17,23 +17,23 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 
-#: templates/config.html.twig:397
+#: templates/config.html.twig:407
 msgid "(Setup > Automatic actions)."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:126, templates/config.html.twig:302
+#: templates/_send_form_fields.html.twig:126, templates/config.html.twig:313
 msgid "0 means unlimited until expiration."
 msgstr ""
 
-#: templates/config.html.twig:202
+#: src/Config.php:217, templates/config.html.twig:205
 msgid "API URL"
 msgstr ""
 
-#: templates/config.html.twig:225
+#: src/Config.php:219, templates/config.html.twig:230
 msgid "API client ID"
 msgstr ""
 
-#: templates/config.html.twig:235
+#: src/Config.php:230, templates/config.html.twig:241
 msgid "API client secret"
 msgstr ""
 
@@ -41,7 +41,7 @@ msgstr ""
 msgid "Access mode"
 msgstr ""
 
-#: templates/config.html.twig:253
+#: src/Config.php:220, templates/config.html.twig:261
 msgid "Account email"
 msgstr ""
 
@@ -53,11 +53,11 @@ msgstr ""
 msgid "Advanced options"
 msgstr ""
 
-#: templates/config.html.twig:365
+#: templates/config.html.twig:378
 msgid "Allow choosing a GLPI followup template when creating a Send"
 msgstr ""
 
-#: templates/config.html.twig:391
+#: templates/config.html.twig:401
 msgid ""
 "Automatic deletion of revoked or expired entries is configured on the automatic action"
 msgstr ""
@@ -119,7 +119,7 @@ msgstr ""
 msgid "Cannot reach the Bitwarden API (%s)"
 msgstr ""
 
-#: templates/config.html.twig:146
+#: templates/config.html.twig:148
 msgid "Client data directory, writable by the web server user."
 msgstr ""
 
@@ -127,11 +127,15 @@ msgstr ""
 msgid "Command line binary (bw)"
 msgstr ""
 
-#: front/config.form.php:47
+#: front/config.form.php:51
+msgid "Configuration not saved: required fields are missing: %s"
+msgstr ""
+
+#: front/config.form.php:58
 msgid "Configuration saved."
 msgstr ""
 
-#: front/config.form.php:62
+#: front/config.form.php:73
 msgid "Connected, vault unlocked. The plugin is ready to use."
 msgstr ""
 
@@ -155,7 +159,7 @@ msgstr ""
 msgid "Could not revoke the link: %s"
 msgstr ""
 
-#: front/config.form.php:49
+#: front/config.form.php:60
 msgid "Could not save the configuration."
 msgstr ""
 
@@ -179,11 +183,11 @@ msgstr ""
 msgid "Decrypted user key has an unexpected length."
 msgstr ""
 
-#: templates/config.html.twig:291
+#: templates/config.html.twig:302
 msgid "Default expiration (days)"
 msgstr ""
 
-#: templates/config.html.twig:298
+#: templates/config.html.twig:309
 msgid "Default maximum views"
 msgstr ""
 
@@ -196,15 +200,15 @@ msgstr ""
 msgid "Delete stored Send entries"
 msgstr ""
 
-#: templates/config.html.twig:123, templates/config.html.twig:273
+#: templates/config.html.twig:124, templates/config.html.twig:284
 msgid "Delete the stored password"
 msgstr ""
 
-#: templates/config.html.twig:245
+#: templates/config.html.twig:253
 msgid "Delete the stored secret"
 msgstr ""
 
-#: templates/config.html.twig:162
+#: templates/config.html.twig:164
 msgid "Delete the stored session"
 msgstr ""
 
@@ -212,15 +216,15 @@ msgstr ""
 msgid "Delete this entry?"
 msgstr ""
 
-#: templates/config.html.twig:158, templates/config.html.twig:241
+#: templates/config.html.twig:160, templates/config.html.twig:249
 msgid "Encrypted with the GLPI key."
 msgstr ""
 
-#: templates/config.html.twig:269
+#: templates/config.html.twig:280
 msgid "Encrypted with the GLPI key. PBKDF2 accounts only — see the README."
 msgstr ""
 
-#: templates/config.html.twig:118
+#: templates/config.html.twig:119
 msgid ""
 "Encrypted with the GLPI key. Used to unlock the vault automatically. Leave empty if you unlock the service yourself."
 msgstr ""
@@ -237,11 +241,11 @@ msgstr ""
 msgid "Expires in"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:177, templates/config.html.twig:332
+#: templates/_send_form_fields.html.twig:177, templates/config.html.twig:343
 msgid "Followup configuration"
 msgstr ""
 
-#: templates/config.html.twig:379
+#: templates/config.html.twig:389
 msgid "Followup template"
 msgstr ""
 
@@ -249,7 +253,7 @@ msgstr ""
 msgid "Followup text"
 msgstr ""
 
-#: templates/config.html.twig:94
+#: templates/config.html.twig:95
 msgid "For example http://127.0.0.1:8087 — never expose this port publicly."
 msgstr ""
 
@@ -257,7 +261,7 @@ msgstr ""
 msgid "GLPI followup templates"
 msgstr ""
 
-#: templates/config.html.twig:186
+#: templates/config.html.twig:188
 msgid ""
 "GLPI will store this account's credentials (encrypted). Use a dedicated, revocable service account — never your own."
 msgstr ""
@@ -287,7 +291,7 @@ msgstr ""
 msgid "Hide my email address from the recipient"
 msgstr ""
 
-#: templates/config.html.twig:309
+#: templates/config.html.twig:320
 msgid "Hide the sender email address by default"
 msgstr ""
 
@@ -295,7 +299,7 @@ msgstr ""
 msgid "Hide the text by default when opened"
 msgstr ""
 
-#: templates/config.html.twig:192
+#: src/Config.php:216, templates/config.html.twig:194
 msgid "Identity URL"
 msgstr ""
 
@@ -303,7 +307,7 @@ msgstr ""
 msgid "Item not found or access denied."
 msgstr ""
 
-#: templates/config.html.twig:356
+#: templates/config.html.twig:367
 msgid "Keep the link in the GLPI database"
 msgstr ""
 
@@ -315,7 +319,7 @@ msgstr ""
 msgid "Length"
 msgstr ""
 
-#: templates/config.html.twig:285
+#: templates/config.html.twig:296
 msgid "Link defaults"
 msgstr ""
 
@@ -335,7 +339,7 @@ msgstr ""
 msgid "Local API (bw serve) — recommended"
 msgstr ""
 
-#: templates/config.html.twig:90
+#: src/Config.php:207, templates/config.html.twig:90
 msgid "Local API URL"
 msgstr ""
 
@@ -343,7 +347,7 @@ msgstr ""
 msgid "Lowercase"
 msgstr ""
 
-#: templates/config.html.twig:109, templates/config.html.twig:263
+#: src/Config.php:235, templates/config.html.twig:110, templates/config.html.twig:272
 msgid "Master password"
 msgstr ""
 
@@ -384,7 +388,7 @@ msgstr ""
 msgid "No profile selected."
 msgstr ""
 
-#: templates/config.html.twig:116, templates/config.html.twig:157, templates/config.html.twig:240, templates/config.html.twig:268
+#: templates/config.html.twig:117, templates/config.html.twig:159, templates/config.html.twig:247, templates/config.html.twig:278
 msgid "Not set"
 msgstr ""
 
@@ -392,12 +396,12 @@ msgstr ""
 msgid "Numbers"
 msgstr ""
 
-#: templates/config.html.twig:111
+#: templates/config.html.twig:112
 msgid ""
 "Only needed if the vault is locked. Not required if it is already unlocked, for example if you unlocked it yourself on the server."
 msgstr ""
 
-#: templates/config.html.twig:176
+#: templates/config.html.twig:178
 msgid ""
 "Only used when the API does not return the access URL. Cloud: https://send.bitwarden.com/# — self-hosted: https://vault.example.com/#/send/"
 msgstr ""
@@ -414,7 +418,7 @@ msgstr ""
 msgid "Password protected"
 msgstr ""
 
-#: templates/config.html.twig:133
+#: src/Config.php:210, templates/config.html.twig:134
 msgid "Path to the bw binary"
 msgstr ""
 
@@ -426,7 +430,7 @@ msgstr ""
 msgid "Post the link as a followup"
 msgstr ""
 
-#: templates/config.html.twig:338
+#: templates/config.html.twig:349
 msgid "Post the link as a followup by default"
 msgstr ""
 
@@ -434,7 +438,7 @@ msgstr ""
 msgid "Private followup (hidden from the requester)"
 msgstr ""
 
-#: templates/config.html.twig:347
+#: templates/config.html.twig:358
 msgid "Private followup by default"
 msgstr ""
 
@@ -470,7 +474,7 @@ msgstr ""
 msgid "See the Bitwarden Sends tab"
 msgstr ""
 
-#: templates/config.html.twig:218
+#: templates/config.html.twig:223
 msgid ""
 "Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other's URLs."
 msgstr ""
@@ -483,7 +487,7 @@ msgstr ""
 msgid "Send it over another channel, by phone or text message for instance."
 msgstr ""
 
-#: templates/config.html.twig:171
+#: templates/config.html.twig:173
 msgid "Send link base URL"
 msgstr ""
 
@@ -491,7 +495,7 @@ msgstr ""
 msgid "Send name"
 msgstr ""
 
-#: templates/config.html.twig:318
+#: templates/config.html.twig:329
 msgid "Show a random password generator on the creation form"
 msgstr ""
 
@@ -499,7 +503,7 @@ msgstr ""
 msgid "Stored encrypted in Bitwarden. GLPI only keeps the link and its metadata."
 msgstr ""
 
-#: templates/config.html.twig:116, templates/config.html.twig:157, templates/config.html.twig:240, templates/config.html.twig:268
+#: templates/config.html.twig:117, templates/config.html.twig:159, templates/config.html.twig:247, templates/config.html.twig:278
 msgid "Stored — type a new one to replace it"
 msgstr ""
 
@@ -507,7 +511,7 @@ msgstr ""
 msgid "Symbols"
 msgstr ""
 
-#: templates/config.html.twig:406
+#: templates/config.html.twig:416
 msgid "Test connection"
 msgstr ""
 
@@ -544,12 +548,12 @@ msgid ""
 "The rights below require this one: every action in the tab checks it first."
 msgstr ""
 
-#: front/config.form.php:82
+#: front/config.form.php:93
 msgid ""
 "The service answers but no account is logged in. Run \"bw login --apikey\" on the server as the service user."
 msgstr ""
 
-#: front/config.form.php:70
+#: front/config.form.php:81
 msgid ""
 "The service answers but the vault is locked. Set the master password below so the plugin can unlock it, or unlock the service manually on the server."
 msgstr ""
@@ -559,7 +563,7 @@ msgid ""
 "This account uses the Argon2id KDF, which the native driver cannot reproduce in PHP. Use a service account configured with PBKDF2, or switch this Send driver to \"cli\"."
 msgstr ""
 
-#: templates/config.html.twig:384
+#: templates/config.html.twig:394
 msgid ""
 "This is the default text proposed when creating a Send. If the option above is enabled, the technician can instead pick one of the GLPI followup templates (Setup > Templates > Followup templates) — the same variables also work in those."
 msgstr ""
@@ -568,7 +572,7 @@ msgstr ""
 msgid "This only removes the record from GLPI. This cannot be undone."
 msgstr ""
 
-#: templates/config.html.twig:100
+#: templates/config.html.twig:101
 msgid "Timeout (seconds)"
 msgstr ""
 
@@ -588,7 +592,7 @@ msgstr ""
 msgid "Unexpected response from the Bitwarden API (HTTP %d)"
 msgstr ""
 
-#: front/config.form.php:94
+#: front/config.form.php:105
 msgid "Unexpected vault status: %s"
 msgstr ""
 
@@ -616,16 +620,16 @@ msgstr ""
 msgid "Use a GLPI followup template"
 msgstr ""
 
-#: templates/config.html.twig:383
+#: templates/config.html.twig:393
 msgid ""
 "Variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}"
 msgstr ""
 
-#: templates/config.html.twig:212
+#: src/Config.php:218, templates/config.html.twig:216
 msgid "Web vault URL"
 msgstr ""
 
-#: templates/config.html.twig:375
+#: templates/config.html.twig:369
 msgid ""
 "When disabled, GLPI only keeps metadata: the link then exists in the followup only."
 msgstr ""
