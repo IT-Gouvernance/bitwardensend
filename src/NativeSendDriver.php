@@ -248,6 +248,8 @@ class NativeSendDriver implements SendDriverInterface
             ));
         } finally {
             SendCrypto::zero($stretchedMasterKey);
+            SendCrypto::zero($encKey);
+            SendCrypto::zero($macKey);
         }
 
         if (strlen($userKey) !== 64) {
@@ -294,10 +296,17 @@ class NativeSendDriver implements SendDriverInterface
         ];
         SendCrypto::zero($clientSecret);
 
+        // $body['client_secret'] is its own copy of the secret, unaffected
+        // by zeroing $clientSecret above — encode it into the request body
+        // first, then zero that copy too rather than leaving it sitting in
+        // $body for the rest of this call.
+        $encodedBody = http_build_query($body, '', '&', PHP_QUERY_RFC1738);
+        SendCrypto::zero($body['client_secret']);
+
         $response = $this->httpRequest(
             'POST',
             $identityUrl . '/connect/token',
-            http_build_query($body, '', '&', PHP_QUERY_RFC1738),
+            $encodedBody,
             ['Content-Type: application/x-www-form-urlencoded']
         );
 
