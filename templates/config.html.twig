@@ -49,7 +49,9 @@
          </div>
 
          <div class="row mb-3">
-            <label class="col-form-label col-md-4" for="cfg_send_driver">{{ __('Send driver', 'bitwardensend') }}</label>
+            <label class="col-form-label col-md-4" for="cfg_send_driver">
+               <i class="ti ti-route me-1 text-secondary"></i>{{ __('Send driver', 'bitwardensend') }}
+            </label>
             <div class="col-md-8">
                <select id="cfg_send_driver" name="send_driver" class="form-select">
                   <option value="cli" {{ conf.send_driver == 'cli' ? 'selected' : '' }}>
@@ -67,7 +69,9 @@
 
          <div data-bws-driver="cli">
             <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_backend">{{ __('Access mode', 'bitwardensend') }}</label>
+               <label class="col-form-label col-md-4" for="cfg_backend">
+                  <i class="ti ti-adjustments-horizontal me-1 text-secondary"></i>{{ __('Access mode', 'bitwardensend') }}
+               </label>
                <div class="col-md-8">
                   <select id="cfg_backend" name="backend" class="form-select">
                      <option value="serve" {{ conf.backend == 'serve' ? 'selected' : '' }}>
@@ -82,7 +86,9 @@
 
             <div data-bws-mode="serve">
                <div class="row mb-3">
-                  <label class="col-form-label col-md-4" for="cfg_api_url">{{ __('Local API URL', 'bitwardensend') }}</label>
+                  <label class="col-form-label col-md-4" for="cfg_api_url">
+                     <i class="ti ti-link me-1 text-secondary"></i>{{ __('Local API URL', 'bitwardensend') }}
+                  </label>
                   <div class="col-md-8">
                      <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}">
                      <div class="form-hint">{{ __('For example http://127.0.0.1:8087 — never expose this port publicly.', 'bitwardensend') }}</div>
@@ -90,7 +96,9 @@
                </div>
 
                <div class="row mb-3">
-                  <label class="col-form-label col-md-4" for="cfg_timeout">{{ __('Timeout (seconds)', 'bitwardensend') }}</label>
+                  <label class="col-form-label col-md-4" for="cfg_timeout">
+                     <i class="ti ti-clock me-1 text-secondary"></i>{{ __('Timeout (seconds)', 'bitwardensend') }}
+                  </label>
                   <div class="col-md-8">
                      <input type="number" id="cfg_timeout" name="timeout" class="form-control" min="1" max="120" value="{{ conf.timeout }}">
                   </div>
@@ -121,14 +129,18 @@
 
             <div data-bws-mode="cli">
                <div class="row mb-3">
-                  <label class="col-form-label col-md-4" for="cfg_cli_path">{{ __('Path to the bw binary', 'bitwardensend') }}</label>
+                  <label class="col-form-label col-md-4" for="cfg_cli_path">
+                     <i class="ti ti-terminal-2 me-1 text-secondary"></i>{{ __('Path to the bw binary', 'bitwardensend') }}
+                  </label>
                   <div class="col-md-8">
                      <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}">
                   </div>
                </div>
 
                <div class="row mb-3">
-                  <label class="col-form-label col-md-4" for="cfg_appdata">BITWARDENCLI_APPDATA_DIR</label>
+                  <label class="col-form-label col-md-4" for="cfg_appdata">
+                     <i class="ti ti-folder me-1 text-secondary"></i>BITWARDENCLI_APPDATA_DIR
+                  </label>
                   <div class="col-md-8">
                      <input type="text" id="cfg_appdata" name="cli_appdata_dir" class="form-control" value="{{ conf.cli_appdata_dir }}">
                      <div class="form-hint">{{ __('Client data directory, writable by the web server user.', 'bitwardensend') }}</div>
@@ -155,7 +167,9 @@
             </div>
 
             <div class="row">
-               <label class="col-form-label col-md-4" for="cfg_send_base">{{ __('Send link base URL', 'bitwardensend') }}</label>
+               <label class="col-form-label col-md-4" for="cfg_send_base">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Send link base URL', 'bitwardensend') }}
+               </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_send_base" name="send_base_url" class="form-control" value="{{ conf.send_base_url }}">
                   <div class="form-hint">
@@ -174,7 +188,9 @@
             </div>
 
             <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_identity_url">{{ __('Identity URL', 'bitwardensend') }}</label>
+               <label class="col-form-label col-md-4" for="cfg_native_identity_url">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Identity URL', 'bitwardensend') }}
+               </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_identity_url" name="native_identity_url" class="form-control"
                          value="{{ conf.native_identity_url }}">
@@ -182,7 +198,9 @@
             </div>
 
             <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_api_url">{{ __('API URL', 'bitwardensend') }}</label>
+               <label class="col-form-label col-md-4" for="cfg_native_api_url">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('API URL', 'bitwardensend') }}
+               </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_api_url" name="native_api_url" class="form-control"
                          value="{{ conf.native_api_url }}">
@@ -190,7 +208,9 @@
             </div>
 
             <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_web_vault_url">{{ __('Web vault URL', 'bitwardensend') }}</label>
+               <label class="col-form-label col-md-4" for="cfg_native_web_vault_url">
+                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Web vault URL', 'bitwardensend') }}
+               </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
                          value="{{ conf.native_web_vault_url }}">
@@ -201,7 +221,9 @@
             </div>
 
             <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_client_id">{{ __('API client ID', 'bitwardensend') }}</label>
+               <label class="col-form-label col-md-4" for="cfg_native_client_id">
+                  <i class="ti ti-id me-1 text-secondary"></i>{{ __('API client ID', 'bitwardensend') }}
+               </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_client_id" name="native_client_id" class="form-control"
                          value="{{ conf.native_client_id }}">
@@ -227,7 +249,9 @@
             </div>
 
             <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_email">{{ __('Account email', 'bitwardensend') }}</label>
+               <label class="col-form-label col-md-4" for="cfg_native_email">
+                  <i class="ti ti-mail me-1 text-secondary"></i>{{ __('Account email', 'bitwardensend') }}
+               </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_email" name="native_email" class="form-control"
                          value="{{ conf.native_email }}">
@@ -263,12 +287,16 @@
 
          <div class="row g-3 mb-3">
             <div class="col-md-6">
-               <label class="form-label" for="cfg_days">{{ __('Default expiration (days)', 'bitwardensend') }}</label>
+               <label class="form-label" for="cfg_days">
+                  <i class="ti ti-calendar-time me-1 text-secondary"></i>{{ __('Default expiration (days)', 'bitwardensend') }}
+               </label>
                <input type="number" id="cfg_days" name="default_deletion_days" class="form-control"
                       min="1" max="31" value="{{ conf.default_deletion_days }}">
             </div>
             <div class="col-md-6">
-               <label class="form-label" for="cfg_access">{{ __('Default maximum views', 'bitwardensend') }}</label>
+               <label class="form-label" for="cfg_access">
+                  <i class="ti ti-eye me-1 text-secondary"></i>{{ __('Default maximum views', 'bitwardensend') }}
+               </label>
                <input type="number" id="cfg_access" name="default_max_access_count" class="form-control"
                       min="0" max="100" value="{{ conf.default_max_access_count }}">
                <div class="form-hint">{{ __('0 means unlimited until expiration.', 'bitwardensend') }}</div>
@@ -277,14 +305,18 @@
 
          <div class="list-group list-group-flush border rounded">
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Hide the sender email address by default', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-mail-off me-1 text-secondary"></i>{{ __('Hide the sender email address by default', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="default_hide_email" value="1" {{ conf.default_hide_email ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Show a random password generator on the creation form', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-key me-1 text-secondary"></i>{{ __('Show a random password generator on the creation form', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="password_generator_enabled" value="1" {{ conf.password_generator_enabled ? 'checked' : '' }}>
@@ -302,28 +334,36 @@
 
          <div class="list-group list-group-flush border rounded mb-2">
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Post the link as a followup by default', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-send me-1 text-secondary"></i>{{ __('Post the link as a followup by default', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="add_followup" value="1" {{ conf.add_followup ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Private followup by default', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-eye-off me-1 text-secondary"></i>{{ __('Private followup by default', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="followup_is_private" value="1" {{ conf.followup_is_private ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Keep the link in the GLPI database', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-database me-1 text-secondary"></i>{{ __('Keep the link in the GLPI database', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="store_access_url" value="1" {{ conf.store_access_url ? 'checked' : '' }}>
                </span>
             </label>
             <label class="list-group-item d-flex align-items-center justify-content-between">
-               <span class="form-check-label me-3">{{ __('Allow choosing a GLPI followup template when creating a Send', 'bitwardensend') }}</span>
+               <span class="form-check-label me-3">
+                  <i class="ti ti-stack-2 me-1 text-secondary"></i>{{ __('Allow choosing a GLPI followup template when creating a Send', 'bitwardensend') }}
+               </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
                          name="allow_glpi_followup_templates" value="1"
@@ -335,7 +375,9 @@
             {{ __('When disabled, GLPI only keeps metadata: the link then exists in the followup only.', 'bitwardensend') }}
          </div>
 
-         <label class="form-label" for="cfg_template">{{ __('Followup template', 'bitwardensend') }}</label>
+         <label class="form-label" for="cfg_template">
+            <i class="ti ti-file-text me-1 text-secondary"></i>{{ __('Followup template', 'bitwardensend') }}
+         </label>
          <textarea id="cfg_template" name="followup_template" class="form-control" rows="8">{{ conf.followup_template }}</textarea>
          <div class="form-hint">
             {{ __('Variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}', 'bitwardensend') }}
