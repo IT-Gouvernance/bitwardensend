@@ -137,9 +137,17 @@ class Send extends CommonDBTM
                 $where['is_active'] = 1;
             }
             if ($DB->fieldExists($table, 'entities_id')) {
-                // Plain match on the item's entity — not GLPI's recursive
-                // resolution, this is just a convenience picker.
-                $where['entities_id'] = (int) ($item->fields['entities_id'] ?? 0);
+                // 'auto': includes is_recursive=1 templates from ancestor
+                // entities when the table has that column, same rule GLPI's
+                // own entity-scoped pickers use — plain entities_id match
+                // otherwise. Without this, a template set recursive on a
+                // parent entity simply never showed up here.
+                $where[] = (new \DbUtils())->getEntitiesRestrictCriteria(
+                    $table,
+                    'entities_id',
+                    (int) ($item->fields['entities_id'] ?? 0),
+                    'auto'
+                );
             }
 
             $templates = [];
