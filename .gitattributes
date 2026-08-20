@@ -1,5 +1,8 @@
 # Excluded from `git archive` output (the plugin release archive built by
 # .github/workflows/release.yml) — dev-only tooling, not needed to run the
 # plugin.
-.github/  export-ignore
-tools/    export-ignore
+.github/     export-ignore
+tools/       export-ignore
+docs/        export-ignore
+screenshots/ export-ignore
+tests/       export-ignore
