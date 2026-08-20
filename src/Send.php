@@ -83,8 +83,7 @@ class Send extends CommonDBTM
             "Hello,\n\n"
             . "Here is a secure link to retrieve the confidential information for this request:\n\n"
             . "{url}\n\n"
-            . "The link expires on {expiration} and can be opened {max_access} time(s). "
-            . "Once viewed, the content is no longer available.\n\n"
+            . "The link expires on {expiration} and can be opened {max_access} time(s).\n\n"
             . "Kind regards,",
             'bitwardensend'
         );

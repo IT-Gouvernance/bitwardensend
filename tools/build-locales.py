@@ -150,16 +150,14 @@ def find_calls(text, func):
 TPL_EN = ("Hello,\n\n"
           "Here is a secure link to retrieve the confidential information for this request:\n\n"
           "{url}\n\n"
-          "The link expires on {expiration} and can be opened {max_access} time(s). "
-          "Once viewed, the content is no longer available.\n\n"
+          "The link expires on {expiration} and can be opened {max_access} time(s).\n\n"
           "Kind regards,")
 
 TPL_FR = ("Bonjour,\n\n"
           "Voici un lien sécurisé pour récupérer les informations confidentielles "
           "de cette demande :\n\n"
           "{url}\n\n"
-          "Ce lien expire le {expiration} et peut être ouvert {max_access} fois. "
-          "Une fois consulté, le contenu n'est plus accessible.\n\n"
+          "Ce lien expire le {expiration} et peut être ouvert {max_access} fois.\n\n"
           "Cordialement,")
 
 FR = {
