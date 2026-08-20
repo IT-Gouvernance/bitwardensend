@@ -91,7 +91,7 @@
                      <span class="text-danger">*</span>
                   </label>
                   <div class="col-md-8">
-                     <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}" required>
+                     <input type="text" id="cfg_api_url" name="api_url" class="form-control" value="{{ conf.api_url }}" data-bws-required="1">
                      <div class="form-hint">{{ __('For example http://127.0.0.1:8087 — never expose this port publicly.', 'bitwardensend') }}</div>
                   </div>
                </div>
@@ -135,7 +135,7 @@
                      <span class="text-danger">*</span>
                   </label>
                   <div class="col-md-8">
-                     <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}" required>
+                     <input type="text" id="cfg_cli_path" name="cli_path" class="form-control" value="{{ conf.cli_path }}" data-bws-required="1">
                   </div>
                </div>
 
@@ -196,7 +196,7 @@
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_identity_url" name="native_identity_url" class="form-control"
-                         value="{{ conf.native_identity_url }}" required>
+                         value="{{ conf.native_identity_url }}" data-bws-required="1">
                </div>
             </div>
 
@@ -207,7 +207,7 @@
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_api_url" name="native_api_url" class="form-control"
-                         value="{{ conf.native_api_url }}" required>
+                         value="{{ conf.native_api_url }}" data-bws-required="1">
                </div>
             </div>
 
@@ -218,7 +218,7 @@
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
-                         value="{{ conf.native_web_vault_url }}" required>
+                         value="{{ conf.native_web_vault_url }}" data-bws-required="1">
                   <div class="form-hint">
                      {{ __('Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}
                   </div>
@@ -232,7 +232,7 @@
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_client_id" name="native_client_id" class="form-control"
-                         value="{{ conf.native_client_id }}" required>
+                         value="{{ conf.native_client_id }}" data-bws-required="1">
                </div>
             </div>
 
@@ -245,7 +245,7 @@
                   <input type="password" id="cfg_native_client_secret" name="native_client_secret" class="form-control"
                          autocomplete="new-password"
                          placeholder="{{ has_native_client_secret ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}"
-                         {{ has_native_client_secret ? '' : 'required' }}>
+                         data-bws-required="{{ has_native_client_secret ? '0' : '1' }}">
                   <div class="form-hint">{{ __('Encrypted with the GLPI key.', 'bitwardensend') }}</div>
                   {% if has_native_client_secret %}
                      <label class="form-check mt-1">
@@ -263,7 +263,7 @@
                </label>
                <div class="col-md-8">
                   <input type="text" id="cfg_native_email" name="native_email" class="form-control"
-                         value="{{ conf.native_email }}" required>
+                         value="{{ conf.native_email }}" data-bws-required="1">
                </div>
             </div>
 
@@ -276,7 +276,7 @@
                   <input type="password" id="cfg_native_master_password" name="native_master_password" class="form-control"
                          autocomplete="new-password"
                          placeholder="{{ has_native_master_password ? __('Stored — type a new one to replace it', 'bitwardensend') : __('Not set', 'bitwardensend') }}"
-                         {{ has_native_master_password ? '' : 'required' }}>
+                         data-bws-required="{{ has_native_master_password ? '0' : '1' }}">
                   <div class="form-hint">{{ __('Encrypted with the GLPI key. PBKDF2 accounts only — see the README.', 'bitwardensend') }}</div>
                   {% if has_native_master_password %}
                      <label class="form-check mt-1">
