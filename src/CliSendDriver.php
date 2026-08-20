@@ -34,13 +34,19 @@ namespace GlpiPlugin\Bitwardensend;
 use RuntimeException;
 
 /**
- * Bitwarden client.
+ * Bitwarden Send driver backed by the official client, one way or another.
+ *
+ * Formerly the plugin's only driver (as the class `Client`); renamed to sit
+ * behind SendDriverInterface alongside NativeSendDriver. The internals below
+ * are unchanged from that version — only the public surface (createSend()
+ * instead of createTextSend(), isAvailable() added) was adapted to the
+ * interface.
  *
  * Two modes are supported:
  *  - "serve" (recommended): Vault Management API exposed by `bw serve`
  *  - "cli":                 direct invocation of the `bw` binary
  */
-class Client
+class CliSendDriver implements SendDriverInterface
 {
     /** @var array<string,mixed> */
     private array $conf;
@@ -53,13 +59,43 @@ class Client
         $this->conf = $conf ?? Config::getConfig();
     }
 
+    public function createSend(SendPayload $payload): SendResult
+    {
+        $result = $this->createTextSend($payload->name, $payload->text, [
+            'notes'             => $payload->notes,
+            'hidden'            => $payload->hidden,
+            'max_access_count'  => $payload->maxAccessCount,
+            'deletion_date'     => $payload->deletionDate,
+            'expiration_date'   => $payload->expirationDate,
+            'password'          => $payload->password,
+            'hide_email'        => $payload->hideEmail,
+        ]);
+
+        return new SendResult(
+            uuid: $result['uuid'],
+            accessId: $result['access_id'],
+            accessUrl: $result['access_url'],
+            deletionDate: $result['deletion_date'],
+        );
+    }
+
+    public function isAvailable(): bool
+    {
+        if (($this->conf['backend'] ?? 'serve') === 'cli') {
+            $binary = (string) ($this->conf['cli_path'] ?? '');
+            return $binary !== '' && is_executable($binary) && Config::getCliSession() !== '';
+        }
+
+        return trim((string) ($this->conf['api_url'] ?? '')) !== '';
+    }
+
     /**
      * Create a text Send.
      *
      * @param array<string,mixed> $options
      * @return array{uuid:string,access_id:string,access_url:string,deletion_date:?string}
      */
-    public function createTextSend(string $name, string $text, array $options = []): array
+    private function createTextSend(string $name, string $text, array $options = []): array
     {
         $max_access = (int) ($options['max_access_count'] ?? 0);
         $password   = (string) ($options['password'] ?? '');
