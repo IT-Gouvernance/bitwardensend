@@ -137,10 +137,8 @@ class Send extends CommonDBTM
                 $where['is_active'] = 1;
             }
             if ($DB->fieldExists($table, 'entities_id')) {
-                // A plain match on the item's own entity, deliberately not
-                // reproducing GLPI's own recursive-entity resolution: simpler,
-                // and this is a convenience picker gated behind its own read
-                // right already, not an isolation boundary.
+                // Plain match on the item's entity — not GLPI's recursive
+                // resolution, this is just a convenience picker.
                 $where['entities_id'] = (int) ($item->fields['entities_id'] ?? 0);
             }
 
@@ -171,23 +169,13 @@ class Send extends CommonDBTM
     // ------------------------------------------------------------------
 
     /**
-     * Entry added to GLPI's "answer" split dropdown/button row (next to
-     * Followup/Task/Solution/...), per the modern (GLPI >= 10.0)
-     * Hooks::TIMELINE_ANSWER_ACTIONS contract — superseding the pre-10.0
-     * Hooks::TIMELINE_ACTIONS this plugin used to register: that one renders
-     * into a separate, visually disconnected "legacy" toolbar rather than
-     * alongside the other answer buttons.
+     * Entry in GLPI's "answer" split button, next to Followup/Task/Solution
+     * (Hooks::TIMELINE_ANSWER_ACTIONS, GLPI >= 10.0). Rights/item-type/new-item
+     * gating happens here rather than in setup.php, so the hook can just
+     * always be registered — [] means "nothing to show".
      *
-     * All the gating that used to live in setup.php (rights, item type,
-     * new-item state) is done here instead, so the hook itself can just
-     * always be registered: returning [] is exactly what "nothing to show"
-     * means for this contract.
-     *
-     * The returned 'item' does not need to be a real GLPI entity — it is
-     * only ever handed back to our own '@bitwardensend/answer_form.html.twig'
-     * as the 'subitem' variable (never through GLPI's generic showForm()
-     * fallback, since a 'template' is always provided) — so it doubles as a
-     * plain data carrier for everything that template needs.
+     * The 'item' key doesn't need to be a real GLPI entity: it's just
+     * handed to our own answer_form.html.twig as 'subitem'.
      *
      * @param array<string,mixed> $params
      * @return array<string,array<string,mixed>>

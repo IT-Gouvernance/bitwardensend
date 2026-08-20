@@ -218,10 +218,7 @@
             }) }}
          </div>
 
-         {# A compact column of icon + control rows next to the text, matching
-            how GLPI's own followup form places its own row of similar
-            controls (category, target, private, pending) beside the text
-            rather than above/below it as a full-width field each. #}
+         {# Compact column of controls next to the text, same idea as GLPI's own followup form. #}
          <div class="d-flex flex-column gap-2 pt-1">
             {% if subitem.followup_templates|length %}
                <div class="bws-side-control d-flex align-items-center gap-1">
@@ -243,9 +240,6 @@
                </div>
             {% endif %}
 
-            {# No separate bws-d-none binding needed here: a child of
-               #bws_followup_block now, hiding that ancestor already hides
-               this. #}
             <div id="bws_followup_private_row" class="bws-side-control d-flex align-items-center gap-1"
                  title="{{ __('Private followup (hidden from the requester)', 'bitwardensend') }}">
                <i class="ti ti-eye-off text-secondary"></i>

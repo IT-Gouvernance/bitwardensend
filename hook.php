@@ -105,11 +105,11 @@ function plugin_bitwardensend_install(): bool
         $DB->doQuery($query);
     }
 
-    // GLPI runs this same function on update, so every write below must be safe to
-    // replay: an unguarded INSERT would fail on a unique key the second time.
+    // GLPI calls this same function again on update, so nothing below can be
+    // a plain unguarded INSERT.
 
-    // Single configuration row. Never overwritten, so a customised followup
-    // template survives updates.
+    // The single config row, created once — never touched again so an admin's
+    // edited followup template isn't reset by a later update.
     if (plugin_bitwardensend_countRows($config_table) === 0) {
         $DB->insert($config_table, [
             'id'                => 1,
@@ -118,15 +118,12 @@ function plugin_bitwardensend_install(): bool
         ]);
     }
 
-    // Rights. ProfileRight::addProfileRights() inserts one row per profile without
-    // checking for existing ones, which violates the (profiles_id, name) unique key
-    // when install is replayed.
+    // addProfileRights() has no "already exists" check of its own, hence the guard.
     if (plugin_bitwardensend_countRows('glpi_profilerights', ['name' => Send::$rightname]) === 0) {
         ProfileRight::addProfileRights([Send::$rightname]);
     }
 
-    // Grant the right to the profile performing the installation. UPDATE is
-    // replayable, and it only widens rights that are already registered.
+    // Give the installing profile full rights right away.
     if (isset($_SESSION['glpiactiveprofile']['id'])) {
         $DB->update(
             'glpi_profilerights',
@@ -139,8 +136,6 @@ function plugin_bitwardensend_install(): bool
         $_SESSION['glpiactiveprofile'][Send::$rightname] = ALLSTANDARDRIGHT;
     }
 
-    // Idempotent: register() checks for an existing row (itemtype + name)
-    // before inserting, so replaying install on update never duplicates it.
     CronTask::register(Send::class, 'cleanup', DAY_TIMESTAMP, [
         'comment' => __(
             'Delete revoked or expired Bitwarden Send entries past the configured retention',
@@ -154,11 +149,6 @@ function plugin_bitwardensend_install(): bool
 }
 
 /**
- * Count rows with the query builder.
- *
- * Used instead of countElementsInTable() so the install guards do not depend on a
- * helper whose behaviour varies across GLPI versions.
- *
  * @param array<string,mixed> $where
  */
 function plugin_bitwardensend_countRows(string $table, array $where = []): int
