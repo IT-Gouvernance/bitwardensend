@@ -85,9 +85,16 @@ final class EncStringTest extends TestCase
         $enc = EncString::encrypt('secret content', $encKey, $macKey);
         $serialized = (string) $enc;
 
-        // Flip one character in the mac segment.
+        // Flip one byte of the decoded mac, then re-encode — mangling the
+        // base64 text directly (e.g. strrev()) can move its padding '='
+        // out of place and produce a string that is not valid base64 at
+        // all, which parse() rejects before decrypt() ever gets to check
+        // the MAC. Tampering the decoded bytes keeps it valid base64 so
+        // this test actually exercises the MAC check.
         $parts = explode('|', $serialized);
-        $parts[2] = strrev($parts[2]);
+        $macBytes = base64_decode($parts[2]);
+        $macBytes[0] = chr(ord($macBytes[0]) ^ 0xFF);
+        $parts[2] = base64_encode($macBytes);
         $tampered = implode('|', $parts);
 
         $this->expectException(RuntimeException::class);
