@@ -239,7 +239,7 @@
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_client_secret">
                   <i class="ti ti-lock me-1 text-secondary"></i>{{ __('API client secret', 'bitwardensend') }}
-                  {% if not has_native_client_secret %}<span class="text-danger">*</span>{% endif %}
+                  <span class="text-danger">*</span>
                </label>
                <div class="col-md-8">
                   <input type="password" id="cfg_native_client_secret" name="native_client_secret" class="form-control"
@@ -270,7 +270,7 @@
             <div class="row">
                <label class="col-form-label col-md-4" for="cfg_native_master_password">
                   <i class="ti ti-lock me-1 text-secondary"></i>{{ __('Master password', 'bitwardensend') }}
-                  {% if not has_native_master_password %}<span class="text-danger">*</span>{% endif %}
+                  <span class="text-danger">*</span>
                </label>
                <div class="col-md-8">
                   <input type="password" id="cfg_native_master_password" name="native_master_password" class="form-control"
