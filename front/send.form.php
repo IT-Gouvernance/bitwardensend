@@ -31,15 +31,7 @@
 
 use GlpiPlugin\Bitwardensend\Send;
 
-if (!defined('GLPI_ROOT')) {
-    include('../../../inc/includes.php');
-}
-
 Session::checkRight(Send::$rightname, READ);
-
-// The CSRF token is validated automatically by GLPI (the plugin declares
-// "csrf_compliant" in setup.php). Tokens are single use, so calling
-// Session::checkCSRF() again here would always fail.
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     Html::back();
