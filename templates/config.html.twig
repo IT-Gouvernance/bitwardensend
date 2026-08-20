@@ -365,6 +365,8 @@
             <label class="list-group-item d-flex align-items-center justify-content-between">
                <span class="form-check-label me-3">
                   <i class="ti ti-database me-1 text-secondary"></i>{{ __('Keep the link in the GLPI database', 'bitwardensend') }}
+                  <i class="ti ti-info-circle text-secondary ms-1"
+                     title="{{ __('When disabled, GLPI only keeps metadata: the link then exists in the followup only.', 'bitwardensend') }}"></i>
                </span>
                <span class="form-check form-switch mb-0">
                   <input type="checkbox" class="form-check-input" role="switch"
@@ -381,9 +383,6 @@
                          {{ conf.allow_glpi_followup_templates ? 'checked' : '' }}>
                </span>
             </label>
-         </div>
-         <div class="form-hint mb-3">
-            {{ __('When disabled, GLPI only keeps metadata: the link then exists in the followup only.', 'bitwardensend') }}
          </div>
 
          <label class="form-label" for="cfg_template">
