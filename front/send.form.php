@@ -54,7 +54,11 @@ if (isset($_POST['create_send'])) {
 if (isset($_POST['revoke'], $_POST['id'])) {
     Session::checkRight(Send::$rightname, UPDATE);
     $send = new Send();
-    if ($send->getFromDB((int) $_POST['id'])) {
+    // checkRight() above only confirms the global right; canUpdateItem()
+    // additionally checks this specific record's entity, so a user cannot
+    // revoke a Send belonging to an entity they have no access to just by
+    // guessing its id.
+    if ($send->getFromDB((int) $_POST['id']) && $send->canUpdateItem()) {
         $send->revoke();
     }
     Html::back();
@@ -63,7 +67,7 @@ if (isset($_POST['revoke'], $_POST['id'])) {
 if (isset($_POST['purge'], $_POST['id'])) {
     Session::checkRight(Send::$rightname, PURGE);
     $send = new Send();
-    if ($send->getFromDB((int) $_POST['id'])) {
+    if ($send->getFromDB((int) $_POST['id']) && $send->canPurgeItem()) {
         $send->delete(['id' => (int) $_POST['id']], true);
     }
     Html::back();
