@@ -289,11 +289,9 @@
    };
 
    /**
-    * A random string drawn from charset, length characters long.
-    *
-    * crypto.getRandomValues, not Math.random(): every caller of this fills a
-    * field whose whole purpose is a secret shared with someone else, so weak
-    * randomness would defeat the point.
+    * A random string drawn from charset, length characters long. Uses
+    * crypto.getRandomValues rather than Math.random — these fill fields
+    * meant to be secrets.
     */
    function pluginBitwardensendRandomString(charset, length) {
       var randomValues = new Uint32Array(length);
@@ -366,22 +364,15 @@
    };
 
    /**
-    * Refresh the followup preview in the Send creation form, substituting
-    * {expiration} and {max_access} with what the current form values would
-    * produce. The access link itself only exists once the Send is created on
-    * the Bitwarden side, so {url} is shown as a placeholder, never a made-up
-    * value.
+    * Refresh the followup preview, substituting {expiration}/{max_access}
+    * with the current form values. {url} stays a placeholder — the real
+    * link doesn't exist until the Send is created.
     *
-    * Translated strings travel through data-bws-* attributes on
-    * #bws_followup_block rather than being hardcoded here, since this file
-    * has no access to GLPI's __().
+    * Translated strings come through data-bws-* attributes on
+    * #bws_followup_block, not hardcoded (no __() in plain JS).
     *
-    * The followup field is a GLPI rich text (TinyMCE) editor when it manages
-    * to initialize, and a plain <textarea> otherwise (e.g. the fallback
-    * dialog path, which injects markup through innerHTML and so never runs
-    * the inline <script> GLPI uses to bootstrap the editor). Both are
-    * supported: TinyMCE content is already real HTML and used as-is; a plain
-    * textarea's value is user-typed plain text and must be escaped first.
+    * Handles both a TinyMCE editor (used as-is, already HTML) and a plain
+    * <textarea> fallback (escaped first, since it's user-typed text).
     */
    window.pluginBitwardensendUpdateFollowupPreview = function () {
       var block = document.getElementById('bws_followup_block');
@@ -447,16 +438,11 @@
    };
 
    /**
-    * Current followup content as TinyMCE itself sees it, or null when the
-    * rich text editor is not (yet, or ever) initialized.
-    *
-    * Deliberately not the plain <textarea> fallback: TinyMCE reformats markup
-    * on load (e.g. paragraph wrapping) independently of anything the user
-    * types, so a baseline captured before the editor is ready would no longer
-    * match once it is — comparing two different serializations of the exact
-    * same, unedited content would raise a false "you have unsaved changes"
-    * warning on every first use. Reading only through this same accessor for
-    * both the baseline and the later comparison keeps them apples-to-apples.
+    * Current followup content as TinyMCE sees it, or null before it's
+    * initialized. Not the raw <textarea> value: TinyMCE reformats markup on
+    * load, so comparing a pre-init baseline to a post-init textarea value
+    * would falsely look like an edit. Always read through this same
+    * accessor for both sides of that comparison.
     */
    function pluginBitwardensendGetFollowupEditorContent() {
       var editor = (window.tinymce && window.tinymce.get) ? window.tinymce.get('bws_followup') : null;

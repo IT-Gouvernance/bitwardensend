@@ -34,27 +34,15 @@ namespace GlpiPlugin\Bitwardensend;
 use RuntimeException;
 
 /**
- * Bitwarden Send driver talking to the Bitwarden API directly in PHP — no
- * `bw` binary, no shell access, works on hosts that can only reach out over
- * HTTPS (e.g. GLPI Cloud). Authenticates as a dedicated service account via
- * its API key (client_credentials grant), the same flow `bw login --apikey`
- * uses.
+ * Talks to the Bitwarden API directly in PHP — no `bw` binary, no shell
+ * access. Authenticates as a service account via its API key
+ * (client_credentials grant), same as `bw login --apikey`.
  *
- * Config field names (native_identity_url, native_api_url, ...) and the
- * Config::getNativeClientSecret()/getNativeMasterPassword() decrypting
- * getters this class defaults its two secret constructor parameters to
- * are wired up in Config.php together with the rest of the native driver's
- * configuration screen — see that commit for the schema.
- *
- * The /connect/token response field names below (Key, Kdf, KdfIterations,
- * access_token, ...) could not be confirmed against a live call during
- * development — bitwarden/server's own source was not reachable — so both
- * the OAuth-standard snake_case names (access_token, expires_in) and the
- * PascalCase names third-party write-ups of the same endpoint show (Key,
- * Kdf, KdfIterations) are accepted; whichever one is real will be picked
- * up, and the other simply never matches. The opt-in integration test (see
- * tests/NativeSendDriverIntegrationTest.php, added once createSend() exists)
- * is what actually proves this against the real API.
+ * The /connect/token response field casing (Key vs key, Kdf vs kdf...)
+ * wasn't confirmed against a live call while writing this, so both the
+ * snake_case and PascalCase names get checked below — see
+ * tests/NativeSendDriverIntegrationTest.php for the one that actually runs
+ * against a real account.
  */
 class NativeSendDriver implements SendDriverInterface
 {
@@ -64,13 +52,9 @@ class NativeSendDriver implements SendDriverInterface
     private string $masterPassword;
 
     /**
-     * $clientSecret/$masterPassword default to Config's own decrypting
-     * getters (the normal path, used by SendDriverFactory) but can be
-     * passed explicitly instead — the only way this class touches GLPI at
-     * all is through those two getters and Config::getConfig(), so
-     * supplying all three directly (as the opt-in integration test does,
-     * from plain environment variables) makes this class fully usable with
-     * no GLPI bootstrap.
+     * The three params default to Config's getters, but can be passed
+     * directly (the integration test does this, from env vars, so it can
+     * run without a GLPI bootstrap).
      *
      * @param array<string,mixed>|null $conf
      */
@@ -133,13 +117,10 @@ class NativeSendDriver implements SendDriverInterface
                 : null,
             'deletionDate'   => $payload->deletionDate,
             'expirationDate' => $payload->expirationDate,
-            // Never the plaintext password: the real API only ever sees a
-            // PBKDF2 hash of it, salted with this Send's own (not the
-            // user's) key material — see SendCrypto::hashSendPassword(). The
-            // CLI driver can send the password as-is because `bw serve`
-            // itself does this hashing before this plugin's request to it
-            // ever reaches the real Bitwarden API; here, this plugin *is*
-            // that client, so it has to do it.
+            // Hashed, not plaintext — see SendCrypto::hashSendPassword(). The
+            // CLI driver can send it as-is because bw serve hashes it before
+            // the request reaches Bitwarden; here we are the client, so we
+            // have to do that step ourselves.
             'password'  => $hasPassword ? SendCrypto::hashSendPassword($payload->password, $keyMaterial) : null,
             'disabled'  => $payload->disabled,
             'hideEmail' => $payload->hideEmail,
@@ -185,11 +166,8 @@ class NativeSendDriver implements SendDriverInterface
             throw new RuntimeException(__('Unknown Send identifier', 'bitwardensend'));
         }
 
-        // Only the bearer token, not the full authenticate(): revoking
-        // needs no key material at all, and skipping the master-key
-        // derivation avoids paying for a (deliberately expensive,
-        // potentially 600k+ iteration) PBKDF2 run on every revoke for
-        // nothing.
+        // Just the token, not the full authenticate() — revoking doesn't
+        // need the user key, so skip the PBKDF2 run for nothing.
         $accessToken = $this->requestAccessToken()['accessToken'];
 
         $apiUrl = rtrim((string) ($this->conf['native_api_url'] ?? ''), '/');
@@ -210,16 +188,11 @@ class NativeSendDriver implements SendDriverInterface
     // ------------------------------------------------------------------
 
     /**
-     * Authenticate as the configured service account and decrypt its user
-     * key. Returns the access token (for the /sends calls that follow) and
-     * the 64-byte user enc+mac key pair (see SendCrypto::stretchKey()) that
-     * encrypts a Send's own key material for the server.
-     *
-     * Nothing here is cached across calls: each Send operation is
-     * infrequent and short-lived enough (a single HTTP request plus some
-     * local key derivation) that re-authenticating every time is simpler
-     * and safer than managing a token's lifetime across requests, at the
-     * cost of one extra round trip per operation.
+     * Logs in and decrypts the account's user key (see
+     * SendCrypto::stretchKey()), which encrypts a Send's own key material
+     * for the server. Not cached — re-authenticating each call is simpler
+     * than tracking a token's lifetime, and Sends aren't created often
+     * enough for the extra round trip to matter.
      *
      * @return array{accessToken:string,userKey:string}
      */
@@ -242,9 +215,8 @@ class NativeSendDriver implements SendDriverInterface
         try {
             $masterKey = SendCrypto::deriveMasterKey($masterPassword, $email, $kdfType, $token['kdfIterations']);
         } catch (RuntimeException $e) {
-            // SendCrypto has no GLPI dependency at all (see its own class
-            // doc comment) and so cannot call __() itself — translating its
-            // one possible failure (an Argon2id account) here instead.
+            // SendCrypto can't call __() itself (no GLPI dependency), so
+            // translate its one failure case here.
             throw new RuntimeException(__(
                 'This account uses the Argon2id KDF, which the native driver cannot reproduce '
                 . 'in PHP. Use a service account configured with PBKDF2, or switch this Send '
@@ -313,13 +285,9 @@ class NativeSendDriver implements SendDriverInterface
             'scope'            => 'api',
             'client_id'        => $clientId,
             'client_secret'    => $clientSecret,
-            // Device metadata is required by the token endpoint (it refuses
-            // requests with none) but does not affect the cryptography
-            // below — at most it mislabels this login in the account's own
-            // "new device" security notifications. deviceType 21 is
-            // Bitwarden's "SDK" classification in every third-party
-            // reference found during development; not confirmed against a
-            // live account, but low-stakes if wrong.
+            // The endpoint rejects requests with no device info. 21 is the
+            // "SDK" deviceType per third-party docs — worst case it just
+            // mislabels the login in the account's device history.
             'deviceType'       => 21,
             'deviceIdentifier' => self::deviceIdentifier($clientId),
             'deviceName'       => 'glpi-bitwardensend',
@@ -359,13 +327,7 @@ class NativeSendDriver implements SendDriverInterface
         ];
     }
 
-    /**
-     * A stable, UUID-shaped device identifier — required by the token
-     * endpoint, but nothing here depends on it matching any specific value
-     * across requests beyond "the same client_id always sends the same
-     * one", which this satisfies without persisting anything new: it's
-     * just derived from the client_id itself, deterministically.
-     */
+    /** UUID-shaped, derived from client_id so it's stable without persisting it anywhere. */
     private static function deviceIdentifier(string $clientId): string
     {
         $hash = hash('sha256', 'bitwardensend:' . $clientId);
@@ -391,10 +353,8 @@ class NativeSendDriver implements SendDriverInterface
             CURLOPT_CUSTOMREQUEST  => $method,
             CURLOPT_TIMEOUT        => (int) ($this->conf['timeout'] ?? 15),
             CURLOPT_CONNECTTIMEOUT => 5,
-            // Never negotiable: this driver is specifically for hosts that
-            // cannot be trusted with a local vault unlock, so the transport
-            // to Bitwarden's own servers must be genuinely verified — no
-            // config flag exists anywhere in this plugin to turn this off.
+            // No config flag to disable this — talking to Bitwarden's real
+            // servers over an unverified connection defeats the point.
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
         ];
@@ -405,14 +365,9 @@ class NativeSendDriver implements SendDriverInterface
         $options[CURLOPT_HTTPHEADER] = array_merge(
             [
                 'Accept: application/json',
-                // Confirmed required against a live account: without it, the
-                // API refuses the request outright ("No client version
-                // header found, required to prevent encryption errors").
-                // Bitwarden's own clients use their real release version
-                // here (format yyyy.mm.r); this plugin is not one of them,
-                // so this is just a recent-looking value to satisfy whatever
-                // minimum-version gate is behind that check — bump it if a
-                // future server rejects it as too old.
+                // Required — the API rejects requests without it ("No client
+                // version header found"). Bump this if a server ever starts
+                // rejecting it as too old.
                 'Bitwarden-Client-Version: 2025.6.0',
             ],
             $headers
@@ -442,10 +397,7 @@ class NativeSendDriver implements SendDriverInterface
             throw new RuntimeException(sprintf(__('Bitwarden API error: %s', 'bitwardensend'), $message));
         }
 
-        // Some successful responses have no body at all (e.g. DELETE
-        // /sends/{id} returns HTTP 200/204 with nothing to decode) — that is
-        // not an error, callers that need fields (createSend, the token
-        // endpoint) already check for them explicitly below.
+        // DELETE /sends/{id} returns 200/204 with an empty body — not an error.
         if ($raw === '' || $raw === false) {
             return [];
         }

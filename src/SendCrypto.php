@@ -35,21 +35,10 @@ use RuntimeException;
 
 /**
  * Key derivation primitives for the native (pure PHP) Bitwarden driver.
- *
- * Every constant and construction here was verified against the actual
- * Rust implementation in bitwarden/sdk-internal (crate bitwarden_crypto),
- * not reconstructed from memory or from Bitwarden's own (intentionally
- * high-level) public documentation — see the doc comment on each method
- * for exactly which source file it matches. None of this is standard
- * textbook HKDF usage in the way the name suggests: the master-key stretch
- * skips HKDF-Extract entirely (the master key itself is used as the PRK),
- * while the Send key derivation does its own HMAC-based extract with a
- * fixed "bitwarden-" prefix before expanding — these are two genuinely
- * different constructions, not one function reused twice.
- *
- * Stateless by design: every method is a pure function of its arguments,
- * so these can be unit tested without any GLPI bootstrap (no $DB, no
- * Session) — see tests/SendCryptoTest.php.
+ * Checked against bitwarden/sdk-internal's Rust implementation
+ * (bitwarden_crypto) rather than the public docs — see each method for
+ * the matching source file. No GLPI dependency, so plain phpunit can
+ * exercise these directly (tests/SendCryptoTest.php).
  */
 final class SendCrypto
 {
@@ -60,21 +49,12 @@ final class SendCrypto
 
     /**
      * The user's master key (32 bytes) from their master password.
+     * Matches MasterKey::derive() in bitwarden_crypto/src/keys/kdf.rs:
+     * PBKDF2-HMAC-SHA256, salted with the trimmed, lowercased email.
      *
-     * Matches MasterKey::derive() / KdfDerivedKeyMaterial::derive() in
-     * bitwarden_crypto/src/keys/kdf.rs: PBKDF2-HMAC-SHA256 over the
-     * password, salted with the trimmed, lowercased email — plain UTF-8
-     * bytes, not hashed first (that hashing-the-salt step is Argon2id-only,
-     * see below).
-     *
-     * Argon2id accounts are deliberately unsupported: Bitwarden salts
-     * Argon2id with SHA-256(email) — 32 bytes — but PHP's sodium extension
-     * hard-requires a 16-byte salt for sodium_crypto_pwhash() (the only
-     * Argon2id primitive it exposes), so this cannot be reproduced without
-     * an extra dependency (e.g. FFI into libsodium's lower-level API) that
-     * would defeat the point of a dependency-free driver. Configure the
-     * Bitwarden service account with PBKDF2 (the default for API-key-only
-     * accounts) to use this driver, or use the CLI driver otherwise.
+     * Argon2id isn't supported: Bitwarden salts it with SHA-256(email) — 32
+     * bytes — but PHP's sodium_crypto_pwhash() only accepts a 16-byte salt.
+     * Use a PBKDF2 service account, or the CLI driver instead.
      */
     public static function deriveMasterKey(
         string $password,
@@ -83,12 +63,8 @@ final class SendCrypto
         int $iterations
     ): string {
         if ($kdfType !== 'pbkdf2') {
-            // Deliberately not translated via __(): this class has no GLPI
-            // dependency at all (see the class doc comment) so it can be
-            // unit tested with a plain `composer install && phpunit`, no
-            // GLPI bootstrap and no __() available. NativeSendDriver
-            // catches this and re-throws/logs a translated, user-facing
-            // message instead.
+            // Not translated — no __() here, NativeSendDriver catches this
+            // and re-throws a translated message.
             throw new RuntimeException(
                 'This account uses the Argon2id KDF, which the native driver cannot '
                 . 'reproduce in PHP. Use a service account configured with PBKDF2, or '
@@ -102,16 +78,11 @@ final class SendCrypto
     }
 
     /**
-     * Stretch a 32-byte master key into its 64-byte encryption+MAC pair
-     * (bytes 0..32 = AES key, 32..64 = HMAC key) — used to decrypt the
-     * EncString the server returns for the user key.
-     *
-     * Matches stretch_key() in bitwarden_crypto/src/keys/utils.rs: two
-     * HKDF-Expand-SHA256 calls, info "enc" and "mac", 32 bytes each — and,
-     * unusually, no HKDF-Extract step at all: the master key bytes
-     * themselves are fed directly to Hkdf::from_prk() as the PRK. This is
-     * NOT the same construction as deriveShareableKey() below, despite
-     * both ultimately calling an "HKDF expand".
+     * 32-byte master key → 64-byte enc+MAC pair (bytes 0..32 = AES key,
+     * 32..64 = HMAC key), for decrypting the server's EncString of the user
+     * key. Matches stretch_key() in bitwarden_crypto/src/keys/utils.rs: two
+     * HKDF-Expand-SHA256 calls ("enc"/"mac"), no Extract step — the master
+     * key itself is used as the PRK.
      */
     public static function stretchKey(string $masterKey): string
     {
@@ -124,23 +95,12 @@ final class SendCrypto
     }
 
     /**
-     * Derive a 64-byte shareable key (encryption+MAC pair) from 16 bytes of
-     * secret key material and a name/info pair — used for a Send's own key,
-     * derived from its randomly generated key material.
-     *
+     * A Send's own 64-byte shareable key, from its random key material.
      * Matches derive_shareable_key() in
      * bitwarden_crypto/src/keys/shareable_key.rs:
      *   prk = HMAC-SHA256(key = "bitwarden-{name}", message = secret)
-     *   output = HKDF-Expand-SHA256(PRK = prk, info = info, L = 64)
-     * i.e. the HKDF-Extract step is done "by hand" with a fixed
-     * "bitwarden-" prefix on the name as the HMAC key, rather than via the
-     * usual HKDF-Extract(salt, IKM) roles. Confirmed against the two fixed
-     * test vectors in that same source file — see
-     * SendCryptoTest::testDeriveShareableKeyMatchesUpstreamTestVectors().
-     *
-     * Bitwarden's own Send code calls this with name="send", info="send"
-     * (see bitwarden_send/src/access.rs, SendAccessKey::from_url_b64) —
-     * deriveSendKey() below is exactly that specialization.
+     *   output = HKDF-Expand-SHA256(prk, info, 64)
+     * Test vectors in SendCryptoTest::testDeriveShareableKeyMatchesUpstreamTestVectors().
      */
     public static function deriveShareableKey(string $secret, string $name, ?string $info): string
     {
@@ -149,12 +109,7 @@ final class SendCrypto
         return self::hkdfExpand($prk, $info ?? '', 64);
     }
 
-    /**
-     * A Send's own encryption+MAC key pair, derived from its 16 bytes of
-     * random key material. See deriveShareableKey() above for the
-     * construction; this is that function with the fixed name/info pair
-     * Bitwarden's own clients use for Sends specifically.
-     */
+    /** deriveShareableKey() with the fixed name/info pair Bitwarden uses for Sends. */
     public static function deriveSendKey(string $keyMaterial): string
     {
         if (strlen($keyMaterial) !== 16) {
@@ -165,14 +120,10 @@ final class SendCrypto
     }
 
     /**
-     * The value sent to the API as a password-protected Send's "password"
-     * field — never the plaintext password itself.
-     *
-     * Matches SendAccessKey::hash_password_b64() in
-     * bitwarden_send/src/access.rs: PBKDF2-HMAC-SHA256(password, salt =
-     * this Send's own raw 16-byte key material, 100000 iterations),
-     * standard (padded) base64 — not base64url; unlike the key material in
-     * the access URL, this value never goes into a URL.
+     * The Send's "password" API field — a hash, never the plaintext.
+     * Matches SendAccessKey::hash_password_b64() in bitwarden_send/src/access.rs:
+     * PBKDF2-HMAC-SHA256(password, salt = the Send's key material, 100000
+     * iterations), standard base64 (not base64url — this never goes in a URL).
      */
     public static function hashSendPassword(string $password, string $keyMaterial): string
     {
@@ -183,30 +134,16 @@ final class SendCrypto
         return base64_encode(hash_pbkdf2('sha256', $password, $keyMaterial, 100000, 32, true));
     }
 
-    /**
-     * 16 bytes of random key material for a new Send.
-     *
-     * random_bytes(), never rand()/mt_rand()/uniqid(): this becomes the
-     * only secret in the Send's access URL, so it needs to be
-     * cryptographically unpredictable, not merely varied.
-     */
+    /** 16 random bytes for a new Send — this ends up as the only secret in its access URL. */
     public static function randomKeyMaterial(): string
     {
         return random_bytes(16);
     }
 
     /**
-     * RFC 5869 HKDF-Expand (SHA-256), given an already-computed PRK.
-     *
-     * Deliberately not PHP's own hash_hkdf(): that function always does
-     * HKDF-Extract itself first (from a $key/$salt pair) before expanding,
-     * with no way to feed it a pre-extracted PRK directly — exactly what
-     * both callers above need (stretchKey() skips extract entirely;
-     * deriveShareableKey() extracts by hand with non-standard salt/IKM
-     * roles). Matches bitwarden_crypto/src/util.rs's hkdf_expand(), which
-     * wraps the `hkdf` crate's Hkdf::from_prk() + expand() — itself a
-     * textbook RFC 5869 implementation, so this is not a Bitwarden-specific
-     * construction, just the missing "expand-only" primitive.
+     * RFC 5869 HKDF-Expand (SHA-256) given an already-computed PRK. Not
+     * PHP's hash_hkdf() — it always does Extract first, with no way to
+     * pass in a pre-extracted PRK, which is what both callers above need.
      */
     private static function hkdfExpand(string $prk, string $info, int $length): string
     {
@@ -227,13 +164,8 @@ final class SendCrypto
     }
 
     /**
-     * Base64url-encode, WITH padding.
-     *
-     * Confirmed against bitwarden_encoding's B64Url type: "indifferent
-     * about padding when decoding, but always produces padding when
-     * encoding" — the padding-free convention common elsewhere (e.g. JWTs)
-     * does not apply here, so this deliberately keeps the trailing '='.
-     * Used for the key material in a Send's access URL fragment.
+     * Base64url, WITH padding (unlike e.g. JWTs) — matches bitwarden_encoding's
+     * B64Url. Used for the key material in a Send's access URL fragment.
      */
     public static function base64UrlEncode(string $bytes): string
     {
@@ -241,15 +173,8 @@ final class SendCrypto
     }
 
     /**
-     * Best-effort zeroing of a secret held in a PHP string.
-     *
-     * "Best-effort": PHP strings are copy-on-write and immutable from the
-     * language's own point of view, so earlier copies made along the way
-     * (functions received the value by value, string concatenation, etc.)
-     * are not reachable to wipe. This only clears the specific variable
-     * passed in — call it on every local holding a secret, as close as
-     * possible to where that secret stops being needed, but treat it as
-     * reducing exposure, not as a hard guarantee.
+     * Best-effort: only wipes this one variable, not any earlier copy PHP
+     * made along the way. Reduces exposure, doesn't guarantee anything.
      */
     public static function zero(string &$secret): void
     {

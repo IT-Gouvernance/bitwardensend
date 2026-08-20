@@ -147,13 +147,8 @@ class Config extends CommonDBTM
     }
 
     /**
-     * Decrypted master password for the native driver's service account.
-     *
-     * A distinct secret from master_password above: that one unlocks
-     * whatever account the CLI/`bw serve` is already logged into on the
-     * server, this one belongs to the account the native driver
-     * authenticates as itself — the two drivers are not assumed to share
-     * an account.
+     * Decrypted master password for the native driver's own service account
+     * (separate from master_password above, which is for the CLI driver).
      */
     public static function getNativeMasterPassword(): string
     {
@@ -181,16 +176,11 @@ class Config extends CommonDBTM
     }
 
     /**
-     * Check that every field the currently selected driver/mode actually
-     * needs at runtime is filled in, so a broken configuration is caught
-     * on the config page instead of surfacing later as a Send failure.
-     *
-     * Mirrors the checks NativeSendDriver and CliSendDriver already do at
-     * runtime — kept in sync manually since the two live in different
-     * classes and one cannot depend on the other's internals.
+     * Checks the fields the selected driver/mode actually needs. Mirrors
+     * NativeSendDriver/CliSendDriver's own runtime checks by hand.
      *
      * @param array<string,mixed> $input
-     * @return list<string> translated labels of the missing fields, empty when input is valid
+     * @return list<string> labels of the missing fields
      */
     public static function validateInput(array $input): array
     {
@@ -313,11 +303,8 @@ class Config extends CommonDBTM
     }
 
     /**
-     * Number of rows in the configuration table.
-     *
-     * Counted with the query builder rather than countElementsInTable() so that
-     * choosing between INSERT and UPDATE cannot end up inserting a duplicate
-     * primary key.
+     * Number of rows in the configuration table (avoids countElementsInTable()
+     * here, since we need this before deciding INSERT vs UPDATE).
      */
     private static function countRows(): int
     {
@@ -337,10 +324,8 @@ class Config extends CommonDBTM
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item instanceof \Config) {
-            // A plain string yields a tab with no icon. createTabEntry() carries the
-            // itemtype and the icon class; the itemtype alone is enough on versions
-            // that resolve the icon through getIcon(), and the explicit class covers
-            // the others.
+            // Passing the class/icon explicitly here too, some GLPI versions
+            // don't pick the icon up from getIcon() alone.
             return self::createTabEntry(self::getTypeName(), 0, self::class, self::getIcon());
         }
         return '';
