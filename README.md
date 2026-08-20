@@ -4,7 +4,7 @@ Share a secret on a ticket, change, or problem — a password, a key, a token �
 a **Bitwarden Send** link, without ever typing it into the ticket itself. One click
 from the ITIL timeline, right next to Answer/Task/Solution/Document/Validation.
 
-![Sharing a Bitwarden Send link from a ticket](screenshots/bitwardensend_timeline.png)
+![Sharing a Bitwarden Send link from a ticket](screenshots/bitwardensend_timeline.gif)
 
 The plugin creates the Send, posts the link as a followup, and keeps track of it on
 its own tab — expiration, remaining views, and a one-click revoke — so the secret
