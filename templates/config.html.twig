@@ -194,7 +194,9 @@
                <div class="col-md-8">
                   <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
                          value="{{ conf.native_web_vault_url }}">
-                  <div class="form-hint">{{ __('Self-hosted or Vaultwarden: adjust these three URLs.', 'bitwardensend') }}</div>
+                  <div class="form-hint">
+                     {{ __('Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}
+                  </div>
                </div>
             </div>
 

@@ -324,8 +324,11 @@ FR = {
     'The link will no longer be viewable. This cannot be undone.':
         'Le lien ne sera plus consultable. Cette action est irréversible.',
     'Revoked': 'Révoqué',
-    'Self-hosted or Vaultwarden: adjust these three URLs.':
-        'Auto-hébergé ou Vaultwarden : ajustez ces trois URL.',
+    'Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are '
+    'separate — an account on one does not work with the other\'s URLs.':
+        "Auto-hébergé : ajustez ces trois URL. Bitwarden.com et bitwarden.eu sont "
+        "deux plateformes distinctes — un compte de l'une ne fonctionne pas avec "
+        "les URL de l'autre.",
     'Send driver': 'Driver de Send',
     'Send it over another channel, by phone or text message for instance.':
         'Transmettez-le par un autre canal, par téléphone ou SMS par exemple.',
