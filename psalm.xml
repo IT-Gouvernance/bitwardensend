@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<psalm
+    runTaintAnalysis="true"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <directory name="ajax"/>
+        <directory name="front"/>
+        <file name="hook.php"/>
+        <file name="setup.php"/>
+    </projectFiles>
+</psalm>
