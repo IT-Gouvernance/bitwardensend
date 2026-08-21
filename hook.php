@@ -128,7 +128,7 @@ function plugin_bitwardensend_install(): bool
             [
                 'profiles_id' => $activeProfile['id'],
                 'name'        => Send::$rightname,
-            ]
+            ],
         );
         $activeProfile[Send::$rightname] = ALLSTANDARDRIGHT;
         $_SESSION['glpiactiveprofile'] = $activeProfile;
@@ -137,7 +137,7 @@ function plugin_bitwardensend_install(): bool
     CronTask::register(Send::class, 'cleanup', DAY_TIMESTAMP, [
         'comment' => __(
             'Delete revoked or expired Bitwarden Send entries past the configured retention',
-            'bitwardensend'
+            'bitwardensend',
         ),
         'mode'    => CronTask::MODE_INTERNAL,
         'param'   => 30,
@@ -163,7 +163,12 @@ function plugin_bitwardensend_countRows(string $table, array $where = []): int
     }
 
     foreach ($DB->request($criteria) as $row) {
-        return (int) $row['cpt'];
+        if (!is_array($row)) {
+            return 0;
+        }
+
+        $cpt = $row['cpt'] ?? 0;
+        return is_numeric($cpt) ? (int) $cpt : 0;
     }
 
     return 0;

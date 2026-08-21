@@ -79,3 +79,11 @@ Initial release.
   ("helpdesk") interface profiles too, even though this plugin's tab and timeline
   action never render under that interface — any rights granted there could never
   have a visible effect. That tab is now limited to "central" interface profiles.
+- Several code paths read values from request input, stored configuration or API
+  responses without checking their type first, which static analysis (phpstan at
+  `level: max`) now flags as unsafe even where the runtime behavior was already
+  correct. Added explicit type checks throughout, plus a couple of small real bugs
+  this turned up: a failed `json_encode()` of a Bitwarden Send request body was
+  passed to curl as `false` instead of being treated as an error, and
+  `SendCrypto::deriveMasterKey()` did not reject a non-positive KDF iteration count
+  before handing it to `hash_pbkdf2()`.

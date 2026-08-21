@@ -42,20 +42,17 @@ if (isset($_POST['update'])) {
     $missingFields = Config::validateInput($_POST);
 
     if ($missingFields !== []) {
-        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(
             sprintf(
                 __('Configuration not saved: required fields are missing: %s', 'bitwardensend'),
-                implode(', ', $missingFields)
+                implode(', ', $missingFields),
             ),
             false,
-            ERROR
+            ERROR,
         );
     } elseif (Config::saveFromInput($_POST)) {
-        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Configuration saved.', 'bitwardensend'), true, INFO);
     } else {
-        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Could not save the configuration.', 'bitwardensend'), false, ERROR);
     }
 
@@ -66,39 +63,37 @@ if (isset($_POST['test'])) {
     try {
         $status = SendDriverFactory::create()->testConnection();
 
-        /** @psalm-suppress TaintedHtml */
         match ($status) {
             'unlocked', 'ok' => Session::addMessageAfterRedirect(
                 __('Connected, vault unlocked. The plugin is ready to use.', 'bitwardensend'),
                 true,
-                INFO
+                INFO,
             ),
             'locked' => Session::addMessageAfterRedirect(
                 __(
                     'The service answers but the vault is locked. Set the master password below so the '
                     . 'plugin can unlock it, or unlock the service manually on the server.',
-                    'bitwardensend'
+                    'bitwardensend',
                 ),
                 false,
-                WARNING
+                WARNING,
             ),
             'unauthenticated' => Session::addMessageAfterRedirect(
                 __(
                     'The service answers but no account is logged in. Run "bw login --apikey" on the '
                     . 'server as the service user.',
-                    'bitwardensend'
+                    'bitwardensend',
                 ),
                 false,
-                ERROR
+                ERROR,
             ),
             default => Session::addMessageAfterRedirect(
                 sprintf(__('Unexpected vault status: %s', 'bitwardensend'), htmlspecialchars($status, ENT_QUOTES)),
                 false,
-                WARNING
+                WARNING,
             ),
         };
     } catch (Throwable $e) {
-        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(htmlspecialchars($e->getMessage(), ENT_QUOTES), false, ERROR);
     }
 

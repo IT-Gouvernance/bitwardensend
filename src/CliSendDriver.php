@@ -75,7 +75,10 @@ class CliSendDriver implements SendDriverInterface
 
     public function isAvailable(): bool
     {
-        return trim((string) ($this->conf['api_url'] ?? '')) !== '';
+        $apiUrl = $this->conf['api_url'] ?? '';
+        $apiUrl = is_string($apiUrl) ? $apiUrl : '';
+
+        return trim($apiUrl) !== '';
     }
 
     /**
@@ -86,8 +89,10 @@ class CliSendDriver implements SendDriverInterface
      */
     private function createTextSend(string $name, string $text, array $options = []): array
     {
-        $max_access = (int) ($options['max_access_count'] ?? 0);
-        $password   = (string) ($options['password'] ?? '');
+        $rawMaxAccess = $options['max_access_count'] ?? 0;
+        $max_access   = is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0;
+        $rawPassword  = $options['password'] ?? '';
+        $password     = is_string($rawPassword) ? $rawPassword : '';
 
         $payload = [
             'type'           => 0,
@@ -158,7 +163,18 @@ class CliSendDriver implements SendDriverInterface
         }
 
         $data = $response['data'] ?? [];
-        return is_array($data) ? $data : [];
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($data as $key => $value) {
+            if (is_string($key)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -175,14 +191,14 @@ class CliSendDriver implements SendDriverInterface
 
         if ($status === 'unauthenticated') {
             throw new RuntimeException(
-                __('The Bitwarden client is not logged in. Run "bw login" on the server.', 'bitwardensend')
+                __('The Bitwarden client is not logged in. Run "bw login" on the server.', 'bitwardensend'),
             );
         }
 
         $password = Config::getMasterPassword();
         if ($password === '') {
             throw new RuntimeException(
-                __('The Bitwarden vault is locked and no master password is configured.', 'bitwardensend')
+                __('The Bitwarden vault is locked and no master password is configured.', 'bitwardensend'),
             );
         }
 
@@ -197,12 +213,17 @@ class CliSendDriver implements SendDriverInterface
      */
     private function extractStatus(array $response): string
     {
-        $data = $response['data'] ?? [];
-        if (isset($data['template']['status'])) {
-            return (string) $data['template']['status'];
+        $data = $response['data'] ?? null;
+        if (!is_array($data)) {
+            return 'unknown';
         }
 
-        if (isset($data['status'])) {
+        $template = $data['template'] ?? null;
+        if (is_array($template) && isset($template['status']) && is_scalar($template['status'])) {
+            return (string) $template['status'];
+        }
+
+        if (isset($data['status']) && is_scalar($data['status'])) {
             return (string) $data['status'];
         }
 
@@ -212,12 +233,15 @@ class CliSendDriver implements SendDriverInterface
     /**
      * HTTP call to the Vault Management API.
      *
+     * @param non-empty-string $method
      * @param array<string,mixed>|null $body
      * @return array<string,mixed>
      */
     private function request(string $method, string $path, ?array $body = null): array
     {
-        $base = rtrim((string) ($this->conf['api_url'] ?? ''), '/');
+        $rawApiUrl = $this->conf['api_url'] ?? '';
+        $apiUrl    = is_string($rawApiUrl) ? $rawApiUrl : '';
+        $base      = rtrim($apiUrl, '/');
         if ($base === '') {
             throw new RuntimeException(__('Bitwarden API URL is not configured', 'bitwardensend'));
         }
@@ -227,34 +251,47 @@ class CliSendDriver implements SendDriverInterface
             throw new RuntimeException(__('Unable to initialize cURL', 'bitwardensend'));
         }
 
-        $headers = ['Accept: application/json'];
-        $options = [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST  => $method,
-            CURLOPT_TIMEOUT        => (int) ($this->conf['timeout'] ?? 15),
-            CURLOPT_CONNECTTIMEOUT => 5,
-        ];
+        $rawTimeout = $this->conf['timeout'] ?? 15;
+        $timeout    = is_numeric($rawTimeout) ? (int) $rawTimeout : 15;
+
+        $headers    = ['Accept: application/json'];
+        $postFields = '';
 
         if ($body !== null) {
             $json = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-            $options[CURLOPT_POSTFIELDS] = $json;
+            if ($json === false) {
+                throw new RuntimeException(__('Unable to encode the request body', 'bitwardensend'));
+            }
+
+            $postFields = $json;
             $headers[] = 'Content-Type: application/json';
-            $headers[] = 'Content-Length: ' . strlen((string) $json);
+            $headers[] = 'Content-Length: ' . strlen($json);
         }
 
-        $options[CURLOPT_HTTPHEADER] = $headers;
+        // Built as a single literal, not mutated afterwards — phpstan can't
+        // reliably re-check curl_setopt_array()'s option types once the
+        // array is assembled through separate `$options[...] = ...` writes.
+        $options = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_TIMEOUT        => $timeout,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_POSTFIELDS     => $postFields,
+            CURLOPT_HTTPHEADER     => $headers,
+        ];
         curl_setopt_array($handle, $options);
 
         $raw   = curl_exec($handle);
         $errno = curl_errno($handle);
         $error = curl_error($handle);
         $code  = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
+        // Not explicitly closed: CurlHandle instances close themselves once
+        // unset/out of scope, and curl_close() is deprecated as of PHP 8.5.
 
         if ($errno !== 0) {
             throw new RuntimeException(sprintf(
                 __('Cannot reach the Bitwarden API (%s)', 'bitwardensend'),
-                $error
+                $error,
             ));
         }
 
@@ -262,11 +299,18 @@ class CliSendDriver implements SendDriverInterface
         if (!is_array($decoded)) {
             throw new RuntimeException(sprintf(
                 __('Unexpected response from the Bitwarden API (HTTP %d)', 'bitwardensend'),
-                $code
+                $code,
             ));
         }
 
-        return $decoded;
+        $result = [];
+        foreach ($decoded as $key => $value) {
+            if (is_string($key)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
     }
 
     // ------------------------------------------------------------------
@@ -280,12 +324,17 @@ class CliSendDriver implements SendDriverInterface
      */
     private function errorMessage(array $response): string
     {
-        if (!empty($response['message'])) {
-            return (string) $response['message'];
+        $message = $response['message'] ?? null;
+        if (!empty($message) && is_scalar($message)) {
+            return (string) $message;
         }
 
-        if (!empty($response['data']['message'])) {
-            return (string) $response['data']['message'];
+        $data = $response['data'] ?? null;
+        if (is_array($data)) {
+            $dataMessage = $data['message'] ?? null;
+            if (!empty($dataMessage) && is_scalar($dataMessage)) {
+                return (string) $dataMessage;
+            }
         }
 
         return __('Unknown Bitwarden API error', 'bitwardensend');
@@ -297,26 +346,35 @@ class CliSendDriver implements SendDriverInterface
      */
     private function normalize(array $send): array
     {
-        $access_id = (string) ($send['accessId'] ?? '');
-        $key       = (string) ($send['key'] ?? '');
-        $url       = (string) ($send['accessUrl'] ?? '');
+        $rawAccessId = $send['accessId'] ?? '';
+        $access_id   = is_string($rawAccessId) ? $rawAccessId : '';
+        $rawKey      = $send['key'] ?? '';
+        $key         = is_string($rawKey) ? $rawKey : '';
+        $rawUrl      = $send['accessUrl'] ?? '';
+        $url         = is_string($rawUrl) ? $rawUrl : '';
 
         if ($url === '' && $access_id !== '' && $key !== '') {
-            $url = rtrim((string) ($this->conf['send_base_url'] ?? 'https://send.bitwarden.com/#'), '/')
-                 . $access_id . '/' . $key;
+            $rawBaseUrl = $this->conf['send_base_url'] ?? 'https://send.bitwarden.com/#';
+            $baseUrl    = is_string($rawBaseUrl) ? $rawBaseUrl : 'https://send.bitwarden.com/#';
+            $url        = rtrim($baseUrl, '/') . $access_id . '/' . $key;
         }
 
         if ($url === '') {
             throw new RuntimeException(
-                __('The Send was created but no access link was returned.', 'bitwardensend')
+                __('The Send was created but no access link was returned.', 'bitwardensend'),
             );
         }
 
+        $rawId = $send['id'] ?? '';
+        $uuid  = is_string($rawId) ? $rawId : '';
+
+        $rawDeletionDate = $send['deletionDate'] ?? null;
+
         return [
-            'uuid'          => (string) ($send['id'] ?? ''),
+            'uuid'          => $uuid,
             'access_id'     => $access_id,
             'access_url'    => $url,
-            'deletion_date' => isset($send['deletionDate']) ? (string) $send['deletionDate'] : null,
+            'deletion_date' => is_string($rawDeletionDate) ? $rawDeletionDate : null,
         ];
     }
 }

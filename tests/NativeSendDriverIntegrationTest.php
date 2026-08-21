@@ -93,7 +93,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
                 self::markTestSkipped(sprintf(
                     'Set %s (and the other BW_TEST_* variables — see this file\'s own '
                     . 'header) to run the native driver against a real Bitwarden account.',
-                    $name
+                    $name,
                 ));
             }
 
@@ -115,7 +115,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
                 'timeout'               => 15,
             ],
             $this->env['BW_TEST_CLIENT_SECRET'],
-            $this->env['BW_TEST_MASTER_PASSWORD']
+            $this->env['BW_TEST_MASTER_PASSWORD'],
         );
 
         $plaintext = 'bitwardensend integration test ' . bin2hex(random_bytes(8));
@@ -132,7 +132,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
             self::assertNotSame('', $result->accessId);
             self::assertStringContainsString(
                 $this->env['BW_TEST_WEB_VAULT_URL'],
-                $result->accessUrl
+                $result->accessUrl,
             );
 
             // Parse the access URL exactly as a recipient's browser would:
@@ -145,7 +145,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
             self::assertSame(16, strlen($keyMaterial));
 
             $accessResponse = $this->httpGet(
-                rtrim($this->env['BW_TEST_API_URL'], '/') . '/sends/access/' . $result->accessId
+                rtrim($this->env['BW_TEST_API_URL'], '/') . '/sends/access/' . $result->accessId,
             );
 
             $sendKey = SendCrypto::deriveSendKey($keyMaterial);
@@ -161,11 +161,11 @@ final class NativeSendDriverIntegrationTest extends TestCase
 
             self::assertSame(
                 'bitwardensend integration test',
-                EncString::parse($nameField)->decrypt($sendEncKey, $sendMacKey)
+                EncString::parse($nameField)->decrypt($sendEncKey, $sendMacKey),
             );
             self::assertSame(
                 $plaintext,
-                EncString::parse($textField)->decrypt($sendEncKey, $sendMacKey)
+                EncString::parse($textField)->decrypt($sendEncKey, $sendMacKey),
             );
         } finally {
             // Always attempt cleanup, even on assertion failure, so a

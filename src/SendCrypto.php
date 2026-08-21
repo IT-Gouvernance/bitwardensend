@@ -60,7 +60,7 @@ final class SendCrypto
         string $password,
         string $email,
         string $kdfType,
-        int $iterations
+        int $iterations,
     ): string {
         if ($kdfType !== 'pbkdf2') {
             // Not translated — no __() here, NativeSendDriver catches this
@@ -68,8 +68,12 @@ final class SendCrypto
             throw new RuntimeException(
                 'This account uses the Argon2id KDF, which the native driver cannot '
                 . 'reproduce in PHP. Use a service account configured with PBKDF2, or '
-                . 'switch this Send driver to "cli".'
+                . 'switch this Send driver to "cli".',
             );
+        }
+
+        if ($iterations < 1) {
+            throw new RuntimeException('KDF iteration count must be at least 1.');
         }
 
         $salt = mb_strtolower(trim($email));
@@ -179,6 +183,10 @@ final class SendCrypto
     public static function zero(string &$secret): void
     {
         if (function_exists('sodium_memzero')) {
+            // phpstan's sodium_memzero stub models this by-ref parameter as
+            // becoming null, which doesn't match this method's own
+            // non-nullable string signature — the value itself stays a string.
+            // @phpstan-ignore-next-line
             sodium_memzero($secret);
             return;
         }

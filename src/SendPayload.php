@@ -49,6 +49,5 @@ final readonly class SendPayload
         public ?string $password = null,
         public bool $hideEmail = false,
         public bool $disabled = false,
-    ) {
-    }
+    ) {}
 }

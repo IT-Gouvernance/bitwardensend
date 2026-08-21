@@ -31,6 +31,7 @@
 
 namespace GlpiPlugin\Bitwardensend;
 
+use DbUtils;
 use ITILFollowupTemplate;
 use Throwable;
 use CommonDBTM;
@@ -87,7 +88,7 @@ class Send extends CommonDBTM
             . "{url}\n\n"
             . "The link expires on {expiration} and can be opened {max_access} time(s).\n\n"
             . "Kind regards,",
-            'bitwardensend'
+            'bitwardensend',
         );
     }
 
@@ -145,11 +146,13 @@ class Send extends CommonDBTM
                 // own entity-scoped pickers use — plain entities_id match
                 // otherwise. Without this, a template set recursive on a
                 // parent entity simply never showed up here.
-                $where[] = (new \DbUtils())->getEntitiesRestrictCriteria(
+                $rawEntitiesId = $item->fields['entities_id'] ?? 0;
+                $entitiesId    = is_numeric($rawEntitiesId) ? (int) $rawEntitiesId : 0;
+                $where[] = (new DbUtils())->getEntitiesRestrictCriteria(
                     $table,
                     'entities_id',
-                    (int) ($item->fields['entities_id'] ?? 0),
-                    'auto'
+                    $entitiesId,
+                    'auto',
                 );
             }
 
@@ -161,10 +164,17 @@ class Send extends CommonDBTM
             ]);
 
             foreach ($iterator as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+
+                $rawId      = $row['id'] ?? 0;
+                $rawName    = $row['name'] ?? '';
+                $rawContent = $row['content'] ?? '';
                 $templates[] = [
-                    'id'      => (int) ($row['id'] ?? 0),
-                    'name'    => (string) ($row['name'] ?? ''),
-                    'content' => (string) ($row['content'] ?? ''),
+                    'id'      => is_numeric($rawId) ? (int) $rawId : 0,
+                    'name'    => is_string($rawName) ? $rawName : '',
+                    'content' => is_string($rawContent) ? $rawContent : '',
                 ];
             }
 
@@ -288,11 +298,23 @@ class Send extends CommonDBTM
         ]);
 
         foreach ($iterator as $row) {
-            $row['user_name']             = $row['users_id'] ? getUserName($row['users_id']) : '';
-            $row['date_creation_display'] = $row['date_creation'] ? Html::convDateTime($row['date_creation']) : '';
-            $row['deletion_date_display'] = $row['deletion_date'] ? Html::convDateTime($row['deletion_date']) : '';
-            $row['is_expired']            = !$row['is_revoked'] && $row['deletion_date'] !== null
-                                             && $row['deletion_date'] < $now;
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $rawUsersId = $row['users_id'] ?? 0;
+            $usersId    = is_numeric($rawUsersId) ? (int) $rawUsersId : 0;
+            $row['user_name'] = $usersId ? getUserName($usersId) : '';
+
+            $rawDateCreation = $row['date_creation'] ?? null;
+            $dateCreation    = is_string($rawDateCreation) ? $rawDateCreation : null;
+            $row['date_creation_display'] = $dateCreation ? Html::convDateTime($dateCreation) : '';
+
+            $rawDeletionDate = $row['deletion_date'] ?? null;
+            $deletionDate    = is_string($rawDeletionDate) ? $rawDeletionDate : null;
+            $row['deletion_date_display'] = $deletionDate ? Html::convDateTime($deletionDate) : '';
+
+            $row['is_expired'] = empty($row['is_revoked']) && $deletionDate !== null && $deletionDate < $now;
             $sends[] = $row;
         }
 
@@ -346,7 +368,8 @@ class Send extends CommonDBTM
         // HTML, a bare "\n" is not a line break, so the default's blank lines
         // between paragraphs would otherwise collapse into a single run-on
         // paragraph the first time this form renders.
-        $conf['followup_template'] = nl2br(htmlspecialchars((string) $conf['followup_template']));
+        $rawFollowupTemplate = $conf['followup_template'] ?? '';
+        $conf['followup_template'] = nl2br(htmlspecialchars(is_string($rawFollowupTemplate) ? $rawFollowupTemplate : ''));
 
         return [
             'itemtype'           => $item->getType(),
@@ -372,38 +395,37 @@ class Send extends CommonDBTM
      */
     public static function createFromInput(array $input): bool
     {
-        $itemtype = (string) ($input['itemtype'] ?? '');
-        $rawItemsId = $input['items_id'] ?? 0;
-        $items_id = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
+        $rawItemtype = $input['itemtype'] ?? '';
+        $itemtype    = is_string($rawItemtype) ? $rawItemtype : '';
+        $rawItemsId  = $input['items_id'] ?? 0;
+        $items_id    = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
 
         if (!in_array($itemtype, self::getSupportedItemtypes(), true)) {
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('Unsupported item type.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
 
         $item = getItemForItemtype($itemtype);
         if (!($item instanceof CommonITILObject) || !$item->getFromDB($items_id) || !$item->canViewItem()) {
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('Item not found or access denied.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
 
-        $secret = (string) ($input['secret'] ?? '');
+        $rawSecret = $input['secret'] ?? '';
+        $secret    = is_string($rawSecret) ? $rawSecret : '';
         if (trim($secret) === '') {
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('The content to share is empty.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -413,18 +435,30 @@ class Send extends CommonDBTM
         $rawDays = $input['deletion_days'] ?? 0;
         $days = is_numeric($rawDays) ? (int) $rawDays : 0;
         if ($days <= 0) {
-            $days = (int) $conf['default_deletion_days'];
+            $rawDefaultDays = $conf['default_deletion_days'] ?? 7;
+            $days = is_numeric($rawDefaultDays) ? (int) $rawDefaultDays : 7;
         }
 
         $days = max(1, min(31, $days));
 
         $expiration_ts = strtotime('+' . $days . ' days');
+        if ($expiration_ts === false) {
+            Session::addMessageAfterRedirect(
+                __('Could not compute the expiration date.', 'bitwardensend'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+
         $deletion_date = gmdate('Y-m-d\TH:i:s.000\Z', $expiration_ts);
         $rawMaxAccess  = $input['max_access_count'] ?? 0;
         $max_access    = max(0, is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0);
-        $password      = (string) ($input['password'] ?? '');
+        $rawPassword   = $input['password'] ?? '';
+        $password      = is_string($rawPassword) ? $rawPassword : '';
 
-        $name = trim((string) ($input['name'] ?? ''));
+        $rawName = $input['name'] ?? '';
+        $name    = trim(is_string($rawName) ? $rawName : '');
         if ($name === '') {
             $name = sprintf('%s #%d', $item->getTypeName(1), $items_id);
         }
@@ -442,17 +476,19 @@ class Send extends CommonDBTM
             ));
         } catch (Throwable $throwable) {
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 sprintf(
                     __('Could not create the Send: %s', 'bitwardensend'),
-                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES)
+                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES),
                 ),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
+
+        $rawItemEntitiesId = $item->fields['entities_id'] ?? 0;
+        $itemEntitiesId    = is_numeric($rawItemEntitiesId) ? (int) $rawItemEntitiesId : 0;
 
         $send = new self();
         $send->add([
@@ -460,7 +496,7 @@ class Send extends CommonDBTM
             'itemtype'              => $itemtype,
             'items_id'              => $items_id,
             'users_id'              => (int) Session::getLoginUserID(),
-            'entities_id'           => (int) ($item->fields['entities_id'] ?? 0),
+            'entities_id'           => $itemEntitiesId,
             'send_uuid'             => $result->uuid,
             'access_id'             => $result->accessId,
             'access_url'            => empty($conf['store_access_url']) ? null : $result->accessUrl,
@@ -471,25 +507,25 @@ class Send extends CommonDBTM
         ]);
 
         if (!empty($input['add_followup'])) {
+            $rawFollowupContent = $input['followup_content'] ?? '';
             self::addFollowup(
                 $item,
-                (string) ($input['followup_content'] ?? ''),
+                is_string($rawFollowupContent) ? $rawFollowupContent : '',
                 $result->accessUrl,
                 $expiration_ts,
                 $max_access,
-                !empty($input['followup_is_private'])
+                !empty($input['followup_is_private']),
             );
         }
 
-        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(
             sprintf(
                 __('Bitwarden Send link created: %s', 'bitwardensend'),
                 '<a href="' . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '" target="_blank" rel="noopener">'
-                . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '</a>'
+                . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '</a>',
             ),
             false,
-            INFO
+            INFO,
         );
 
         return true;
@@ -504,10 +540,11 @@ class Send extends CommonDBTM
         string $url,
         int $expiration_ts,
         int $max_access,
-        bool $is_private
+        bool $is_private,
     ): void {
         if (trim($template) === '') {
-            $template = Config::getConfig()['followup_template'];
+            $rawDefaultTemplate = Config::getConfig()['followup_template'] ?? '';
+            $template = is_string($rawDefaultTemplate) ? $rawDefaultTemplate : '';
         }
 
         $escaped_url = htmlspecialchars($url, ENT_QUOTES);
@@ -537,10 +574,10 @@ class Send extends CommonDBTM
                 // e.g. from a GLPI followup template with its own wording).
                 $link,
                 $escaped_url,
-                Html::convDateTime(date('Y-m-d H:i:s', $expiration_ts)),
+                Html::convDateTime(date('Y-m-d H:i:s', $expiration_ts)) ?? '',
                 $max_access > 0 ? (string) $max_access : __('an unlimited number of', 'bitwardensend'),
             ],
-            $template
+            $template,
         );
 
         // Stored as HTML, like a followup typed in the rich text editor.
@@ -556,11 +593,10 @@ class Send extends CommonDBTM
         ]);
 
         if (!$created) {
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('The Send was created but the followup could not be added.', 'bitwardensend'),
                 false,
-                WARNING
+                WARNING,
             );
         }
     }
@@ -575,17 +611,17 @@ class Send extends CommonDBTM
     public function revoke(): bool
     {
         try {
-            SendDriverFactory::create()->deleteSend((string) $this->fields['send_uuid']);
+            $rawSendUuid = $this->fields['send_uuid'] ?? '';
+            SendDriverFactory::create()->deleteSend(is_string($rawSendUuid) ? $rawSendUuid : '');
         } catch (Throwable $throwable) {
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 sprintf(
                     __('Could not revoke the link: %s', 'bitwardensend'),
-                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES)
+                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES),
                 ),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -596,7 +632,6 @@ class Send extends CommonDBTM
             'access_url' => null,
         ]);
 
-        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Link revoked.', 'bitwardensend'), false, INFO);
 
         return true;
@@ -606,13 +641,16 @@ class Send extends CommonDBTM
     // Automatic action (Setup > Automatic actions)
     // ------------------------------------------------------------------
 
+    /**
+     * @return array<string,string>
+     */
     public static function cronInfo(string $name): array
     {
         if ($name === 'cleanup') {
             return [
                 'description' => __(
                     'Delete revoked or expired Bitwarden Send entries past the configured retention',
-                    'bitwardensend'
+                    'bitwardensend',
                 ),
                 'parameter'   => __('Retention (days)', 'bitwardensend'),
             ];
@@ -630,7 +668,8 @@ class Send extends CommonDBTM
     {
         $task = new CronTask();
         if ($task->getFromDBbyName(self::class, 'cleanup')) {
-            return CronTask::getFormURLWithID((int) $task->fields['id']);
+            $rawTaskId = $task->fields['id'] ?? 0;
+            return CronTask::getFormURLWithID(is_numeric($rawTaskId) ? (int) $rawTaskId : 0);
         }
 
         return null;
@@ -648,12 +687,18 @@ class Send extends CommonDBTM
     {
         global $DB;
 
-        $days = $task instanceof CronTask ? (int) ($task->fields['param'] ?? 0) : 0;
+        $rawParam = $task instanceof CronTask ? ($task->fields['param'] ?? 0) : 0;
+        $days     = is_numeric($rawParam) ? (int) $rawParam : 0;
         if ($days <= 0) {
             return 0;
         }
 
-        $cutoff = date('Y-m-d H:i:s', strtotime('-' . $days . ' days'));
+        $cutoffTs = strtotime('-' . $days . ' days');
+        if ($cutoffTs === false) {
+            return 0;
+        }
+
+        $cutoff = date('Y-m-d H:i:s', $cutoffTs);
 
         $iterator = $DB->request([
             'FROM'  => self::getTable(),
@@ -672,8 +717,14 @@ class Send extends CommonDBTM
 
         $count = 0;
         foreach ($iterator as $row) {
-            $send = new self();
-            if ($send->delete(['id' => $row['id']], true)) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $rawId = $row['id'] ?? 0;
+            $id    = is_numeric($rawId) ? (int) $rawId : 0;
+            $send  = new self();
+            if ($send->delete(['id' => $id], true)) {
                 $count++;
             }
         }

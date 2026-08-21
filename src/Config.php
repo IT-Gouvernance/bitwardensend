@@ -105,14 +105,17 @@ class Config extends CommonDBTM
         if ($DB->tableExists(self::getTable())) {
             $iterator = $DB->request(['FROM' => self::getTable(), 'LIMIT' => 1]);
             foreach ($iterator as $data) {
-                $row = $data;
+                if (is_array($data)) {
+                    $row = $data;
+                }
             }
         }
 
         foreach ($row as $key => $value) {
-            if ($value === null || $value === '') {
+            if (!is_string($key) || $value === null || $value === '') {
                 continue;
             }
+
             $defaults[$key] = $value;
         }
 
@@ -125,7 +128,9 @@ class Config extends CommonDBTM
      */
     public static function getMasterPassword(): string
     {
-        return self::decrypt((string) (self::getConfig()['master_password'] ?? ''));
+        $rawValue = self::getConfig()['master_password'] ?? '';
+
+        return self::decrypt(is_string($rawValue) ? $rawValue : '');
     }
 
     /**
@@ -133,7 +138,9 @@ class Config extends CommonDBTM
      */
     public static function getNativeClientSecret(): string
     {
-        return self::decrypt((string) (self::getConfig()['native_client_secret'] ?? ''));
+        $rawValue = self::getConfig()['native_client_secret'] ?? '';
+
+        return self::decrypt(is_string($rawValue) ? $rawValue : '');
     }
 
     /**
@@ -142,7 +149,9 @@ class Config extends CommonDBTM
      */
     public static function getNativeMasterPassword(): string
     {
-        return self::decrypt((string) (self::getConfig()['native_master_password'] ?? ''));
+        $rawValue = self::getConfig()['native_master_password'] ?? '';
+
+        return self::decrypt(is_string($rawValue) ? $rawValue : '');
     }
 
     private static function decrypt(string $value): string
@@ -150,6 +159,7 @@ class Config extends CommonDBTM
         if ($value === '') {
             return '';
         }
+
         try {
             return (string) (new GLPIKey())->decrypt($value);
         } catch (Throwable) {
@@ -181,7 +191,9 @@ class Config extends CommonDBTM
             ? $input['send_driver'] : 'cli';
 
         if ($driver === 'cli') {
-            if (trim((string) ($input['api_url'] ?? '')) === '') {
+            $rawApiUrl = $input['api_url'] ?? '';
+            $apiUrl    = is_string($rawApiUrl) ? $rawApiUrl : '';
+            if (trim($apiUrl) === '') {
                 $errors[] = __('Local API URL', 'bitwardensend');
             }
 
@@ -196,18 +208,24 @@ class Config extends CommonDBTM
             'native_email'         => __('Account email', 'bitwardensend'),
         ];
         foreach ($requiredNative as $field => $label) {
-            if (trim((string) ($input[$field] ?? '')) === '') {
+            $rawValue = $input[$field] ?? '';
+            $value    = is_string($rawValue) ? $rawValue : '';
+            if (trim($value) === '') {
                 $errors[] = $label;
             }
         }
 
-        $hasClientSecret = self::getNativeClientSecret() !== '' && empty($input['clear_native_client_secret']);
-        if (trim((string) ($input['native_client_secret'] ?? '')) === '' && !$hasClientSecret) {
+        $rawClientSecret  = $input['native_client_secret'] ?? '';
+        $clientSecret     = is_string($rawClientSecret) ? $rawClientSecret : '';
+        $hasClientSecret  = self::getNativeClientSecret() !== '' && empty($input['clear_native_client_secret']);
+        if (trim($clientSecret) === '' && !$hasClientSecret) {
             $errors[] = __('API client secret', 'bitwardensend');
         }
 
+        $rawMasterPassword = $input['native_master_password'] ?? '';
+        $masterPassword    = is_string($rawMasterPassword) ? $rawMasterPassword : '';
         $hasMasterPassword = self::getNativeMasterPassword() !== '' && empty($input['clear_native_master_password']);
-        if (trim((string) ($input['native_master_password'] ?? '')) === '' && !$hasMasterPassword) {
+        if (trim($masterPassword) === '' && !$hasMasterPassword) {
             $errors[] = __('Master password', 'bitwardensend');
         }
 
@@ -223,40 +241,78 @@ class Config extends CommonDBTM
     {
         global $DB;
 
+        $rawApiUrl = $input['api_url'] ?? '';
+        $apiUrl    = is_string($rawApiUrl) ? $rawApiUrl : '';
+
+        $rawSendBaseUrl = $input['send_base_url'] ?? '';
+        $sendBaseUrl    = is_string($rawSendBaseUrl) ? $rawSendBaseUrl : '';
+
+        $rawTimeout = $input['timeout'] ?? 15;
+        $timeout    = is_numeric($rawTimeout) ? (int) $rawTimeout : 15;
+
+        $rawDeletionDays = $input['default_deletion_days'] ?? 7;
+        $deletionDays    = is_numeric($rawDeletionDays) ? (int) $rawDeletionDays : 7;
+
+        $rawMaxAccess = $input['default_max_access_count'] ?? 1;
+        $maxAccess    = is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 1;
+
+        $rawFollowupTemplate = $input['followup_template'] ?? '';
+        $followupTemplate    = is_string($rawFollowupTemplate) ? $rawFollowupTemplate : '';
+
+        $rawSendDriver = $input['send_driver'] ?? 'cli';
+        $sendDriver    = in_array($rawSendDriver, ['cli', 'native'], true) ? $rawSendDriver : 'cli';
+
+        $rawIdentityUrl = $input['native_identity_url'] ?? '';
+        $identityUrl    = is_string($rawIdentityUrl) ? $rawIdentityUrl : '';
+
+        $rawNativeApiUrl = $input['native_api_url'] ?? '';
+        $nativeApiUrl    = is_string($rawNativeApiUrl) ? $rawNativeApiUrl : '';
+
+        $rawWebVaultUrl = $input['native_web_vault_url'] ?? '';
+        $webVaultUrl    = is_string($rawWebVaultUrl) ? $rawWebVaultUrl : '';
+
+        $rawClientId = $input['native_client_id'] ?? '';
+        $clientId    = is_string($rawClientId) ? $rawClientId : '';
+
+        $rawEmail = $input['native_email'] ?? '';
+        $email    = is_string($rawEmail) ? $rawEmail : '';
+
         $fields = [
-            'api_url'                       => rtrim(trim((string) ($input['api_url'] ?? '')), '/'),
-            'send_base_url'                 => trim((string) ($input['send_base_url'] ?? '')),
-            'timeout'                       => max(1, (int) ($input['timeout'] ?? 15)),
-            'default_deletion_days'         => max(1, (int) ($input['default_deletion_days'] ?? 7)),
-            'default_max_access_count'      => max(0, (int) ($input['default_max_access_count'] ?? 1)),
+            'api_url'                       => rtrim(trim($apiUrl), '/'),
+            'send_base_url'                 => trim($sendBaseUrl),
+            'timeout'                       => max(1, $timeout),
+            'default_deletion_days'         => max(1, $deletionDays),
+            'default_max_access_count'      => max(0, $maxAccess),
             'default_hide_email'            => empty($input['default_hide_email']) ? 0 : 1,
             'add_followup'                  => empty($input['add_followup']) ? 0 : 1,
             'followup_is_private'           => empty($input['followup_is_private']) ? 0 : 1,
             'store_access_url'              => empty($input['store_access_url']) ? 0 : 1,
-            'followup_template'             => (string) ($input['followup_template'] ?? ''),
+            'followup_template'             => $followupTemplate,
             'allow_glpi_followup_templates' => empty($input['allow_glpi_followup_templates']) ? 0 : 1,
             'password_generator_enabled'    => empty($input['password_generator_enabled']) ? 0 : 1,
-            'send_driver'                   => in_array($input['send_driver'] ?? 'cli', ['cli', 'native'], true)
-                                                 ? $input['send_driver'] : 'cli',
-            'native_identity_url'           => rtrim(trim((string) ($input['native_identity_url'] ?? '')), '/'),
-            'native_api_url'                => rtrim(trim((string) ($input['native_api_url'] ?? '')), '/'),
-            'native_web_vault_url'          => rtrim(trim((string) ($input['native_web_vault_url'] ?? '')), '/'),
-            'native_client_id'              => trim((string) ($input['native_client_id'] ?? '')),
-            'native_email'                  => trim((string) ($input['native_email'] ?? '')),
+            'send_driver'                   => $sendDriver,
+            'native_identity_url'           => rtrim(trim($identityUrl), '/'),
+            'native_api_url'                => rtrim(trim($nativeApiUrl), '/'),
+            'native_web_vault_url'          => rtrim(trim($webVaultUrl), '/'),
+            'native_client_id'              => trim($clientId),
+            'native_email'                  => trim($email),
             'date_mod'                      => $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s'),
         ];
 
         // Secrets are only rewritten when a new value is submitted.
-        if (($input['master_password'] ?? '') !== '') {
-            $fields['master_password'] = self::encrypt((string) $input['master_password']);
+        $rawMasterPasswordInput = $input['master_password'] ?? '';
+        if (is_string($rawMasterPasswordInput) && $rawMasterPasswordInput !== '') {
+            $fields['master_password'] = self::encrypt($rawMasterPasswordInput);
         }
 
-        if (($input['native_client_secret'] ?? '') !== '') {
-            $fields['native_client_secret'] = self::encrypt((string) $input['native_client_secret']);
+        $rawNativeClientSecretInput = $input['native_client_secret'] ?? '';
+        if (is_string($rawNativeClientSecretInput) && $rawNativeClientSecretInput !== '') {
+            $fields['native_client_secret'] = self::encrypt($rawNativeClientSecretInput);
         }
 
-        if (($input['native_master_password'] ?? '') !== '') {
-            $fields['native_master_password'] = self::encrypt((string) $input['native_master_password']);
+        $rawNativeMasterPasswordInput = $input['native_master_password'] ?? '';
+        if (is_string($rawNativeMasterPasswordInput) && $rawNativeMasterPasswordInput !== '') {
+            $fields['native_master_password'] = self::encrypt($rawNativeMasterPasswordInput);
         }
 
         if (!empty($input['clear_master_password'])) {
@@ -296,7 +352,12 @@ class Config extends CommonDBTM
         }
 
         foreach ($DB->request(['COUNT' => 'cpt', 'FROM' => self::getTable()]) as $row) {
-            return (int) $row['cpt'];
+            if (!is_array($row)) {
+                return 0;
+            }
+
+            $cpt = $row['cpt'] ?? 0;
+            return is_numeric($cpt) ? (int) $cpt : 0;
         }
 
         return 0;
@@ -345,6 +406,9 @@ class Config extends CommonDBTM
     {
         global $CFG_GLPI;
 
-        return $CFG_GLPI['root_doc'] . '/front/config.form.php?forcetab=' . urlencode(self::class . '$1');
+        $rawRootDoc = $CFG_GLPI['root_doc'] ?? '';
+        $rootDoc    = is_string($rawRootDoc) ? $rawRootDoc : '';
+
+        return $rootDoc . '/front/config.form.php?forcetab=' . urlencode(self::class . '$1');
     }
 }
