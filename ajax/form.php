@@ -37,7 +37,8 @@ Session::checkRight(Send::$rightname, CREATE);
 header('Content-Type: text/html; charset=UTF-8');
 
 $itemtype = $_REQUEST['itemtype'] ?? '';
-$items_id = (int) ($_REQUEST['items_id'] ?? 0);
+$rawItemsId = $_REQUEST['items_id'] ?? 0;
+$items_id = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
 
 if (!in_array($itemtype, Send::getSupportedItemtypes(), true)) {
     TemplateRenderer::getInstance()->display('@bitwardensend/_ajax_error.html.twig', [

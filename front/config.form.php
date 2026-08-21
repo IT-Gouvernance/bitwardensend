@@ -42,6 +42,10 @@ if (isset($_POST['update'])) {
     $missingFields = Config::validateInput($_POST);
 
     if ($missingFields !== []) {
+        // Every piece of this message is a developer-authored __() literal
+        // (validateInput() only ever returns its own hardcoded field labels),
+        // never anything from $_POST itself.
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(
             sprintf(
                 __('Configuration not saved: required fields are missing: %s', 'bitwardensend'),
@@ -51,8 +55,10 @@ if (isset($_POST['update'])) {
             ERROR
         );
     } elseif (Config::saveFromInput($_POST)) {
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Configuration saved.', 'bitwardensend'), true, INFO);
     } else {
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Could not save the configuration.', 'bitwardensend'), false, ERROR);
     }
 
@@ -63,6 +69,10 @@ if (isset($_POST['test'])) {
     try {
         $status = SendDriverFactory::create()->testConnection();
 
+        // Every branch's own text is a __() literal; only the default case
+        // below interpolates $status, which is escaped there since it comes
+        // from the driver (bw serve locally, or the CLI status output).
+        /** @psalm-suppress TaintedHtml */
         match ($status) {
             'unlocked', 'ok' => Session::addMessageAfterRedirect(
                 __('Connected, vault unlocked. The plugin is ready to use.', 'bitwardensend'),
@@ -88,13 +98,14 @@ if (isset($_POST['test'])) {
                 ERROR
             ),
             default => Session::addMessageAfterRedirect(
-                sprintf(__('Unexpected vault status: %s', 'bitwardensend'), $status),
+                sprintf(__('Unexpected vault status: %s', 'bitwardensend'), htmlspecialchars($status, ENT_QUOTES)),
                 false,
                 WARNING
             ),
         };
     } catch (Throwable $e) {
-        Session::addMessageAfterRedirect($e->getMessage(), false, ERROR);
+        /** @psalm-suppress TaintedHtml */
+        Session::addMessageAfterRedirect(htmlspecialchars($e->getMessage(), ENT_QUOTES), false, ERROR);
     }
 
     Html::redirect(Config::getConfigTabUrl());
