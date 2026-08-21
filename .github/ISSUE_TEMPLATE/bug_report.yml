@@ -1,0 +1,81 @@
+name: Bug report
+description: Something isn't working as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please search
+        [existing issues](https://github.com/IT-Gouvernance/bitwardensend/issues)
+        first — it may already be reported.
+
+        Found a **security vulnerability**? Please don't use this form — see
+        [Reporting a vulnerability](https://github.com/IT-Gouvernance/bitwardensend/blob/main/CONTRIBUTING.md#reporting-a-vulnerability)
+        instead.
+
+  - type: input
+    id: glpi-version
+    attributes:
+      label: GLPI version
+      placeholder: "11.0.x"
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: Setup > Plugins, or the release archive's file name.
+      placeholder: "1.0.0-betaN"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: send-driver
+    attributes:
+      label: Send driver
+      description: Setup > General > Bitwarden Send > Send driver.
+      options:
+        - "CLI (bw serve)"
+        - "Native (PHP only)"
+        - "Not sure / not applicable"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: >-
+        GLPI's error log, the browser console, or the output of "Test connection"
+        on the configuration page, if relevant. No secrets, passwords, or API
+        keys, please — redact them first.
+      render: shell
+    validations:
+      required: false
