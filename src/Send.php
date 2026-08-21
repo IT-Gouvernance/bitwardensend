@@ -296,11 +296,23 @@ class Send extends CommonDBTM
         ]);
 
         foreach ($iterator as $row) {
-            $row['user_name']             = $row['users_id'] ? getUserName($row['users_id']) : '';
-            $row['date_creation_display'] = $row['date_creation'] ? Html::convDateTime($row['date_creation']) : '';
-            $row['deletion_date_display'] = $row['deletion_date'] ? Html::convDateTime($row['deletion_date']) : '';
-            $row['is_expired']            = !$row['is_revoked'] && $row['deletion_date'] !== null
-                                             && $row['deletion_date'] < $now;
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $rawUsersId = $row['users_id'] ?? 0;
+            $usersId    = is_numeric($rawUsersId) ? (int) $rawUsersId : 0;
+            $row['user_name'] = $usersId ? getUserName($usersId) : '';
+
+            $rawDateCreation = $row['date_creation'] ?? null;
+            $dateCreation    = is_string($rawDateCreation) ? $rawDateCreation : null;
+            $row['date_creation_display'] = $dateCreation ? Html::convDateTime($dateCreation) : '';
+
+            $rawDeletionDate = $row['deletion_date'] ?? null;
+            $deletionDate    = is_string($rawDeletionDate) ? $rawDeletionDate : null;
+            $row['deletion_date_display'] = $deletionDate ? Html::convDateTime($deletionDate) : '';
+
+            $row['is_expired'] = empty($row['is_revoked']) && $deletionDate !== null && $deletionDate < $now;
             $sends[] = $row;
         }
 

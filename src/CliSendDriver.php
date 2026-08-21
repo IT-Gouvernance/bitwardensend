@@ -233,6 +233,7 @@ class CliSendDriver implements SendDriverInterface
     /**
      * HTTP call to the Vault Management API.
      *
+     * @param non-empty-string $method
      * @param array<string,mixed>|null $body
      * @return array<string,mixed>
      */

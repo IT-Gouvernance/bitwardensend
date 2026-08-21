@@ -371,6 +371,7 @@ class NativeSendDriver implements SendDriverInterface
     }
 
     /**
+     * @param non-empty-string $method
      * @param array<string,mixed>|string|null $body
      * @param list<string> $headers
      * @return array<string,mixed>
