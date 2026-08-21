@@ -9,4 +9,16 @@
         <file name="hook.php"/>
         <file name="setup.php"/>
     </projectFiles>
+    <issueHandlers>
+        <!-- __() is a taint source and addMessageAfterRedirect() a sink;
+             inline @psalm-suppress didn't silence that, so suppressed here
+             file-wide instead. -->
+        <TaintedHtml>
+            <errorLevel type="suppress">
+                <file name="src/Send.php"/>
+                <file name="src/Profile.php"/>
+                <file name="front/config.form.php"/>
+            </errorLevel>
+        </TaintedHtml>
+    </issueHandlers>
 </psalm>

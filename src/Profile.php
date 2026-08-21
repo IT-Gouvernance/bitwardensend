@@ -180,7 +180,6 @@ class Profile extends \Profile
 
         $profiles_id = (int) ($input['profiles_id'] ?? 0);
         if ($profiles_id <= 0) {
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('No profile selected.', 'bitwardensend'),
                 false,
@@ -214,7 +213,6 @@ class Profile extends \Profile
             : $DB->insert('glpi_profilerights', $where + ['rights' => $value]);
 
         if (!$result) {
-            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('Could not update the rights.', 'bitwardensend'),
                 false,
@@ -231,7 +229,6 @@ class Profile extends \Profile
             $_SESSION['glpiactiveprofile'] = $activeProfile;
         }
 
-        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Rights updated.', 'bitwardensend'), true, INFO);
 
         return true;

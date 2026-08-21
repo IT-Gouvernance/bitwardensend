@@ -49,6 +49,7 @@ define('PLUGIN_BITWARDENSEND_MAX_GLPI', '11.0.99');
  */
 function plugin_init_bitwardensend(): void
 {
+    /** @var array<string, array<string, mixed>> $PLUGIN_HOOKS */
     global $PLUGIN_HOOKS;
 
     $PLUGIN_HOOKS['csrf_compliant']['bitwardensend'] = true;
@@ -84,6 +85,8 @@ function plugin_init_bitwardensend(): void
 
 /**
  * Plugin description.
+ *
+ * @return array<string, mixed>
  */
 function plugin_version_bitwardensend(): array
 {
@@ -121,7 +124,7 @@ function plugin_bitwardensend_check_prerequisites(): bool
 /**
  * Configuration check.
  */
-function plugin_bitwardensend_check_config($verbose = false): bool
+function plugin_bitwardensend_check_config(bool $verbose = false): bool
 {
     return true;
 }

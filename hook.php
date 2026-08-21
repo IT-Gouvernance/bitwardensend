@@ -163,7 +163,11 @@ function plugin_bitwardensend_countRows(string $table, array $where = []): int
     }
 
     foreach ($DB->request($criteria) as $row) {
-        return (int) $row['cpt'];
+        if (!is_array($row)) {
+            return 0;
+        }
+        $cpt = $row['cpt'] ?? 0;
+        return is_numeric($cpt) ? (int) $cpt : 0;
     }
 
     return 0;
