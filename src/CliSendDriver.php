@@ -250,11 +250,14 @@ class CliSendDriver implements SendDriverInterface
             throw new RuntimeException(__('Unable to initialize cURL', 'bitwardensend'));
         }
 
+        $rawTimeout = $this->conf['timeout'] ?? 15;
+        $timeout    = is_numeric($rawTimeout) ? (int) $rawTimeout : 15;
+
         $headers = ['Accept: application/json'];
         $options = [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CUSTOMREQUEST  => $method,
-            CURLOPT_TIMEOUT        => (int) ($this->conf['timeout'] ?? 15),
+            CURLOPT_TIMEOUT        => $timeout,
             CURLOPT_CONNECTTIMEOUT => 5,
         ];
 
@@ -272,7 +275,8 @@ class CliSendDriver implements SendDriverInterface
         $errno = curl_errno($handle);
         $error = curl_error($handle);
         $code  = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
+        // Not explicitly closed: CurlHandle instances close themselves once
+        // unset/out of scope, and curl_close() is deprecated as of PHP 8.5.
 
         if ($errno !== 0) {
             throw new RuntimeException(sprintf(
@@ -289,7 +293,14 @@ class CliSendDriver implements SendDriverInterface
             ));
         }
 
-        return $decoded;
+        $result = [];
+        foreach ($decoded as $key => $value) {
+            if (is_string($key)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
     }
 
     // ------------------------------------------------------------------
@@ -303,12 +314,17 @@ class CliSendDriver implements SendDriverInterface
      */
     private function errorMessage(array $response): string
     {
-        if (!empty($response['message'])) {
-            return (string) $response['message'];
+        $message = $response['message'] ?? null;
+        if (!empty($message) && is_scalar($message)) {
+            return (string) $message;
         }
 
-        if (!empty($response['data']['message'])) {
-            return (string) $response['data']['message'];
+        $data = $response['data'] ?? null;
+        if (is_array($data)) {
+            $dataMessage = $data['message'] ?? null;
+            if (!empty($dataMessage) && is_scalar($dataMessage)) {
+                return (string) $dataMessage;
+            }
         }
 
         return __('Unknown Bitwarden API error', 'bitwardensend');
@@ -320,13 +336,17 @@ class CliSendDriver implements SendDriverInterface
      */
     private function normalize(array $send): array
     {
-        $access_id = (string) ($send['accessId'] ?? '');
-        $key       = (string) ($send['key'] ?? '');
-        $url       = (string) ($send['accessUrl'] ?? '');
+        $rawAccessId = $send['accessId'] ?? '';
+        $access_id   = is_string($rawAccessId) ? $rawAccessId : '';
+        $rawKey      = $send['key'] ?? '';
+        $key         = is_string($rawKey) ? $rawKey : '';
+        $rawUrl      = $send['accessUrl'] ?? '';
+        $url         = is_string($rawUrl) ? $rawUrl : '';
 
         if ($url === '' && $access_id !== '' && $key !== '') {
-            $url = rtrim((string) ($this->conf['send_base_url'] ?? 'https://send.bitwarden.com/#'), '/')
-                 . $access_id . '/' . $key;
+            $rawBaseUrl = $this->conf['send_base_url'] ?? 'https://send.bitwarden.com/#';
+            $baseUrl    = is_string($rawBaseUrl) ? $rawBaseUrl : 'https://send.bitwarden.com/#';
+            $url        = rtrim($baseUrl, '/') . $access_id . '/' . $key;
         }
 
         if ($url === '') {
@@ -335,11 +355,16 @@ class CliSendDriver implements SendDriverInterface
             );
         }
 
+        $rawId = $send['id'] ?? '';
+        $uuid  = is_string($rawId) ? $rawId : '';
+
+        $rawDeletionDate = $send['deletionDate'] ?? null;
+
         return [
-            'uuid'          => (string) ($send['id'] ?? ''),
+            'uuid'          => $uuid,
             'access_id'     => $access_id,
             'access_url'    => $url,
-            'deletion_date' => isset($send['deletionDate']) ? (string) $send['deletionDate'] : null,
+            'deletion_date' => is_string($rawDeletionDate) ? $rawDeletionDate : null,
         ];
     }
 }

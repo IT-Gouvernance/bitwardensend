@@ -412,7 +412,8 @@ class NativeSendDriver implements SendDriverInterface
         $errno = curl_errno($handle);
         $error = curl_error($handle);
         $code  = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
+        // Not explicitly closed: CurlHandle instances close themselves once
+        // unset/out of scope, and curl_close() is deprecated as of PHP 8.5.
 
         if ($errno !== 0) {
             throw new RuntimeException(sprintf(
@@ -443,6 +444,13 @@ class NativeSendDriver implements SendDriverInterface
             ));
         }
 
-        return $decoded;
+        $result = [];
+        foreach ($decoded as $key => $value) {
+            if (is_string($key)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
     }
 }
