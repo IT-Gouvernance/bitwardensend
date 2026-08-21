@@ -48,6 +48,9 @@ Initial release.
 - GitHub Actions workflows: automatic translation catalog rebuilds on every relevant
   push, and automatic GitHub Releases (with a `glpi-bitwardensend-<version>.tar.bz2`
   archive) on every version bump.
+- Community/contribution files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
+  `SECURITY.md`, a pull request template, and bug report/feature request issue
+  forms.
 
 ### Fixed
 
