@@ -51,6 +51,8 @@ function plugin_init_bitwardensend(): void
 {
     global $PLUGIN_HOOKS;
 
+    $PLUGIN_HOOKS['csrf_compliant']['bitwardensend'] = true;
+
     // JavaScript and CSS are inlined by templates/assets.html.twig instead of
     // being served as static files: the GLPI 11 router does not always expose
     // them when plugins live outside the webroot (404).

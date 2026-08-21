@@ -27,6 +27,7 @@
  -------------------------------------------------------------------------
 #}
 <form method="post" action="{{ path('plugins/bitwardensend/front/profile.form.php') }}">
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token }}">
    <input type="hidden" name="profiles_id" value="{{ profiles_id }}">
 
    <div class="card-body">
