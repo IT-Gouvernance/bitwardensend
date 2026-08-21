@@ -76,11 +76,7 @@ class Config extends CommonDBTM
         }
 
         $defaults = [
-            'backend'                        => 'serve',
             'api_url'                        => 'http://127.0.0.1:8087',
-            'cli_path'                       => '/usr/local/bin/bw',
-            'cli_appdata_dir'                => '/var/lib/bitwarden-cli',
-            'cli_session'                    => '',
             'send_base_url'                  => 'https://send.bitwarden.com/#',
             'master_password'                => '',
             'timeout'                        => 15,
@@ -128,14 +124,6 @@ class Config extends CommonDBTM
     public static function getMasterPassword(): string
     {
         return self::decrypt((string) (self::getConfig()['master_password'] ?? ''));
-    }
-
-    /**
-     * Decrypted BW_SESSION value (CLI mode only).
-     */
-    public static function getCliSession(): string
-    {
-        return self::decrypt((string) (self::getConfig()['cli_session'] ?? ''));
     }
 
     /**
@@ -190,14 +178,8 @@ class Config extends CommonDBTM
             ? $input['send_driver'] : 'cli';
 
         if ($driver === 'cli') {
-            $backend = in_array($input['backend'] ?? 'serve', ['serve', 'cli'], true)
-                ? $input['backend'] : 'serve';
-
-            if ($backend === 'serve' && trim((string) ($input['api_url'] ?? '')) === '') {
+            if (trim((string) ($input['api_url'] ?? '')) === '') {
                 $errors[] = __('Local API URL', 'bitwardensend');
-            }
-            if ($backend === 'cli' && trim((string) ($input['cli_path'] ?? '')) === '') {
-                $errors[] = __('Path to the bw binary', 'bitwardensend');
             }
             return $errors;
         }
@@ -238,11 +220,7 @@ class Config extends CommonDBTM
         global $DB;
 
         $fields = [
-            'backend'                       => in_array($input['backend'] ?? 'serve', ['serve', 'cli'], true)
-                                                 ? $input['backend'] : 'serve',
             'api_url'                       => rtrim(trim((string) ($input['api_url'] ?? '')), '/'),
-            'cli_path'                      => trim((string) ($input['cli_path'] ?? '')),
-            'cli_appdata_dir'               => trim((string) ($input['cli_appdata_dir'] ?? '')),
             'send_base_url'                 => trim((string) ($input['send_base_url'] ?? '')),
             'timeout'                       => max(1, (int) ($input['timeout'] ?? 15)),
             'default_deletion_days'         => max(1, (int) ($input['default_deletion_days'] ?? 7)),
@@ -268,9 +246,6 @@ class Config extends CommonDBTM
         if (($input['master_password'] ?? '') !== '') {
             $fields['master_password'] = self::encrypt((string) $input['master_password']);
         }
-        if (($input['cli_session'] ?? '') !== '') {
-            $fields['cli_session'] = self::encrypt((string) $input['cli_session']);
-        }
         if (($input['native_client_secret'] ?? '') !== '') {
             $fields['native_client_secret'] = self::encrypt((string) $input['native_client_secret']);
         }
@@ -279,9 +254,6 @@ class Config extends CommonDBTM
         }
         if (!empty($input['clear_master_password'])) {
             $fields['master_password'] = '';
-        }
-        if (!empty($input['clear_cli_session'])) {
-            $fields['cli_session'] = '';
         }
         if (!empty($input['clear_native_client_secret'])) {
             $fields['native_client_secret'] = '';
@@ -346,7 +318,6 @@ class Config extends CommonDBTM
         TemplateRenderer::getInstance()->display('@bitwardensend/config.html.twig', [
             'conf'                          => $conf,
             'has_master_password'           => self::getMasterPassword() !== '',
-            'has_cli_session'               => self::getCliSession() !== '',
             'has_native_client_secret'      => self::getNativeClientSecret() !== '',
             'has_native_master_password'    => self::getNativeMasterPassword() !== '',
             'cleanup_cron_url'              => Send::getCleanupCronUrl(),

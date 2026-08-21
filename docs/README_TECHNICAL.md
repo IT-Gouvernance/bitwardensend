@@ -32,9 +32,9 @@ Release history: see [CHANGELOG.md](../CHANGELOG.md).
 
 The plugin creates Sends through one of two drivers, chosen on the configuration page:
 
-- **CLI** (default) — drives the official `bw` client, either through its local API
-  (`bw serve`) or by invoking the binary directly. Requires shell/system access on the
-  GLPI server to install and run that client — see "Server prerequisites" below.
+- **CLI** (default) — drives the official `bw` client's local API (`bw serve`). Requires
+  shell/system access on the GLPI server to install and run that client — see "Server
+  prerequisites" below.
 - **Native** — talks to the Bitwarden API directly in PHP, with no external binary at
   all. The only option on hosts where the CLI driver's shell access is not available,
   e.g. GLPI Cloud. See "Native driver" below for its own setup and one real limitation
@@ -43,9 +43,8 @@ The plugin creates Sends through one of two drivers, chosen on the configuration
 ## Server prerequisites
 
 Bitwarden does not expose Send creation through its public organization API, so the
-CLI driver drives the official `bw` client, either through the **local API**
-(recommended) or by invoking the binary directly. Skip this whole section if you are
-using the native driver instead.
+CLI driver drives the official `bw` client's local API (`bw serve`). Skip this whole
+section if you are using the native driver instead.
 
 ```bash
 # 1. Install the client
@@ -130,10 +129,8 @@ Setup > General > **Bitwarden Send** tab:
 | Setting | Purpose |
 |---|---|
 | Send driver | `cli` (default) or `native` — see "Send driver" above |
-| Access mode | CLI driver only: `serve` (local HTTP API) or `cli` (binary invocation) |
-| Local API URL | CLI driver, `serve` mode: `http://127.0.0.1:8087` |
+| Local API URL | CLI driver: `http://127.0.0.1:8087` |
 | Master password | CLI driver, optional, encrypted; enables automatic vault unlocking |
-| BW_SESSION | CLI driver, `cli` mode only, encrypted |
 | Send link base URL | CLI driver: fallback when the API does not return the access URL |
 | Identity/API/Web vault URL | Native driver: Bitwarden endpoints — pre-filled for the cloud |
 | API client ID/secret, account email, master password | Native driver's service account — see "Native driver" above |

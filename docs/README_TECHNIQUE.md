@@ -34,10 +34,9 @@ Historique des versions : voir [CHANGELOG.md](../CHANGELOG.md).
 Le plugin crée les Sends via l'un de ces deux drivers, choisi sur la page de
 configuration :
 
-- **CLI** (par défaut) — pilote le client officiel `bw`, soit via son API locale
-  (`bw serve`), soit en invoquant directement le binaire. Nécessite un accès
-  système/shell sur le serveur GLPI pour installer et lancer ce client — voir
-  « Prérequis serveur » ci-dessous.
+- **CLI** (par défaut) — pilote l'API locale (`bw serve`) du client officiel `bw`.
+  Nécessite un accès système/shell sur le serveur GLPI pour installer et lancer ce
+  client — voir « Prérequis serveur » ci-dessous.
 - **Natif** — dialogue directement avec l'API Bitwarden en PHP, sans aucun binaire
   externe. La seule option sur les hébergements où l'accès shell du driver CLI n'est
   pas disponible, par exemple GLPI Cloud. Voir « Driver natif » ci-dessous pour sa
@@ -46,9 +45,8 @@ configuration :
 ## Prérequis serveur
 
 Bitwarden n'expose pas la création de Send via son API publique d'organisation ; le
-driver CLI pilote donc le client officiel `bw`, soit via son **API locale**
-(recommandé), soit en invoquant directement le binaire. Ignorez toute cette section si
-vous utilisez le driver natif.
+driver CLI pilote donc l'**API locale** (`bw serve`) du client officiel `bw`. Ignorez
+toute cette section si vous utilisez le driver natif.
 
 ```bash
 # 1. Installer le client
@@ -136,10 +134,8 @@ Configuration > Général > onglet **Bitwarden Send** :
 | Réglage | Rôle |
 |---|---|
 | Driver de Send | `cli` (par défaut) ou `native` — voir « Driver de Send » ci-dessus |
-| Mode d'accès | Driver CLI uniquement : `serve` (API HTTP locale) ou `cli` (invocation du binaire) |
-| URL de l'API locale | Driver CLI, mode `serve` : `http://127.0.0.1:8087` |
+| URL de l'API locale | Driver CLI : `http://127.0.0.1:8087` |
 | Mot de passe maître | Driver CLI, optionnel, chiffré ; permet le déverrouillage automatique du coffre |
-| BW_SESSION | Driver CLI, mode `cli` uniquement, chiffré |
 | URL de base des liens Send | Driver CLI : repli quand l'API ne renvoie pas le lien d'accès |
 | URL d'identité/API/coffre web | Driver natif : points d'accès Bitwarden — pré-remplis pour le cloud |
 | ID/secret client de l'API, e-mail, mot de passe maître | Compte de service du driver natif — voir « Driver natif » ci-dessus |
