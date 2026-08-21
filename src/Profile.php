@@ -172,7 +172,7 @@ class Profile extends \Profile
      * Writes the bitmask directly rather than going through the core profile form
      * conventions, so the field naming here is self-contained.
      *
-     * @param array<string,mixed> $input
+     * @param array<int|string,mixed> $input
      */
     public static function saveFromInput(array $input): bool
     {
@@ -180,6 +180,7 @@ class Profile extends \Profile
 
         $profiles_id = (int) ($input['profiles_id'] ?? 0);
         if ($profiles_id <= 0) {
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('No profile selected.', 'bitwardensend'),
                 false,
@@ -213,6 +214,7 @@ class Profile extends \Profile
             : $DB->insert('glpi_profilerights', $where + ['rights' => $value]);
 
         if (!$result) {
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('Could not update the rights.', 'bitwardensend'),
                 false,
@@ -223,10 +225,13 @@ class Profile extends \Profile
 
         // Reflect the change immediately when editing one's own profile, otherwise
         // the session keeps the previous rights until the next profile switch.
-        if ((int) ($_SESSION['glpiactiveprofile']['id'] ?? 0) === $profiles_id) {
-            $_SESSION['glpiactiveprofile'][Send::$rightname] = $value;
+        $activeProfile = $_SESSION['glpiactiveprofile'] ?? null;
+        if (is_array($activeProfile) && (int) ($activeProfile['id'] ?? 0) === $profiles_id) {
+            $activeProfile[Send::$rightname] = $value;
+            $_SESSION['glpiactiveprofile'] = $activeProfile;
         }
 
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Rights updated.', 'bitwardensend'), true, INFO);
 
         return true;

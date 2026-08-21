@@ -368,14 +368,16 @@ class Send extends CommonDBTM
     /**
      * Create the Bitwarden Send, store it and optionally post a followup.
      *
-     * @param array<string,mixed> $input
+     * @param array<int|string,mixed> $input
      */
     public static function createFromInput(array $input): bool
     {
         $itemtype = (string) ($input['itemtype'] ?? '');
-        $items_id = (int) ($input['items_id'] ?? 0);
+        $rawItemsId = $input['items_id'] ?? 0;
+        $items_id = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
 
         if (!in_array($itemtype, self::getSupportedItemtypes(), true)) {
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('Unsupported item type.', 'bitwardensend'),
                 false,
@@ -386,6 +388,7 @@ class Send extends CommonDBTM
 
         $item = getItemForItemtype($itemtype);
         if (!($item instanceof CommonITILObject) || !$item->getFromDB($items_id) || !$item->canViewItem()) {
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('Item not found or access denied.', 'bitwardensend'),
                 false,
@@ -396,6 +399,7 @@ class Send extends CommonDBTM
 
         $secret = (string) ($input['secret'] ?? '');
         if (trim($secret) === '') {
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('The content to share is empty.', 'bitwardensend'),
                 false,
@@ -406,7 +410,8 @@ class Send extends CommonDBTM
 
         $conf = Config::getConfig();
 
-        $days = (int) ($input['deletion_days'] ?? 0);
+        $rawDays = $input['deletion_days'] ?? 0;
+        $days = is_numeric($rawDays) ? (int) $rawDays : 0;
         if ($days <= 0) {
             $days = (int) $conf['default_deletion_days'];
         }
@@ -415,7 +420,8 @@ class Send extends CommonDBTM
 
         $expiration_ts = strtotime('+' . $days . ' days');
         $deletion_date = gmdate('Y-m-d\TH:i:s.000\Z', $expiration_ts);
-        $max_access    = max(0, (int) ($input['max_access_count'] ?? 0));
+        $rawMaxAccess  = $input['max_access_count'] ?? 0;
+        $max_access    = max(0, is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0);
         $password      = (string) ($input['password'] ?? '');
 
         $name = trim((string) ($input['name'] ?? ''));
@@ -436,8 +442,12 @@ class Send extends CommonDBTM
             ));
         } catch (Throwable $throwable) {
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
-                sprintf(__('Could not create the Send: %s', 'bitwardensend'), $throwable->getMessage()),
+                sprintf(
+                    __('Could not create the Send: %s', 'bitwardensend'),
+                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES)
+                ),
                 false,
                 ERROR
             );
@@ -471,6 +481,7 @@ class Send extends CommonDBTM
             );
         }
 
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(
             sprintf(
                 __('Bitwarden Send link created: %s', 'bitwardensend'),
@@ -545,6 +556,7 @@ class Send extends CommonDBTM
         ]);
 
         if (!$created) {
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
                 __('The Send was created but the followup could not be added.', 'bitwardensend'),
                 false,
@@ -566,8 +578,12 @@ class Send extends CommonDBTM
             SendDriverFactory::create()->deleteSend((string) $this->fields['send_uuid']);
         } catch (Throwable $throwable) {
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
+            /** @psalm-suppress TaintedHtml */
             Session::addMessageAfterRedirect(
-                sprintf(__('Could not revoke the link: %s', 'bitwardensend'), $throwable->getMessage()),
+                sprintf(
+                    __('Could not revoke the link: %s', 'bitwardensend'),
+                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES)
+                ),
                 false,
                 ERROR
             );
@@ -580,6 +596,7 @@ class Send extends CommonDBTM
             'access_url' => null,
         ]);
 
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Link revoked.', 'bitwardensend'), false, INFO);
 
         return true;

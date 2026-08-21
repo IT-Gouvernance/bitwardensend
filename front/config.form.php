@@ -42,6 +42,7 @@ if (isset($_POST['update'])) {
     $missingFields = Config::validateInput($_POST);
 
     if ($missingFields !== []) {
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(
             sprintf(
                 __('Configuration not saved: required fields are missing: %s', 'bitwardensend'),
@@ -51,8 +52,10 @@ if (isset($_POST['update'])) {
             ERROR
         );
     } elseif (Config::saveFromInput($_POST)) {
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Configuration saved.', 'bitwardensend'), true, INFO);
     } else {
+        /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(__('Could not save the configuration.', 'bitwardensend'), false, ERROR);
     }
 
@@ -63,6 +66,7 @@ if (isset($_POST['test'])) {
     try {
         $status = SendDriverFactory::create()->testConnection();
 
+        /** @psalm-suppress TaintedHtml */
         match ($status) {
             'unlocked', 'ok' => Session::addMessageAfterRedirect(
                 __('Connected, vault unlocked. The plugin is ready to use.', 'bitwardensend'),
@@ -88,13 +92,14 @@ if (isset($_POST['test'])) {
                 ERROR
             ),
             default => Session::addMessageAfterRedirect(
-                sprintf(__('Unexpected vault status: %s', 'bitwardensend'), $status),
+                sprintf(__('Unexpected vault status: %s', 'bitwardensend'), htmlspecialchars($status, ENT_QUOTES)),
                 false,
                 WARNING
             ),
         };
     } catch (Throwable $e) {
-        Session::addMessageAfterRedirect($e->getMessage(), false, ERROR);
+        /** @psalm-suppress TaintedHtml */
+        Session::addMessageAfterRedirect(htmlspecialchars($e->getMessage(), ENT_QUOTES), false, ERROR);
     }
 
     Html::redirect(Config::getConfigTabUrl());

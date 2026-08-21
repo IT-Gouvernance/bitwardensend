@@ -170,7 +170,7 @@ class Config extends CommonDBTM
      * Checks the fields the selected driver/mode actually needs. Mirrors
      * NativeSendDriver/CliSendDriver's own runtime checks by hand.
      *
-     * @param array<string,mixed> $input
+     * @param array<int|string,mixed> $input
      * @return list<string> labels of the missing fields
      */
     public static function validateInput(array $input): array
@@ -217,7 +217,7 @@ class Config extends CommonDBTM
     /**
      * Save the configuration coming from the form.
      *
-     * @param array<string,mixed> $input
+     * @param array<int|string,mixed> $input
      */
     public static function saveFromInput(array $input): bool
     {

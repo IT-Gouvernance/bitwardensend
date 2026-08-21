@@ -120,16 +120,18 @@ function plugin_bitwardensend_install(): bool
     }
 
     // Give the installing profile full rights right away.
-    if (isset($_SESSION['glpiactiveprofile']['id'])) {
+    $activeProfile = $_SESSION['glpiactiveprofile'] ?? null;
+    if (is_array($activeProfile) && isset($activeProfile['id'])) {
         $DB->update(
             'glpi_profilerights',
             ['rights' => ALLSTANDARDRIGHT],
             [
-                'profiles_id' => $_SESSION['glpiactiveprofile']['id'],
+                'profiles_id' => $activeProfile['id'],
                 'name'        => Send::$rightname,
             ]
         );
-        $_SESSION['glpiactiveprofile'][Send::$rightname] = ALLSTANDARDRIGHT;
+        $activeProfile[Send::$rightname] = ALLSTANDARDRIGHT;
+        $_SESSION['glpiactiveprofile'] = $activeProfile;
     }
 
     CronTask::register(Send::class, 'cleanup', DAY_TIMESTAMP, [
