@@ -29,11 +29,8 @@
  * -------------------------------------------------------------------------
  */
 
+use Glpi\Application\View\TemplateRenderer;
 use GlpiPlugin\Bitwardensend\Send;
-
-if (!defined('GLPI_ROOT')) {
-    include('../../../inc/includes.php');
-}
 
 Session::checkRight(Send::$rightname, CREATE);
 
@@ -43,13 +40,17 @@ $itemtype = $_REQUEST['itemtype'] ?? '';
 $items_id = (int) ($_REQUEST['items_id'] ?? 0);
 
 if (!in_array($itemtype, Send::getSupportedItemtypes(), true)) {
-    echo '<div class="alert alert-danger">' . __('Unsupported item type.', 'bitwardensend') . '</div>';
+    TemplateRenderer::getInstance()->display('@bitwardensend/_ajax_error.html.twig', [
+        'message' => __('Unsupported item type.', 'bitwardensend'),
+    ]);
     return;
 }
 
 $item = getItemForItemtype($itemtype);
 if (!$item || !$item->getFromDB($items_id) || !$item->canViewItem()) {
-    echo '<div class="alert alert-danger">' . __('Item not found or access denied.', 'bitwardensend') . '</div>';
+    TemplateRenderer::getInstance()->display('@bitwardensend/_ajax_error.html.twig', [
+        'message' => __('Item not found or access denied.', 'bitwardensend'),
+    ]);
     return;
 }
 

@@ -47,11 +47,7 @@ function plugin_bitwardensend_install(): bool
     if (!$DB->tableExists($config_table)) {
         $query = "CREATE TABLE `$config_table` (
             `id` int $sign NOT NULL AUTO_INCREMENT,
-            `backend` varchar(20) NOT NULL DEFAULT 'serve',
             `api_url` varchar(255) NOT NULL DEFAULT 'http://127.0.0.1:8087',
-            `cli_path` varchar(255) NOT NULL DEFAULT '/usr/local/bin/bw',
-            `cli_appdata_dir` varchar(255) NOT NULL DEFAULT '/var/lib/bitwarden-cli',
-            `cli_session` text,
             `send_base_url` varchar(255) NOT NULL DEFAULT 'https://send.bitwarden.com/#',
             `master_password` text,
             `timeout` int NOT NULL DEFAULT 15,

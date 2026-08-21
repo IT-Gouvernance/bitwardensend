@@ -168,7 +168,6 @@ FR = {
     'API URL': "URL de l'API",
     'API client ID': "ID client de l'API",
     'API client secret': "Secret client de l'API",
-    'Access mode': "Mode d'accès",
     'Account email': 'E-mail du compte',
     'Active': 'Actif',
     'Advanced options': 'Options avancées',
@@ -185,8 +184,6 @@ FR = {
     'Bitwarden API client credentials are not configured.':
         "Les identifiants client de l'API Bitwarden ne sont pas configurés.",
     'Bitwarden API error: %s': "Erreur de l'API Bitwarden : %s",
-    'Bitwarden CLI binary not found or not executable: %s':
-        'Binaire Bitwarden CLI introuvable ou non exécutable : %s',
     'Bitwarden Send link created: %s': 'Lien Bitwarden Send créé : %s',
     'Bitwarden connection': 'Connexion à Bitwarden',
     'Bitwarden did not return KDF parameters.':
@@ -201,10 +198,6 @@ FR = {
         "L'URL d'identité Bitwarden n'est pas configurée.",
     'Cannot reach the Bitwarden API (%s)': "Impossible de joindre l'API Bitwarden (%s)",
     'CLI / bw serve — recommended': 'CLI / bw serve — recommandé',
-    'Client data directory, writable by the web server user.':
-        'Répertoire de données du client, accessible en écriture par '
-        "l'utilisateur du serveur web.",
-    'Command line binary (bw)': 'Binaire en ligne de commande (bw)',
     'Configuration not saved: required fields are missing: %s':
         "Configuration non enregistrée : champs obligatoires manquants : %s",
     'Configuration saved.': 'Configuration enregistrée.',
@@ -227,7 +220,6 @@ FR = {
         "Supprime les entrées Bitwarden Send révoquées ou expirées au-delà de la durée de rétention configurée",
     'Delete the stored password': 'Supprimer le mot de passe enregistré',
     'Delete the stored secret': 'Supprimer le secret enregistré',
-    'Delete the stored session': 'Supprimer la session enregistrée',
     'Delete this entry?': 'Supprimer cette entrée ?',
     'Encrypted with the GLPI key. Used to unlock the vault automatically. '
     'Leave empty if you unlock the service yourself.':
@@ -280,8 +272,6 @@ FR = {
         "Cloud), mais ne prend en charge que les comptes de service en KDF "
         'PBKDF2 — voir le README.',
     'New Bitwarden Send': 'Nouveau Bitwarden Send',
-    'No BW_SESSION value is configured for CLI mode.':
-        "Aucune valeur BW_SESSION n'est configurée pour le mode CLI.",
     'No Bitwarden Send link has been created for this item yet.':
         "Aucun lien Bitwarden Send n'a encore été créé pour cet élément.",
     'No master password is configured for the native driver.':
@@ -301,7 +291,6 @@ FR = {
         'Visible uniquement dans votre coffre Bitwarden.',
     'Password generator options': 'Options du générateur de mot de passe',
     'Password protected': 'Protégé par mot de passe',
-    'Path to the bw binary': 'Chemin du binaire bw',
     'Plugin default template': 'Modèle par défaut du plugin',
     'Post the link as a followup': 'Publier le lien dans un suivi',
     'Post the link as a followup by default':
@@ -346,8 +335,6 @@ FR = {
         "Les droits ci-dessous nécessitent celui-ci : chaque action de l'onglet le vérifie en premier.",
     'The Bitwarden client is not logged in. Run "bw login" on the server.':
         "Le client Bitwarden n'est pas connecté. Exécutez « bw login » sur le serveur.",
-    'The Bitwarden client returned an error: %s':
-        'Le client Bitwarden a retourné une erreur : %s',
     'The Bitwarden vault is locked and no master password is configured.':
         "Le coffre Bitwarden est verrouillé et aucun mot de passe maître n'est configuré.",
     'The Send was created but no access link was returned.':
@@ -384,9 +371,6 @@ FR = {
     'Timeout (seconds)': "Délai d'attente (secondes)",
     'Unable to initialize cURL': "Impossible d'initialiser cURL",
     'Uppercase': 'Majuscules',
-    'Unable to start the Bitwarden client': 'Impossible de démarrer le client Bitwarden',
-    'Unexpected output from the Bitwarden client: %s':
-        'Sortie inattendue du client Bitwarden : %s',
     'Unexpected response from the Bitwarden API (HTTP %d)':
         "Réponse inattendue de l'API Bitwarden (HTTP %d)",
     'Unexpected vault status: %s': 'État du coffre inattendu : %s',

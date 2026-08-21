@@ -35,6 +35,7 @@
  * as a followup.
  */
 
+use Glpi\Plugin\Hooks;
 use GlpiPlugin\Bitwardensend\Config;
 use GlpiPlugin\Bitwardensend\Profile;
 use GlpiPlugin\Bitwardensend\Send;
@@ -50,9 +51,6 @@ function plugin_init_bitwardensend(): void
 {
     global $PLUGIN_HOOKS;
 
-    // Hook names are passed as plain strings rather than through the
-    // Glpi\Plugin\Hooks constants: a missing constant would raise a fatal error
-    // if GLPI ever renames or moves that class.
     $PLUGIN_HOOKS['csrf_compliant']['bitwardensend'] = true;
 
     // JavaScript and CSS are inlined by templates/assets.html.twig instead of
@@ -81,7 +79,7 @@ function plugin_init_bitwardensend(): void
     // Solution/... — rights, item type and new-item state are all checked
     // inside Send::getTimelineAnswerActions() itself, so the hook is simply
     // always registered here (an empty array is exactly "nothing to add").
-    $PLUGIN_HOOKS['timeline_answer_actions']['bitwardensend'] = [Send::class, 'getTimelineAnswerActions'];
+    $PLUGIN_HOOKS[Hooks::TIMELINE_ANSWER_ACTIONS]['bitwardensend'] = [Send::class, 'getTimelineAnswerActions'];
 }
 
 /**

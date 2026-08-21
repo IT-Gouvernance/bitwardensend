@@ -32,10 +32,6 @@
 use GlpiPlugin\Bitwardensend\Config;
 use GlpiPlugin\Bitwardensend\SendDriverFactory;
 
-if (!defined('GLPI_ROOT')) {
-    include('../../../inc/includes.php');
-}
-
 Session::checkRight('config', UPDATE);
 
 // The CSRF token is validated automatically by GLPI (the plugin declares
