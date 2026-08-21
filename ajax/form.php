@@ -31,10 +31,6 @@
 
 use GlpiPlugin\Bitwardensend\Send;
 
-if (!defined('GLPI_ROOT')) {
-    include('../../../inc/includes.php');
-}
-
 Session::checkRight(Send::$rightname, CREATE);
 
 header('Content-Type: text/html; charset=UTF-8');
