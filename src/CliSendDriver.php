@@ -290,7 +290,7 @@ class CliSendDriver implements SendDriverInterface
         if ($errno !== 0) {
             throw new RuntimeException(sprintf(
                 __('Cannot reach the Bitwarden API (%s)', 'bitwardensend'),
-                $error
+                $error,
             ));
         }
 
@@ -298,7 +298,7 @@ class CliSendDriver implements SendDriverInterface
         if (!is_array($decoded)) {
             throw new RuntimeException(sprintf(
                 __('Unexpected response from the Bitwarden API (HTTP %d)', 'bitwardensend'),
-                $code
+                $code,
             ));
         }
 

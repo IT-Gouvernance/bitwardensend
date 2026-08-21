@@ -75,7 +75,7 @@ final readonly class EncString implements Stringable
         if ($type !== (string) self::TYPE) {
             throw new RuntimeException(sprintf(
                 'Unsupported EncString type "%s": only type 2 (AES-256-CBC + HMAC-SHA256) is implemented.',
-                $type
+                $type,
             ));
         }
 

@@ -54,13 +54,13 @@ final class SendCryptoTest extends TestCase
         $key = SendCrypto::deriveShareableKey('&/$%F1a895g67HlX', 'test_key', null);
         self::assertSame(
             '4PV6+PcmF2w7YHRatvyMcVQtI7zvCyssv/wFWmzjiH6Iv9altjmDkuBD1aagLVaLezbthbSe+ktR+U6qswxNnQ==',
-            base64_encode($key)
+            base64_encode($key),
         );
 
         $key = SendCrypto::deriveShareableKey('67t9b5g67$%Dh89n', 'test_key', 'test');
         self::assertSame(
             'F9jVQmrACGx9VUPjuzfMYDjr726JtL300Y3Yg+VYUnVQtQ1s8oImJ5xtp1KALC9h2nav04++1LDW4iFD+infng==',
-            base64_encode($key)
+            base64_encode($key),
         );
     }
 
@@ -104,7 +104,7 @@ final class SendCryptoTest extends TestCase
 
         self::assertSame(
             SendCrypto::deriveShareableKey($keyMaterial, 'send', 'send'),
-            SendCrypto::deriveSendKey($keyMaterial)
+            SendCrypto::deriveSendKey($keyMaterial),
         );
     }
 

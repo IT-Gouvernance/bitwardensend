@@ -222,7 +222,7 @@ class NativeSendDriver implements SendDriverInterface
         if ($masterPassword === '') {
             throw new RuntimeException(__(
                 'No master password is configured for the native driver.',
-                'bitwardensend'
+                'bitwardensend',
             ));
         }
 
@@ -238,7 +238,7 @@ class NativeSendDriver implements SendDriverInterface
                 'This account uses the Argon2id KDF, which the native driver cannot reproduce '
                 . 'in PHP. Use a service account configured with PBKDF2, or switch this Send '
                 . 'driver to "cli".',
-                'bitwardensend'
+                'bitwardensend',
             ), $runtimeException->getCode(), $runtimeException);
         } finally {
             SendCrypto::zero($masterPassword);
@@ -261,7 +261,7 @@ class NativeSendDriver implements SendDriverInterface
             // to preserve it.
             throw new RuntimeException(__(
                 'Could not decrypt the account user key: wrong master password?',
-                'bitwardensend'
+                'bitwardensend',
             ));
         } finally {
             SendCrypto::zero($stretchedMasterKey);
@@ -297,7 +297,7 @@ class NativeSendDriver implements SendDriverInterface
         if ($clientId === '' || $clientSecret === '') {
             throw new RuntimeException(__(
                 'Bitwarden API client credentials are not configured.',
-                'bitwardensend'
+                'bitwardensend',
             ));
         }
 
@@ -349,7 +349,7 @@ class NativeSendDriver implements SendDriverInterface
         if (!is_string($key) || $key === '') {
             throw new RuntimeException(__(
                 'Bitwarden did not return the account user key.',
-                'bitwardensend'
+                'bitwardensend',
             ));
         }
 
@@ -424,7 +424,7 @@ class NativeSendDriver implements SendDriverInterface
         if ($errno !== 0) {
             throw new RuntimeException(sprintf(
                 __('Cannot reach the Bitwarden API (%s)', 'bitwardensend'),
-                $error
+                $error,
             ));
         }
 
@@ -446,7 +446,7 @@ class NativeSendDriver implements SendDriverInterface
         if (!is_array($decoded)) {
             throw new RuntimeException(sprintf(
                 __('Unexpected response from the Bitwarden API (HTTP %d)', 'bitwardensend'),
-                $code
+                $code,
             ));
         }
 
