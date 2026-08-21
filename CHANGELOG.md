@@ -87,3 +87,6 @@ Initial release.
   passed to curl as `false` instead of being treated as an error, and
   `SendCrypto::deriveMasterKey()` did not reject a non-positive KDF iteration count
   before handing it to `hash_pbkdf2()`.
+- Two error messages added along with the type-safety fixes above ("Could not
+  compute the expiration date.", "Unable to encode the request body") had no
+  French translation, so `tools/build-locales.py` failed. Added them.
