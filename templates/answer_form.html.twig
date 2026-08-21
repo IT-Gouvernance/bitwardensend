@@ -39,13 +39,9 @@
    The actual fields are shared with the "Bitwarden Sends" tab's own modal
    (front-ends differ, form is the same) — see _send_form_fields.html.twig.
 
-   Unlike that modal (opened from a button in list.html.twig, which already
-   includes assets.html.twig), this form is part of the ticket's own initial
-   page — nothing else guarantees the plugin's CSS/JS got loaded before it
-   renders, so it is included here explicitly. Idempotent either way (see
-   assets.html.twig's own loaded-guard).
+   CSS/JS need no explicit include here: add_javascript/add_css in
+   setup.php load them on every page through GLPI's own hook mechanism.
 #}
-{% include '@bitwardensend/assets.html.twig' %}
 <form method="post"
       action="{{ path('plugins/bitwardensend/front/send.form.php') }}"
       class="plugin-bitwardensend-form">

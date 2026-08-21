@@ -54,12 +54,12 @@ function plugin_init_bitwardensend(): void
 
     $PLUGIN_HOOKS['csrf_compliant']['bitwardensend'] = true;
 
-    // JavaScript and CSS are inlined by templates/assets.html.twig instead of
-    // being served as static files: the GLPI 11 router does not always expose
-    // them when plugins live outside the webroot (404).
-    // If static assets are served correctly on your instance, you may switch back to:
-    //   $PLUGIN_HOOKS['add_javascript']['bitwardensend'] = ['js/bitwardensend.js'];
-    //   $PLUGIN_HOOKS['add_css']['bitwardensend']        = ['css/bitwardensend.css'];
+    // Served from public/ (GLPI 11's convention for plugin static assets —
+    // see public/js/bitwardensend.js and public/css/bitwardensend.css):
+    // the hook path itself never includes the "public/" prefix, GLPI's
+    // router adds it automatically when resolving /plugins/bitwardensend/...
+    $PLUGIN_HOOKS['add_javascript']['bitwardensend'] = ['js/bitwardensend.js'];
+    $PLUGIN_HOOKS['add_css']['bitwardensend']        = ['css/bitwardensend.css'];
 
     Plugin::registerClass(Config::class, ['addtabon' => ['Config']]);
     Plugin::registerClass(Send::class, ['addtabon' => Send::getSupportedItemtypes()]);
