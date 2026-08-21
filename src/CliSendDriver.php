@@ -253,25 +253,30 @@ class CliSendDriver implements SendDriverInterface
         $rawTimeout = $this->conf['timeout'] ?? 15;
         $timeout    = is_numeric($rawTimeout) ? (int) $rawTimeout : 15;
 
-        $headers = ['Accept: application/json'];
-        $options = [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST  => $method,
-            CURLOPT_TIMEOUT        => $timeout,
-            CURLOPT_CONNECTTIMEOUT => 5,
-        ];
+        $headers    = ['Accept: application/json'];
+        $postFields = '';
 
         if ($body !== null) {
             $json = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             if ($json === false) {
                 throw new RuntimeException(__('Unable to encode the request body', 'bitwardensend'));
             }
-            $options[CURLOPT_POSTFIELDS] = $json;
+            $postFields = $json;
             $headers[] = 'Content-Type: application/json';
             $headers[] = 'Content-Length: ' . strlen($json);
         }
 
-        $options[CURLOPT_HTTPHEADER] = $headers;
+        // Built as a single literal, not mutated afterwards — phpstan can't
+        // reliably re-check curl_setopt_array()'s option types once the
+        // array is assembled through separate `$options[...] = ...` writes.
+        $options = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_TIMEOUT        => $timeout,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_POSTFIELDS     => $postFields,
+            CURLOPT_HTTPHEADER     => $headers,
+        ];
         curl_setopt_array($handle, $options);
 
         $raw   = curl_exec($handle);

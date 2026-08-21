@@ -123,7 +123,11 @@ class Profile extends \Profile
         ]);
 
         foreach ($iterator as $row) {
-            return (int) $row['rights'];
+            if (!is_array($row)) {
+                return 0;
+            }
+            $rights = $row['rights'] ?? 0;
+            return is_numeric($rights) ? (int) $rights : 0;
         }
 
         return 0;
@@ -178,7 +182,8 @@ class Profile extends \Profile
     {
         global $DB;
 
-        $profiles_id = (int) ($input['profiles_id'] ?? 0);
+        $rawProfilesId = $input['profiles_id'] ?? 0;
+        $profiles_id   = is_numeric($rawProfilesId) ? (int) $rawProfilesId : 0;
         if ($profiles_id <= 0) {
             Session::addMessageAfterRedirect(
                 __('No profile selected.', 'bitwardensend'),
@@ -204,7 +209,11 @@ class Profile extends \Profile
 
         $exists = false;
         foreach ($DB->request(['COUNT' => 'cpt', 'FROM' => 'glpi_profilerights', 'WHERE' => $where]) as $row) {
-            $exists = (int) $row['cpt'] > 0;
+            if (!is_array($row)) {
+                continue;
+            }
+            $cpt = $row['cpt'] ?? 0;
+            $exists = (is_numeric($cpt) ? (int) $cpt : 0) > 0;
         }
 
         // A profile created after the plugin was installed has no row yet.
@@ -224,9 +233,13 @@ class Profile extends \Profile
         // Reflect the change immediately when editing one's own profile, otherwise
         // the session keeps the previous rights until the next profile switch.
         $activeProfile = $_SESSION['glpiactiveprofile'] ?? null;
-        if (is_array($activeProfile) && (int) ($activeProfile['id'] ?? 0) === $profiles_id) {
-            $activeProfile[Send::$rightname] = $value;
-            $_SESSION['glpiactiveprofile'] = $activeProfile;
+        if (is_array($activeProfile)) {
+            $rawActiveId = $activeProfile['id'] ?? 0;
+            $activeId    = is_numeric($rawActiveId) ? (int) $rawActiveId : 0;
+            if ($activeId === $profiles_id) {
+                $activeProfile[Send::$rightname] = $value;
+                $_SESSION['glpiactiveprofile'] = $activeProfile;
+            }
         }
 
         Session::addMessageAfterRedirect(__('Rights updated.', 'bitwardensend'), true, INFO);

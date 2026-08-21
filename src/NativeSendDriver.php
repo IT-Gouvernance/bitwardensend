@@ -385,22 +385,7 @@ class NativeSendDriver implements SendDriverInterface
         $rawTimeout = $this->conf['timeout'] ?? 15;
         $timeout    = is_numeric($rawTimeout) ? (int) $rawTimeout : 15;
 
-        $options = [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST  => $method,
-            CURLOPT_TIMEOUT        => $timeout,
-            CURLOPT_CONNECTTIMEOUT => 5,
-            // No config flag to disable this — talking to Bitwarden's real
-            // servers over an unverified connection defeats the point.
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-        ];
-
-        if ($body !== null) {
-            $options[CURLOPT_POSTFIELDS] = $body;
-        }
-
-        $options[CURLOPT_HTTPHEADER] = array_merge(
+        $headers = array_merge(
             [
                 'Accept: application/json',
                 // Required — the API rejects requests without it ("No client
@@ -411,6 +396,21 @@ class NativeSendDriver implements SendDriverInterface
             $headers
         );
 
+        // Built as a single literal, not mutated afterwards — phpstan can't
+        // reliably re-check curl_setopt_array()'s option types once the
+        // array is assembled through separate `$options[...] = ...` writes.
+        $options = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_TIMEOUT        => $timeout,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            // No config flag to disable this — talking to Bitwarden's real
+            // servers over an unverified connection defeats the point.
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_POSTFIELDS     => $body ?? '',
+            CURLOPT_HTTPHEADER     => $headers,
+        ];
         curl_setopt_array($handle, $options);
 
         $raw   = curl_exec($handle);

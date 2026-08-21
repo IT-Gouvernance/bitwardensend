@@ -403,6 +403,9 @@ class Config extends CommonDBTM
     {
         global $CFG_GLPI;
 
-        return $CFG_GLPI['root_doc'] . '/front/config.form.php?forcetab=' . urlencode(self::class . '$1');
+        $rawRootDoc = $CFG_GLPI['root_doc'] ?? '';
+        $rootDoc    = is_string($rawRootDoc) ? $rawRootDoc : '';
+
+        return $rootDoc . '/front/config.form.php?forcetab=' . urlencode(self::class . '$1');
     }
 }

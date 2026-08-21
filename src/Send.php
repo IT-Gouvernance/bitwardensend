@@ -145,10 +145,12 @@ class Send extends CommonDBTM
                 // own entity-scoped pickers use — plain entities_id match
                 // otherwise. Without this, a template set recursive on a
                 // parent entity simply never showed up here.
+                $rawEntitiesId = $item->fields['entities_id'] ?? 0;
+                $entitiesId    = is_numeric($rawEntitiesId) ? (int) $rawEntitiesId : 0;
                 $where[] = (new \DbUtils())->getEntitiesRestrictCriteria(
                     $table,
                     'entities_id',
-                    (int) ($item->fields['entities_id'] ?? 0),
+                    $entitiesId,
                     'auto'
                 );
             }
@@ -161,10 +163,16 @@ class Send extends CommonDBTM
             ]);
 
             foreach ($iterator as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $rawId      = $row['id'] ?? 0;
+                $rawName    = $row['name'] ?? '';
+                $rawContent = $row['content'] ?? '';
                 $templates[] = [
-                    'id'      => (int) ($row['id'] ?? 0),
-                    'name'    => (string) ($row['name'] ?? ''),
-                    'content' => (string) ($row['content'] ?? ''),
+                    'id'      => is_numeric($rawId) ? (int) $rawId : 0,
+                    'name'    => is_string($rawName) ? $rawName : '',
+                    'content' => is_string($rawContent) ? $rawContent : '',
                 ];
             }
 
@@ -346,7 +354,8 @@ class Send extends CommonDBTM
         // HTML, a bare "\n" is not a line break, so the default's blank lines
         // between paragraphs would otherwise collapse into a single run-on
         // paragraph the first time this form renders.
-        $conf['followup_template'] = nl2br(htmlspecialchars((string) $conf['followup_template']));
+        $rawFollowupTemplate = $conf['followup_template'] ?? '';
+        $conf['followup_template'] = nl2br(htmlspecialchars(is_string($rawFollowupTemplate) ? $rawFollowupTemplate : ''));
 
         return [
             'itemtype'           => $item->getType(),
@@ -372,9 +381,10 @@ class Send extends CommonDBTM
      */
     public static function createFromInput(array $input): bool
     {
-        $itemtype = (string) ($input['itemtype'] ?? '');
-        $rawItemsId = $input['items_id'] ?? 0;
-        $items_id = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
+        $rawItemtype = $input['itemtype'] ?? '';
+        $itemtype    = is_string($rawItemtype) ? $rawItemtype : '';
+        $rawItemsId  = $input['items_id'] ?? 0;
+        $items_id    = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
 
         if (!in_array($itemtype, self::getSupportedItemtypes(), true)) {
             Session::addMessageAfterRedirect(
@@ -395,7 +405,8 @@ class Send extends CommonDBTM
             return false;
         }
 
-        $secret = (string) ($input['secret'] ?? '');
+        $rawSecret = $input['secret'] ?? '';
+        $secret    = is_string($rawSecret) ? $rawSecret : '';
         if (trim($secret) === '') {
             Session::addMessageAfterRedirect(
                 __('The content to share is empty.', 'bitwardensend'),
@@ -410,7 +421,8 @@ class Send extends CommonDBTM
         $rawDays = $input['deletion_days'] ?? 0;
         $days = is_numeric($rawDays) ? (int) $rawDays : 0;
         if ($days <= 0) {
-            $days = (int) $conf['default_deletion_days'];
+            $rawDefaultDays = $conf['default_deletion_days'] ?? 7;
+            $days = is_numeric($rawDefaultDays) ? (int) $rawDefaultDays : 7;
         }
 
         $days = max(1, min(31, $days));
@@ -419,9 +431,11 @@ class Send extends CommonDBTM
         $deletion_date = gmdate('Y-m-d\TH:i:s.000\Z', $expiration_ts);
         $rawMaxAccess  = $input['max_access_count'] ?? 0;
         $max_access    = max(0, is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0);
-        $password      = (string) ($input['password'] ?? '');
+        $rawPassword   = $input['password'] ?? '';
+        $password      = is_string($rawPassword) ? $rawPassword : '';
 
-        $name = trim((string) ($input['name'] ?? ''));
+        $rawName = $input['name'] ?? '';
+        $name    = trim(is_string($rawName) ? $rawName : '');
         if ($name === '') {
             $name = sprintf('%s #%d', $item->getTypeName(1), $items_id);
         }
@@ -450,13 +464,16 @@ class Send extends CommonDBTM
             return false;
         }
 
+        $rawItemEntitiesId = $item->fields['entities_id'] ?? 0;
+        $itemEntitiesId    = is_numeric($rawItemEntitiesId) ? (int) $rawItemEntitiesId : 0;
+
         $send = new self();
         $send->add([
             'name'                  => $name,
             'itemtype'              => $itemtype,
             'items_id'              => $items_id,
             'users_id'              => (int) Session::getLoginUserID(),
-            'entities_id'           => (int) ($item->fields['entities_id'] ?? 0),
+            'entities_id'           => $itemEntitiesId,
             'send_uuid'             => $result->uuid,
             'access_id'             => $result->accessId,
             'access_url'            => empty($conf['store_access_url']) ? null : $result->accessUrl,
@@ -467,9 +484,10 @@ class Send extends CommonDBTM
         ]);
 
         if (!empty($input['add_followup'])) {
+            $rawFollowupContent = $input['followup_content'] ?? '';
             self::addFollowup(
                 $item,
-                (string) ($input['followup_content'] ?? ''),
+                is_string($rawFollowupContent) ? $rawFollowupContent : '',
                 $result->accessUrl,
                 $expiration_ts,
                 $max_access,
@@ -569,7 +587,8 @@ class Send extends CommonDBTM
     public function revoke(): bool
     {
         try {
-            SendDriverFactory::create()->deleteSend((string) $this->fields['send_uuid']);
+            $rawSendUuid = $this->fields['send_uuid'] ?? '';
+            SendDriverFactory::create()->deleteSend(is_string($rawSendUuid) ? $rawSendUuid : '');
         } catch (Throwable $throwable) {
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
             Session::addMessageAfterRedirect(
@@ -622,7 +641,8 @@ class Send extends CommonDBTM
     {
         $task = new CronTask();
         if ($task->getFromDBbyName(self::class, 'cleanup')) {
-            return CronTask::getFormURLWithID((int) $task->fields['id']);
+            $rawTaskId = $task->fields['id'] ?? 0;
+            return CronTask::getFormURLWithID(is_numeric($rawTaskId) ? (int) $rawTaskId : 0);
         }
 
         return null;
@@ -640,7 +660,8 @@ class Send extends CommonDBTM
     {
         global $DB;
 
-        $days = $task instanceof CronTask ? (int) ($task->fields['param'] ?? 0) : 0;
+        $rawParam = $task instanceof CronTask ? ($task->fields['param'] ?? 0) : 0;
+        $days     = is_numeric($rawParam) ? (int) $rawParam : 0;
         if ($days <= 0) {
             return 0;
         }
