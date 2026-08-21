@@ -126,6 +126,7 @@ class Profile extends \Profile
             if (!is_array($row)) {
                 return 0;
             }
+
             $rights = $row['rights'] ?? 0;
             return is_numeric($rights) ? (int) $rights : 0;
         }
@@ -212,6 +213,7 @@ class Profile extends \Profile
             if (!is_array($row)) {
                 continue;
             }
+
             $cpt = $row['cpt'] ?? 0;
             $exists = (is_numeric($cpt) ? (int) $cpt : 0) > 0;
         }

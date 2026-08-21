@@ -262,6 +262,7 @@ class CliSendDriver implements SendDriverInterface
             if ($json === false) {
                 throw new RuntimeException(__('Unable to encode the request body', 'bitwardensend'));
             }
+
             $postFields = $json;
             $headers[] = 'Content-Type: application/json';
             $headers[] = 'Content-Length: ' . strlen($json);

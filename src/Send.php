@@ -31,6 +31,7 @@
 
 namespace GlpiPlugin\Bitwardensend;
 
+use DbUtils;
 use ITILFollowupTemplate;
 use Throwable;
 use CommonDBTM;
@@ -147,7 +148,7 @@ class Send extends CommonDBTM
                 // parent entity simply never showed up here.
                 $rawEntitiesId = $item->fields['entities_id'] ?? 0;
                 $entitiesId    = is_numeric($rawEntitiesId) ? (int) $rawEntitiesId : 0;
-                $where[] = (new \DbUtils())->getEntitiesRestrictCriteria(
+                $where[] = (new DbUtils())->getEntitiesRestrictCriteria(
                     $table,
                     'entities_id',
                     $entitiesId,
@@ -166,6 +167,7 @@ class Send extends CommonDBTM
                 if (!is_array($row)) {
                     continue;
                 }
+
                 $rawId      = $row['id'] ?? 0;
                 $rawName    = $row['name'] ?? '';
                 $rawContent = $row['content'] ?? '';
@@ -448,6 +450,7 @@ class Send extends CommonDBTM
             );
             return false;
         }
+
         $deletion_date = gmdate('Y-m-d\TH:i:s.000\Z', $expiration_ts);
         $rawMaxAccess  = $input['max_access_count'] ?? 0;
         $max_access    = max(0, is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0);
@@ -694,6 +697,7 @@ class Send extends CommonDBTM
         if ($cutoffTs === false) {
             return 0;
         }
+
         $cutoff = date('Y-m-d H:i:s', $cutoffTs);
 
         $iterator = $DB->request([
@@ -716,6 +720,7 @@ class Send extends CommonDBTM
             if (!is_array($row)) {
                 continue;
             }
+
             $rawId = $row['id'] ?? 0;
             $id    = is_numeric($rawId) ? (int) $rawId : 0;
             $send  = new self();

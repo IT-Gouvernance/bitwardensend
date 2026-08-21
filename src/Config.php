@@ -115,6 +115,7 @@ class Config extends CommonDBTM
             if (!is_string($key) || $value === null || $value === '') {
                 continue;
             }
+
             $defaults[$key] = $value;
         }
 
@@ -158,6 +159,7 @@ class Config extends CommonDBTM
         if ($value === '') {
             return '';
         }
+
         try {
             return (string) (new GLPIKey())->decrypt($value);
         } catch (Throwable) {
@@ -353,6 +355,7 @@ class Config extends CommonDBTM
             if (!is_array($row)) {
                 return 0;
             }
+
             $cpt = $row['cpt'] ?? 0;
             return is_numeric($cpt) ? (int) $cpt : 0;
         }

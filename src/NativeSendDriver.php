@@ -318,11 +318,11 @@ class NativeSendDriver implements SendDriverInterface
         // $body['client_secret'] is its own copy of the secret, unaffected
         // by zeroing $clientSecret above — encode it into the request body
         // first, then zero that copy too rather than leaving it sitting in
-        // $body for the rest of this call. Copied into a plain string first:
-        // zero() takes its argument by reference, and an array element isn't
-        // guaranteed to be a string from a static analysis standpoint.
+        // $body for the rest of this call. Copied into a plain variable
+        // first since zero()'s by-ref parameter needs one, not an array
+        // offset expression.
         $encodedBody = http_build_query($body, '', '&', PHP_QUERY_RFC1738);
-        $bodyClientSecret = (string) $body['client_secret'];
+        $bodyClientSecret = $body['client_secret'];
         SendCrypto::zero($bodyClientSecret);
         $body['client_secret'] = $bodyClientSecret;
 
