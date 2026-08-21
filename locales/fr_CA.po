@@ -17,31 +17,31 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 
-#: templates/config.html.twig:347
+#: templates/config.html.twig:346
 msgid "(Setup > Automatic actions)."
 msgstr "(Configuration > Actions automatiques)."
 
-#: templates/_send_form_fields.html.twig:126, templates/config.html.twig:253
+#: templates/_send_form_fields.html.twig:126, templates/config.html.twig:252
 msgid "0 means unlimited until expiration."
 msgstr "0 signifie illimité jusqu'à l'expiration."
 
-#: src/Config.php:193, templates/config.html.twig:145
+#: src/Config.php:205, templates/config.html.twig:144
 msgid "API URL"
 msgstr "URL de l'API"
 
-#: src/Config.php:195, templates/config.html.twig:170
+#: src/Config.php:207, templates/config.html.twig:169
 msgid "API client ID"
 msgstr "ID client de l'API"
 
-#: src/Config.php:206, templates/config.html.twig:181
+#: src/Config.php:222, templates/config.html.twig:180
 msgid "API client secret"
 msgstr "Secret client de l'API"
 
-#: src/Config.php:196, templates/config.html.twig:201
+#: src/Config.php:208, templates/config.html.twig:200
 msgid "Account email"
 msgstr "E-mail du compte"
 
-#: templates/list.html.twig:85
+#: templates/list.html.twig:84
 msgid "Active"
 msgstr "Actif"
 
@@ -49,12 +49,12 @@ msgstr "Actif"
 msgid "Advanced options"
 msgstr "Options avancées"
 
-#: templates/config.html.twig:318
+#: templates/config.html.twig:317
 msgid "Allow choosing a GLPI followup template when creating a Send"
 msgstr ""
 "Autoriser le choix d'un gabarit de suivi GLPI lors de la création d'un Send"
 
-#: templates/config.html.twig:341
+#: templates/config.html.twig:340
 msgid ""
 "Automatic deletion of revoked or expired entries is configured on the automatic action"
 msgstr ""
@@ -66,51 +66,51 @@ msgid ""
 msgstr ""
 "Variables disponibles : {url} (lien prêt à cliquer), {url_raw} (juste l'adresse, pour votre propre lien), {expiration}, {max_access}"
 
-#: src/CliSendDriver.php:222, src/NativeSendDriver.php:138, src/NativeSendDriver.php:177
+#: src/CliSendDriver.php:246, src/NativeSendDriver.php:141, src/NativeSendDriver.php:191
 msgid "Bitwarden API URL is not configured"
 msgstr "L'URL de l'API Bitwarden n'est pas configurée"
 
-#: src/NativeSendDriver.php:281
+#: src/NativeSendDriver.php:298
 msgid "Bitwarden API client credentials are not configured."
 msgstr "Les identifiants client de l'API Bitwarden ne sont pas configurés."
 
-#: src/NativeSendDriver.php:415
+#: src/NativeSendDriver.php:438
 msgid "Bitwarden API error: %s"
 msgstr "Erreur de l'API Bitwarden : %s"
 
-#: src/Send.php:476
+#: src/Send.php:523
 msgid "Bitwarden Send link created: %s"
 msgstr "Lien Bitwarden Send créé : %s"
 
-#: templates/config.html.twig:38
+#: templates/config.html.twig:37
 msgid "Bitwarden connection"
 msgstr "Connexion à Bitwarden"
 
-#: src/NativeSendDriver.php:329
+#: src/NativeSendDriver.php:346
 msgid "Bitwarden did not return KDF parameters."
 msgstr "Bitwarden n'a pas renvoyé les paramètres KDF."
 
-#: src/NativeSendDriver.php:151
+#: src/NativeSendDriver.php:161
 msgid "Bitwarden did not return a Send id/accessId"
 msgstr "Bitwarden n'a pas renvoyé d'identifiant de Send (id/accessId)"
 
-#: src/NativeSendDriver.php:325
+#: src/NativeSendDriver.php:342
 msgid "Bitwarden did not return an access token."
 msgstr "Bitwarden n'a pas renvoyé de jeton d'accès."
 
-#: src/NativeSendDriver.php:333
+#: src/NativeSendDriver.php:350
 msgid "Bitwarden did not return the account user key."
 msgstr "Bitwarden n'a pas renvoyé la clé utilisateur du compte."
 
-#: src/NativeSendDriver.php:275
+#: src/NativeSendDriver.php:291
 msgid "Bitwarden identity URL is not configured."
 msgstr "L'URL d'identité Bitwarden n'est pas configurée."
 
-#: templates/config.html.twig:56
+#: templates/config.html.twig:55
 msgid "CLI / bw serve — recommended"
 msgstr "CLI / bw serve — recommandé"
 
-#: src/CliSendDriver.php:256, src/NativeSendDriver.php:404
+#: src/CliSendDriver.php:293, src/NativeSendDriver.php:426
 msgid "Cannot reach the Bitwarden API (%s)"
 msgstr "Impossible de joindre l'API Bitwarden (%s)"
 
@@ -130,20 +130,24 @@ msgstr "Connexion établie, coffre déverrouillé. Le plugin est opérationnel."
 msgid "Content to share"
 msgstr "Contenu à partager"
 
-#: templates/list.html.twig:70
+#: templates/list.html.twig:69
 msgid "Copy link"
 msgstr "Copier le lien"
 
-#: src/Send.php:440
+#: src/Send.php:447
+msgid "Could not compute the expiration date."
+msgstr "Impossible de calculer la date d'expiration."
+
+#: src/Send.php:481
 msgid "Could not create the Send: %s"
 msgstr "Échec de la création du Send : %s"
 
-#: src/NativeSendDriver.php:247
+#: src/NativeSendDriver.php:262
 msgid "Could not decrypt the account user key: wrong master password?"
 msgstr ""
 "Impossible de déchiffrer la clé utilisateur du compte : mot de passe maître incorrect ?"
 
-#: src/Send.php:570
+#: src/Send.php:620
 msgid "Could not revoke the link: %s"
 msgstr "Échec de la révocation du lien : %s"
 
@@ -151,7 +155,7 @@ msgstr "Échec de la révocation du lien : %s"
 msgid "Could not save the configuration."
 msgstr "Échec de l'enregistrement de la configuration."
 
-#: src/Profile.php:217
+#: src/Profile.php:228
 msgid "Could not update the rights."
 msgstr "Échec de la mise à jour des droits."
 
@@ -159,27 +163,27 @@ msgstr "Échec de la mise à jour des droits."
 msgid "Create Send links"
 msgstr "Créer des liens Send"
 
-#: templates/answer_form.html.twig:61, templates/form.html.twig:60
+#: templates/answer_form.html.twig:57, templates/form.html.twig:60
 msgid "Create link"
 msgstr "Créer le lien"
 
-#: src/Send.php:709, templates/list.html.twig:51
+#: src/Send.php:777, templates/list.html.twig:50
 msgid "Created by"
 msgstr "Créé par"
 
-#: src/NativeSendDriver.php:258
+#: src/NativeSendDriver.php:273
 msgid "Decrypted user key has an unexpected length."
 msgstr "La clé utilisateur déchiffrée a une longueur inattendue."
 
-#: templates/config.html.twig:242
+#: templates/config.html.twig:241
 msgid "Default expiration (days)"
 msgstr "Expiration par défaut (jours)"
 
-#: templates/config.html.twig:249
+#: templates/config.html.twig:248
 msgid "Default maximum views"
 msgstr "Nombre maximal d'ouvertures par défaut"
 
-#: hook.php:136, src/Send.php:596
+#: hook.php:138, src/Send.php:651
 msgid ""
 "Delete revoked or expired Bitwarden Send entries past the configured retention"
 msgstr ""
@@ -189,37 +193,37 @@ msgstr ""
 msgid "Delete stored Send entries"
 msgstr "Supprimer les entrées Send enregistrées"
 
-#: templates/config.html.twig:105, templates/config.html.twig:224
+#: templates/config.html.twig:104, templates/config.html.twig:223
 msgid "Delete the stored password"
 msgstr "Supprimer le mot de passe enregistré"
 
-#: templates/config.html.twig:193
+#: templates/config.html.twig:192
 msgid "Delete the stored secret"
 msgstr "Supprimer le secret enregistré"
 
-#: templates/list.html.twig:117
+#: templates/list.html.twig:116
 msgid "Delete this entry?"
 msgstr "Supprimer cette entrée ?"
 
-#: templates/config.html.twig:189
+#: templates/config.html.twig:188
 msgid "Encrypted with the GLPI key."
 msgstr "Chiffré avec la clé GLPI."
 
-#: templates/config.html.twig:220
+#: templates/config.html.twig:219
 msgid "Encrypted with the GLPI key. PBKDF2 accounts only — see the README."
 msgstr "Chiffré avec la clé GLPI. Comptes PBKDF2 uniquement — voir le README."
 
-#: templates/config.html.twig:100
+#: templates/config.html.twig:99
 msgid ""
 "Encrypted with the GLPI key. Used to unlock the vault automatically. Leave empty if you unlock the service yourself."
 msgstr ""
 "Chiffré avec la clé GLPI. Sert à déverrouiller automatiquement le coffre. Laissez vide si vous déverrouillez le service vous-même."
 
-#: src/Send.php:721, templates/list.html.twig:53
+#: src/Send.php:789, templates/list.html.twig:52
 msgid "Expiration"
 msgstr "Expiration"
 
-#: templates/list.html.twig:83
+#: templates/list.html.twig:82
 msgid "Expired"
 msgstr "Expiré"
 
@@ -227,11 +231,11 @@ msgstr "Expiré"
 msgid "Expires in"
 msgstr "Expire dans"
 
-#: templates/_send_form_fields.html.twig:177, templates/config.html.twig:283
+#: templates/_send_form_fields.html.twig:177, templates/config.html.twig:282
 msgid "Followup configuration"
 msgstr "Configuration du suivi"
 
-#: templates/config.html.twig:329
+#: templates/config.html.twig:328
 msgid "Followup template"
 msgstr "Modèle de suivi"
 
@@ -239,7 +243,7 @@ msgstr "Modèle de suivi"
 msgid "Followup text"
 msgstr "Texte du suivi"
 
-#: templates/config.html.twig:76
+#: templates/config.html.twig:75
 msgid "For example http://127.0.0.1:8087 — never expose this port publicly."
 msgstr ""
 "Par exemple http://127.0.0.1:8087 — n'exposez jamais ce port publiquement."
@@ -248,7 +252,7 @@ msgstr ""
 msgid "GLPI followup templates"
 msgstr "Gabarits de suivi GLPI"
 
-#: templates/config.html.twig:128
+#: templates/config.html.twig:127
 msgid ""
 "GLPI will store this account's credentials (encrypted). Use a dedicated, revocable service account — never your own."
 msgstr ""
@@ -262,7 +266,7 @@ msgstr "Générer un mot de passe"
 msgid "Generate a random password"
 msgstr "Générer un mot de passe aléatoire"
 
-#: src/Send.php:84
+#: src/Send.php:85
 msgid ""
 "Hello,\n"
 "\n"
@@ -288,7 +292,7 @@ msgstr ""
 msgid "Hide my email address from the recipient"
 msgstr "Masquer mon adresse e-mail au destinataire"
 
-#: templates/config.html.twig:260
+#: templates/config.html.twig:259
 msgid "Hide the sender email address by default"
 msgstr "Masquer par défaut l'adresse e-mail de l'expéditeur"
 
@@ -296,15 +300,15 @@ msgstr "Masquer par défaut l'adresse e-mail de l'expéditeur"
 msgid "Hide the text by default when opened"
 msgstr "Masquer le texte par défaut à l'ouverture"
 
-#: src/Config.php:192, templates/config.html.twig:134
+#: src/Config.php:204, templates/config.html.twig:133
 msgid "Identity URL"
 msgstr "URL d'identité"
 
-#: ajax/form.php:52, src/Send.php:390
+#: ajax/form.php:54, src/Send.php:415
 msgid "Item not found or access denied."
 msgstr "Élément introuvable ou accès refusé."
 
-#: templates/config.html.twig:307
+#: templates/config.html.twig:306
 msgid "Keep the link in the GLPI database"
 msgstr "Conserver le lien dans la base GLPI"
 
@@ -316,7 +320,7 @@ msgstr "Laissez vide pour n'en exiger aucun"
 msgid "Length"
 msgstr "Longueur"
 
-#: templates/config.html.twig:236
+#: templates/config.html.twig:235
 msgid "Link defaults"
 msgstr "Valeurs par défaut des liens"
 
@@ -328,15 +332,15 @@ msgstr "Options du lien"
 msgid "Link password (optional)"
 msgstr "Mot de passe du lien (facultatif)"
 
-#: src/Send.php:583
+#: src/Send.php:635
 msgid "Link revoked."
 msgstr "Lien révoqué."
 
-#: templates/config.html.twig:44
+#: templates/config.html.twig:43
 msgid "Local API (bw serve) — recommended"
 msgstr "API locale (bw serve) — recommandé"
 
-#: src/Config.php:185, templates/config.html.twig:71
+#: src/Config.php:197, templates/config.html.twig:70
 msgid "Local API URL"
 msgstr "URL de l'API locale"
 
@@ -344,11 +348,11 @@ msgstr "URL de l'API locale"
 msgid "Lowercase"
 msgstr "Minuscules"
 
-#: src/Config.php:211, templates/config.html.twig:91, templates/config.html.twig:212
+#: src/Config.php:229, templates/config.html.twig:90, templates/config.html.twig:211
 msgid "Master password"
 msgstr "Mot de passe maître"
 
-#: templates/list.html.twig:54
+#: templates/list.html.twig:53
 msgid "Max views"
 msgstr "Ouvertures max."
 
@@ -356,33 +360,33 @@ msgstr "Ouvertures max."
 msgid "Maximum number of views"
 msgstr "Nombre maximal d'ouvertures"
 
-#: templates/config.html.twig:42, templates/config.html.twig:59
+#: templates/config.html.twig:41, templates/config.html.twig:58
 msgid "Native (PHP only)"
 msgstr "Natif (PHP uniquement)"
 
-#: templates/config.html.twig:63
+#: templates/config.html.twig:62
 msgid ""
 "Native works without shell access on the server (e.g. GLPI Cloud) but only supports service accounts using the PBKDF2 KDF — see the README."
 msgstr ""
 "Le mode natif fonctionne sans accès shell au serveur (par exemple GLPI Cloud), mais ne prend en charge que les comptes de service en KDF PBKDF2 — voir le README."
 
-#: templates/list.html.twig:36
+#: templates/list.html.twig:35
 msgid "New Bitwarden Send"
 msgstr "Nouveau Bitwarden Send"
 
-#: templates/list.html.twig:43
+#: templates/list.html.twig:42
 msgid "No Bitwarden Send link has been created for this item yet."
 msgstr "Aucun lien Bitwarden Send n'a encore été créé pour cet élément."
 
-#: src/NativeSendDriver.php:209
+#: src/NativeSendDriver.php:223
 msgid "No master password is configured for the native driver."
 msgstr "Aucun mot de passe maître n'est configuré pour le driver natif."
 
-#: src/Profile.php:184
+#: src/Profile.php:190
 msgid "No profile selected."
 msgstr "Aucun profil sélectionné."
 
-#: templates/config.html.twig:98, templates/config.html.twig:187, templates/config.html.twig:218
+#: templates/config.html.twig:97, templates/config.html.twig:186, templates/config.html.twig:217
 msgid "Not set"
 msgstr "Non renseigné"
 
@@ -390,13 +394,13 @@ msgstr "Non renseigné"
 msgid "Numbers"
 msgstr "Chiffres"
 
-#: templates/config.html.twig:93
+#: templates/config.html.twig:92
 msgid ""
 "Only needed if the vault is locked. Not required if it is already unlocked, for example if you unlocked it yourself on the server."
 msgstr ""
 "Nécessaire uniquement si le coffre est verrouillé. Inutile s'il est déjà déverrouillé, par exemple si vous l'avez déverrouillé vous-même sur le serveur."
 
-#: templates/config.html.twig:118
+#: templates/config.html.twig:117
 msgid ""
 "Only used when the API does not return the access URL. Cloud: https://send.bitwarden.com/# — self-hosted: https://vault.example.com/#/send/"
 msgstr ""
@@ -410,7 +414,7 @@ msgstr "Visible uniquement dans votre coffre Bitwarden."
 msgid "Password generator options"
 msgstr "Options du générateur de mot de passe"
 
-#: templates/list.html.twig:65
+#: templates/list.html.twig:64
 msgid "Password protected"
 msgstr "Protégé par mot de passe"
 
@@ -422,7 +426,7 @@ msgstr "Modèle par défaut du plugin"
 msgid "Post the link as a followup"
 msgstr "Publier le lien dans un suivi"
 
-#: templates/config.html.twig:289
+#: templates/config.html.twig:288
 msgid "Post the link as a followup by default"
 msgstr "Publier par défaut le lien dans un suivi"
 
@@ -430,7 +434,7 @@ msgstr "Publier par défaut le lien dans un suivi"
 msgid "Private followup (hidden from the requester)"
 msgstr "Suivi privé (masqué pour le demandeur)"
 
-#: templates/config.html.twig:298
+#: templates/config.html.twig:297
 msgid "Private followup by default"
 msgstr "Suivi privé par défaut"
 
@@ -438,11 +442,11 @@ msgstr "Suivi privé par défaut"
 msgid "Replace the current text? Your changes will be lost."
 msgstr "Remplacer le texte actuel ? Vos modifications seront perdues."
 
-#: src/Send.php:600
+#: src/Send.php:655
 msgid "Retention (days)"
 msgstr "Rétention (jours)"
 
-#: templates/list.html.twig:99, templates/list.html.twig:102
+#: templates/list.html.twig:98, templates/list.html.twig:101
 msgid "Revoke"
 msgstr "Révoquer"
 
@@ -450,15 +454,15 @@ msgstr "Révoquer"
 msgid "Revoke Send links"
 msgstr "Révoquer des liens Send"
 
-#: templates/list.html.twig:100
+#: templates/list.html.twig:99
 msgid "Revoke this link?"
 msgstr "Révoquer ce lien ?"
 
-#: src/Send.php:727, templates/list.html.twig:81
+#: src/Send.php:795, templates/list.html.twig:80
 msgid "Revoked"
 msgstr "Révoqué"
 
-#: src/Profile.php:230
+#: src/Profile.php:247
 msgid "Rights updated."
 msgstr "Droits mis à jour."
 
@@ -466,13 +470,13 @@ msgstr "Droits mis à jour."
 msgid "See the Bitwarden Sends tab"
 msgstr "Voir l'onglet Bitwarden Sends"
 
-#: templates/config.html.twig:163
+#: templates/config.html.twig:162
 msgid ""
 "Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other's URLs."
 msgstr ""
 "Auto-hébergé : ajustez ces trois URL. Bitwarden.com et bitwarden.eu sont deux plateformes distinctes — un compte de l'une ne fonctionne pas avec les URL de l'autre."
 
-#: templates/config.html.twig:51
+#: templates/config.html.twig:50
 msgid "Send driver"
 msgstr "Driver de Send"
 
@@ -480,7 +484,7 @@ msgstr "Driver de Send"
 msgid "Send it over another channel, by phone or text message for instance."
 msgstr "Transmettez-le par un autre canal, par téléphone ou SMS par exemple."
 
-#: templates/config.html.twig:113
+#: templates/config.html.twig:112
 msgid "Send link base URL"
 msgstr "URL de base des liens Send"
 
@@ -488,7 +492,7 @@ msgstr "URL de base des liens Send"
 msgid "Send name"
 msgstr "Nom du Send"
 
-#: templates/config.html.twig:269
+#: templates/config.html.twig:268
 msgid "Show a random password generator on the creation form"
 msgstr ""
 "Afficher un générateur de mot de passe aléatoire dans le formulaire de création"
@@ -498,7 +502,7 @@ msgid "Stored encrypted in Bitwarden. GLPI only keeps the link and its metadata.
 msgstr ""
 "Stocké chiffré dans Bitwarden. GLPI ne conserve que le lien et ses métadonnées."
 
-#: templates/config.html.twig:98, templates/config.html.twig:187, templates/config.html.twig:218
+#: templates/config.html.twig:97, templates/config.html.twig:186, templates/config.html.twig:217
 msgid "Stored — type a new one to replace it"
 msgstr "Enregistré — saisissez-en un nouveau pour le remplacer"
 
@@ -506,37 +510,37 @@ msgstr "Enregistré — saisissez-en un nouveau pour le remplacer"
 msgid "Symbols"
 msgstr "Symboles"
 
-#: templates/config.html.twig:356
+#: templates/config.html.twig:355
 msgid "Test connection"
 msgstr "Tester la connexion"
 
-#: src/CliSendDriver.php:178
+#: src/CliSendDriver.php:194
 msgid "The Bitwarden client is not logged in. Run \"bw login\" on the server."
 msgstr ""
 "Le client Bitwarden n'est pas connecté. Exécutez « bw login » sur le serveur."
 
-#: src/CliSendDriver.php:185
+#: src/CliSendDriver.php:201
 msgid "The Bitwarden vault is locked and no master password is configured."
 msgstr ""
 "Le coffre Bitwarden est verrouillé et aucun mot de passe maître n'est configuré."
 
-#: src/CliSendDriver.php:311
+#: src/CliSendDriver.php:364
 msgid "The Send was created but no access link was returned."
 msgstr "Le Send a été créé mais aucun lien d'accès n'a été retourné."
 
-#: src/Send.php:549
+#: src/Send.php:597
 msgid "The Send was created but the followup could not be added."
 msgstr "Le Send a été créé mais le suivi n'a pas pu être ajouté."
 
-#: src/Send.php:400
+#: src/Send.php:426
 msgid "The content to share is empty."
 msgstr "Le contenu à partager est vide."
 
-#: templates/list.html.twig:101
+#: templates/list.html.twig:100
 msgid "The link will no longer be viewable. This cannot be undone."
 msgstr "Le lien ne sera plus consultable. Cette action est irréversible."
 
-#: src/Profile.php:160
+#: src/Profile.php:165
 msgid ""
 "The rights below require this one: every action in the tab checks it first."
 msgstr ""
@@ -554,32 +558,36 @@ msgid ""
 msgstr ""
 "Le service répond mais le coffre est verrouillé. Renseignez le mot de passe maître ci-dessous pour que le plugin puisse le déverrouiller, ou déverrouillez le service à la main sur le serveur."
 
-#: src/NativeSendDriver.php:222
+#: src/NativeSendDriver.php:237
 msgid ""
 "This account uses the Argon2id KDF, which the native driver cannot reproduce in PHP. Use a service account configured with PBKDF2, or switch this Send driver to \"cli\"."
 msgstr ""
 "Ce compte utilise le KDF Argon2id, que le driver natif ne peut pas reproduire en PHP. Utilisez un compte de service configuré en PBKDF2, ou basculez ce driver de Send sur « cli »."
 
-#: templates/config.html.twig:334
+#: templates/config.html.twig:333
 msgid ""
 "This is the default text proposed when creating a Send. If the option above is enabled, the technician can instead pick one of the GLPI followup templates (Setup > Templates > Followup templates) — the same variables also work in those."
 msgstr ""
 "C'est le texte par défaut proposé à la création d'un Send. Si l'option ci-dessus est activée, le technicien peut à la place choisir un des gabarits de suivi GLPI (Configuration > Gabarits > Gabarits de suivi) — les mêmes variables y fonctionnent aussi."
 
-#: templates/list.html.twig:118
+#: templates/list.html.twig:117
 msgid "This only removes the record from GLPI. This cannot be undone."
 msgstr ""
 "Cela supprime uniquement l'enregistrement dans GLPI. Cette action est irréversible."
 
-#: templates/config.html.twig:82
+#: templates/config.html.twig:81
 msgid "Timeout (seconds)"
 msgstr "Délai d'attente (secondes)"
 
-#: src/CliSendDriver.php:227, src/NativeSendDriver.php:365
+#: src/CliSendDriver.php:263, src/NativeSendDriver.php:146
+msgid "Unable to encode the request body"
+msgstr "Impossible d'encoder le corps de la requête"
+
+#: src/CliSendDriver.php:251, src/NativeSendDriver.php:383
 msgid "Unable to initialize cURL"
 msgstr "Impossible d'initialiser cURL"
 
-#: src/CliSendDriver.php:264, src/NativeSendDriver.php:425
+#: src/CliSendDriver.php:301, src/NativeSendDriver.php:448
 msgid "Unexpected response from the Bitwarden API (HTTP %d)"
 msgstr "Réponse inattendue de l'API Bitwarden (HTTP %d)"
 
@@ -587,19 +595,19 @@ msgstr "Réponse inattendue de l'API Bitwarden (HTTP %d)"
 msgid "Unexpected vault status: %s"
 msgstr "État du coffre inattendu : %s"
 
-#: src/CliSendDriver.php:291
+#: src/CliSendDriver.php:340
 msgid "Unknown Bitwarden API error"
 msgstr "Erreur inconnue de l'API Bitwarden"
 
-#: src/CliSendDriver.php:118, src/NativeSendDriver.php:168
+#: src/CliSendDriver.php:123, src/NativeSendDriver.php:181
 msgid "Unknown Send identifier"
 msgstr "Identifiant de Send inconnu"
 
-#: templates/list.html.twig:78
+#: templates/list.html.twig:77
 msgid "Unlimited"
 msgstr "Illimité"
 
-#: ajax/form.php:44, src/Send.php:380
+#: ajax/form.php:46, src/Send.php:405
 msgid "Unsupported item type."
 msgstr "Type d'élément non pris en charge."
 
@@ -611,23 +619,23 @@ msgstr "Majuscules"
 msgid "Use a GLPI followup template"
 msgstr "Utiliser un gabarit de suivi GLPI"
 
-#: templates/config.html.twig:333
+#: templates/config.html.twig:332
 msgid ""
 "Variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}"
 msgstr ""
 "Variables : {url} (lien prêt à cliquer), {url_raw} (juste l'adresse, pour votre propre lien), {expiration}, {max_access}"
 
-#: src/Config.php:194, templates/config.html.twig:156
+#: src/Config.php:206, templates/config.html.twig:155
 msgid "Web vault URL"
 msgstr "URL du coffre web"
 
-#: templates/config.html.twig:309
+#: templates/config.html.twig:308
 msgid ""
 "When disabled, GLPI only keeps metadata: the link then exists in the followup only."
 msgstr ""
 "Désactivé, GLPI ne conserve que les métadonnées : le lien n'existe alors que dans le suivi."
 
-#: src/Send.php:530, templates/_send_form_fields.html.twig:199
+#: src/Send.php:578, templates/_send_form_fields.html.twig:199
 msgid "an unlimited number of"
 msgstr "un nombre illimité de"
 
@@ -643,7 +651,7 @@ msgstr "jours"
 msgid "the link (created once you submit)"
 msgstr "le lien (créé une fois validé)"
 
-#: src/Send.php:62
+#: src/Send.php:63
 msgid "Bitwarden Send"
 msgid_plural "Bitwarden Sends"
 msgstr[0] "Bitwarden Send"
