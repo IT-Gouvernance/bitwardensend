@@ -205,6 +205,8 @@ FR = {
         'Connexion établie, coffre déverrouillé. Le plugin est opérationnel.',
     'Content to share': 'Contenu à partager',
     'Copy link': 'Copier le lien',
+    'Could not compute the expiration date.':
+        "Impossible de calculer la date d'expiration.",
     'Could not create the Send: %s': 'Échec de la création du Send : %s',
     'Could not decrypt the account user key: wrong master password?':
         'Impossible de déchiffrer la clé utilisateur du compte : mot de passe maître incorrect ?',
@@ -369,6 +371,7 @@ FR = {
         'maître ci-dessous pour que le plugin puisse le déverrouiller, ou '
         'déverrouillez le service à la main sur le serveur.',
     'Timeout (seconds)': "Délai d'attente (secondes)",
+    'Unable to encode the request body': "Impossible d'encoder le corps de la requête",
     'Unable to initialize cURL': "Impossible d'initialiser cURL",
     'Uppercase': 'Majuscules',
     'Unexpected response from the Bitwarden API (HTTP %d)':
