@@ -79,7 +79,7 @@ function plugin_init_bitwardensend(): void
     // Solution/... — rights, item type and new-item state are all checked
     // inside Send::getTimelineAnswerActions() itself, so the hook is simply
     // always registered here (an empty array is exactly "nothing to add").
-    $PLUGIN_HOOKS[Hooks::TIMELINE_ANSWER_ACTIONS]['bitwardensend'] = [Send::class, 'getTimelineAnswerActions'];
+    $PLUGIN_HOOKS[Hooks::TIMELINE_ANSWER_ACTIONS]['bitwardensend'] = Send::getTimelineAnswerActions(...);
 }
 
 /**
@@ -114,6 +114,7 @@ function plugin_bitwardensend_check_prerequisites(): bool
         echo 'The PHP curl extension is required.';
         return false;
     }
+
     return true;
 }
 

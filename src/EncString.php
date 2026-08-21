@@ -31,6 +31,7 @@
 
 namespace GlpiPlugin\Bitwardensend;
 
+use Stringable;
 use RuntimeException;
 
 /**
@@ -48,14 +49,14 @@ use RuntimeException;
  * where the MAC is HMAC-SHA256(macKey, iv || ciphertext), and iv is 16
  * bytes (AES block size).
  */
-final class EncString
+final readonly class EncString implements Stringable
 {
     private const TYPE = 2;
 
     private function __construct(
-        public readonly string $iv,
-        public readonly string $ciphertext,
-        public readonly string $mac,
+        public string $iv,
+        public string $ciphertext,
+        public string $mac,
     ) {
     }
 
@@ -93,6 +94,7 @@ final class EncString
         if (strlen($iv) !== 16) {
             throw new RuntimeException('Malformed EncString: iv must be 16 bytes.');
         }
+
         if (strlen($mac) !== 32) {
             throw new RuntimeException('Malformed EncString: mac must be 32 bytes.');
         }

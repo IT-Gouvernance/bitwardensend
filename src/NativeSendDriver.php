@@ -48,8 +48,10 @@ class NativeSendDriver implements SendDriverInterface
 {
     /** @var array<string,mixed> */
     private array $conf;
-    private string $clientSecret;
-    private string $masterPassword;
+
+    private readonly string $clientSecret;
+
+    private readonly string $masterPassword;
 
     /**
      * The three params default to Config's getters, but can be passed
@@ -214,7 +216,7 @@ class NativeSendDriver implements SendDriverInterface
 
         try {
             $masterKey = SendCrypto::deriveMasterKey($masterPassword, $email, $kdfType, $token['kdfIterations']);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException $runtimeException) {
             // SendCrypto can't call __() itself (no GLPI dependency), so
             // translate its one failure case here.
             throw new RuntimeException(__(
@@ -222,7 +224,7 @@ class NativeSendDriver implements SendDriverInterface
                 . 'in PHP. Use a service account configured with PBKDF2, or switch this Send '
                 . 'driver to "cli".',
                 'bitwardensend'
-            ));
+            ), $runtimeException->getCode(), $runtimeException);
         } finally {
             SendCrypto::zero($masterPassword);
         }
@@ -236,7 +238,7 @@ class NativeSendDriver implements SendDriverInterface
 
         try {
             $userKey = $userKeyEncString->decrypt($encKey, $macKey);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             // Never let the underlying exception message leak key material —
             // it can't, since EncString's own messages never include key
             // bytes, but re-wrapping keeps that guarantee obviously true
@@ -291,7 +293,7 @@ class NativeSendDriver implements SendDriverInterface
             // "SDK" deviceType per third-party docs — worst case it just
             // mislabels the login in the account's device history.
             'deviceType'       => 21,
-            'deviceIdentifier' => self::deviceIdentifier($clientId),
+            'deviceIdentifier' => $this->deviceIdentifier($clientId),
             'deviceName'       => 'glpi-bitwardensend',
         ];
         SendCrypto::zero($clientSecret);
@@ -299,9 +301,13 @@ class NativeSendDriver implements SendDriverInterface
         // $body['client_secret'] is its own copy of the secret, unaffected
         // by zeroing $clientSecret above — encode it into the request body
         // first, then zero that copy too rather than leaving it sitting in
-        // $body for the rest of this call.
+        // $body for the rest of this call. Copied into a plain string first:
+        // zero() takes its argument by reference, and an array element isn't
+        // guaranteed to be a string from a static analysis standpoint.
         $encodedBody = http_build_query($body, '', '&', PHP_QUERY_RFC1738);
-        SendCrypto::zero($body['client_secret']);
+        $bodyClientSecret = (string) $body['client_secret'];
+        SendCrypto::zero($bodyClientSecret);
+        $body['client_secret'] = $bodyClientSecret;
 
         $response = $this->httpRequest(
             'POST',
@@ -318,9 +324,11 @@ class NativeSendDriver implements SendDriverInterface
         if (!is_string($accessToken) || $accessToken === '') {
             throw new RuntimeException(__('Bitwarden did not return an access token.', 'bitwardensend'));
         }
+
         if (!is_numeric($kdf) || !is_numeric($kdfIterations)) {
             throw new RuntimeException(__('Bitwarden did not return KDF parameters.', 'bitwardensend'));
         }
+
         if (!is_string($key) || $key === '') {
             throw new RuntimeException(__(
                 'Bitwarden did not return the account user key.',
@@ -337,7 +345,7 @@ class NativeSendDriver implements SendDriverInterface
     }
 
     /** UUID-shaped, derived from client_id so it's stable without persisting it anywhere. */
-    private static function deviceIdentifier(string $clientId): string
+    private function deviceIdentifier(string $clientId): string
     {
         $hash = hash('sha256', 'bitwardensend:' . $clientId);
 
@@ -371,6 +379,7 @@ class NativeSendDriver implements SendDriverInterface
         if ($body !== null) {
             $options[CURLOPT_POSTFIELDS] = $body;
         }
+
         $options[CURLOPT_HTTPHEADER] = array_merge(
             [
                 'Accept: application/json',
@@ -387,7 +396,7 @@ class NativeSendDriver implements SendDriverInterface
         $raw   = curl_exec($handle);
         $errno = curl_errno($handle);
         $error = curl_error($handle);
-        $code  = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        $code  = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         curl_close($handle);
 
         if ($errno !== 0) {

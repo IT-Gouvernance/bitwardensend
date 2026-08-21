@@ -41,7 +41,7 @@ Session::checkRight('config', UPDATE);
 if (isset($_POST['update'])) {
     $missingFields = Config::validateInput($_POST);
 
-    if (!empty($missingFields)) {
+    if ($missingFields !== []) {
         Session::addMessageAfterRedirect(
             sprintf(
                 __('Configuration not saved: required fields are missing: %s', 'bitwardensend'),
@@ -55,6 +55,7 @@ if (isset($_POST['update'])) {
     } else {
         Session::addMessageAfterRedirect(__('Could not save the configuration.', 'bitwardensend'), false, ERROR);
     }
+
     Html::redirect(Config::getConfigTabUrl());
 }
 
@@ -62,50 +63,40 @@ if (isset($_POST['test'])) {
     try {
         $status = SendDriverFactory::create()->testConnection();
 
-        switch ($status) {
-            case 'unlocked':
-            case 'ok':
-                Session::addMessageAfterRedirect(
-                    __('Connected, vault unlocked. The plugin is ready to use.', 'bitwardensend'),
-                    true,
-                    INFO
-                );
-                break;
-
-            case 'locked':
-                Session::addMessageAfterRedirect(
-                    __(
-                        'The service answers but the vault is locked. Set the master password below so the '
-                        . 'plugin can unlock it, or unlock the service manually on the server.',
-                        'bitwardensend'
-                    ),
-                    false,
-                    WARNING
-                );
-                break;
-
-            case 'unauthenticated':
-                Session::addMessageAfterRedirect(
-                    __(
-                        'The service answers but no account is logged in. Run "bw login --apikey" on the '
-                        . 'server as the service user.',
-                        'bitwardensend'
-                    ),
-                    false,
-                    ERROR
-                );
-                break;
-
-            default:
-                Session::addMessageAfterRedirect(
-                    sprintf(__('Unexpected vault status: %s', 'bitwardensend'), $status),
-                    false,
-                    WARNING
-                );
-        }
+        match ($status) {
+            'unlocked', 'ok' => Session::addMessageAfterRedirect(
+                __('Connected, vault unlocked. The plugin is ready to use.', 'bitwardensend'),
+                true,
+                INFO
+            ),
+            'locked' => Session::addMessageAfterRedirect(
+                __(
+                    'The service answers but the vault is locked. Set the master password below so the '
+                    . 'plugin can unlock it, or unlock the service manually on the server.',
+                    'bitwardensend'
+                ),
+                false,
+                WARNING
+            ),
+            'unauthenticated' => Session::addMessageAfterRedirect(
+                __(
+                    'The service answers but no account is logged in. Run "bw login --apikey" on the '
+                    . 'server as the service user.',
+                    'bitwardensend'
+                ),
+                false,
+                ERROR
+            ),
+            default => Session::addMessageAfterRedirect(
+                sprintf(__('Unexpected vault status: %s', 'bitwardensend'), $status),
+                false,
+                WARNING
+            ),
+        };
     } catch (Throwable $e) {
         Session::addMessageAfterRedirect($e->getMessage(), false, ERROR);
     }
+
     Html::redirect(Config::getConfigTabUrl());
 }
 

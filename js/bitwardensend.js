@@ -27,7 +27,7 @@
  * -------------------------------------------------------------------------
  */
 
-/* global CFG_GLPI, glpi_ajax_dialog, bootstrap */
+/* global glpi_ajax_dialog, bootstrap */
 (function () {
    if (window.pluginBitwardensendLoaded) {
       return;
@@ -50,7 +50,7 @@
             dialogclass: 'modal-lg',
             title: title
          });
-         pluginBitwardensendStartFollowupPreviewPolling();
+         window.pluginBitwardensendStartFollowupPreviewPolling();
          return;
       }
 
@@ -90,7 +90,7 @@
             // glpi_ajax_dialog path above (also means GLPI's own TinyMCE
             // bootstrap script for the followup field won't run here either —
             // it stays a plain textarea in this fallback, still functional).
-            pluginBitwardensendStartFollowupPreviewPolling();
+            window.pluginBitwardensendStartFollowupPreviewPolling();
          })
          .catch(function () {
             modalEl.querySelector('.modal-body').innerHTML =
