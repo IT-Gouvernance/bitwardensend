@@ -42,9 +42,6 @@ if (isset($_POST['update'])) {
     $missingFields = Config::validateInput($_POST);
 
     if ($missingFields !== []) {
-        // Every piece of this message is a developer-authored __() literal
-        // (validateInput() only ever returns its own hardcoded field labels),
-        // never anything from $_POST itself.
         /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(
             sprintf(
@@ -69,9 +66,6 @@ if (isset($_POST['test'])) {
     try {
         $status = SendDriverFactory::create()->testConnection();
 
-        // Every branch's own text is a __() literal; only the default case
-        // below interpolates $status, which is escaped there since it comes
-        // from the driver (bw serve locally, or the CLI status output).
         /** @psalm-suppress TaintedHtml */
         match ($status) {
             'unlocked', 'ok' => Session::addMessageAfterRedirect(

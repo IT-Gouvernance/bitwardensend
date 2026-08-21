@@ -481,8 +481,6 @@ class Send extends CommonDBTM
             );
         }
 
-        // The <a> tag is deliberate HTML, but $result->accessUrl is
-        // htmlspecialchars()-escaped both places it's embedded.
         /** @psalm-suppress TaintedHtml */
         Session::addMessageAfterRedirect(
             sprintf(
