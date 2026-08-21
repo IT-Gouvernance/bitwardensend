@@ -440,6 +440,14 @@ class Send extends CommonDBTM
         $days = max(1, min(31, $days));
 
         $expiration_ts = strtotime('+' . $days . ' days');
+        if ($expiration_ts === false) {
+            Session::addMessageAfterRedirect(
+                __('Could not compute the expiration date.', 'bitwardensend'),
+                false,
+                ERROR
+            );
+            return false;
+        }
         $deletion_date = gmdate('Y-m-d\TH:i:s.000\Z', $expiration_ts);
         $rawMaxAccess  = $input['max_access_count'] ?? 0;
         $max_access    = max(0, is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0);
@@ -532,7 +540,8 @@ class Send extends CommonDBTM
         bool $is_private
     ): void {
         if (trim($template) === '') {
-            $template = Config::getConfig()['followup_template'];
+            $rawDefaultTemplate = Config::getConfig()['followup_template'] ?? '';
+            $template = is_string($rawDefaultTemplate) ? $rawDefaultTemplate : '';
         }
 
         $escaped_url = htmlspecialchars($url, ENT_QUOTES);
@@ -562,7 +571,7 @@ class Send extends CommonDBTM
                 // e.g. from a GLPI followup template with its own wording).
                 $link,
                 $escaped_url,
-                Html::convDateTime(date('Y-m-d H:i:s', $expiration_ts)),
+                Html::convDateTime(date('Y-m-d H:i:s', $expiration_ts)) ?? '',
                 $max_access > 0 ? (string) $max_access : __('an unlimited number of', 'bitwardensend'),
             ],
             $template
@@ -629,6 +638,9 @@ class Send extends CommonDBTM
     // Automatic action (Setup > Automatic actions)
     // ------------------------------------------------------------------
 
+    /**
+     * @return array<string,string>
+     */
     public static function cronInfo(string $name): array
     {
         if ($name === 'cleanup') {
@@ -678,7 +690,11 @@ class Send extends CommonDBTM
             return 0;
         }
 
-        $cutoff = date('Y-m-d H:i:s', strtotime('-' . $days . ' days'));
+        $cutoffTs = strtotime('-' . $days . ' days');
+        if ($cutoffTs === false) {
+            return 0;
+        }
+        $cutoff = date('Y-m-d H:i:s', $cutoffTs);
 
         $iterator = $DB->request([
             'FROM'  => self::getTable(),
@@ -697,8 +713,13 @@ class Send extends CommonDBTM
 
         $count = 0;
         foreach ($iterator as $row) {
-            $send = new self();
-            if ($send->delete(['id' => $row['id']], true)) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $rawId = $row['id'] ?? 0;
+            $id    = is_numeric($rawId) ? (int) $rawId : 0;
+            $send  = new self();
+            if ($send->delete(['id' => $id], true)) {
                 $count++;
             }
         }

@@ -72,6 +72,10 @@ final class SendCrypto
             );
         }
 
+        if ($iterations < 1) {
+            throw new RuntimeException('KDF iteration count must be at least 1.');
+        }
+
         $salt = mb_strtolower(trim($email));
 
         return hash_pbkdf2('sha256', $password, $salt, $iterations, 32, true);
@@ -179,6 +183,10 @@ final class SendCrypto
     public static function zero(string &$secret): void
     {
         if (function_exists('sodium_memzero')) {
+            // phpstan's sodium_memzero stub models this by-ref parameter as
+            // becoming null, which doesn't match this method's own
+            // non-nullable string signature — the value itself stays a string.
+            // @phpstan-ignore-next-line
             sodium_memzero($secret);
             return;
         }
