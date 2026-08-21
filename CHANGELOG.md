@@ -87,3 +87,11 @@ Initial release.
   passed to curl as `false` instead of being treated as an error, and
   `SendCrypto::deriveMasterKey()` did not reject a non-positive KDF iteration count
   before handing it to `hash_pbkdf2()`.
+- The plugin's JS/CSS were inlined directly into every page's HTML (via a Twig
+  template included wherever needed) to work around GLPI 11's router not
+  serving a plugin's static files reliably. Moved `js/bitwardensend.js` and
+  `css/bitwardensend.css` into `public/`, GLPI 11's actual convention for
+  plugin static assets, and declared them the normal way
+  (`add_javascript`/`add_css` in `setup.php`) — no behavior change, but the
+  script/stylesheet is now a real cacheable file instead of being duplicated
+  and re-sent inline on every page.
