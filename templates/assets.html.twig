@@ -344,36 +344,12 @@
    };
 
    /**
-    * Show only the configuration fields that apply to the selected access mode.
-    *
-    * Rows opt in with data-bws-mode="serve", "cli", or a space separated list. A row
-    * without the attribute is always visible.
-    *
-    * Hidden inputs are still submitted, deliberately: switching modes to look around
-    * does not wipe the settings belonging to the other mode.
-    */
-   window.pluginBitwardensendToggleBackend = function () {
-      var select = document.getElementById('cfg_backend');
-      if (!select) {
-         return;
-      }
-
-      var mode = select.value;
-      var rows = document.querySelectorAll('[data-bws-mode]');
-
-      Array.prototype.forEach.call(rows, function (row) {
-         var applies = row.getAttribute('data-bws-mode').split(/\s+/);
-         row.style.display = applies.indexOf(mode) === -1 ? 'none' : '';
-      });
-
-      window.pluginBitwardensendUpdateRequiredFields();
-   };
-
-   /**
     * Show only the connection fields for the selected Send driver (cli vs
-    * native) — same mechanism as pluginBitwardensendToggleBackend() above,
-    * a separate attribute/select pair since the two choices are
-    * independent (backend only matters within the "cli" driver).
+    * native). Rows opt in with data-bws-driver="cli", "native", or a space
+    * separated list.
+    *
+    * Hidden inputs are still submitted, deliberately: switching drivers to
+    * look around does not wipe the other driver's settings.
     */
    window.pluginBitwardensendToggleSendDriver = function () {
       var select = document.getElementById('cfg_send_driver');
@@ -396,7 +372,7 @@
     * Keep the "required" property in sync with actual visibility.
     *
     * A field can carry the HTML required attribute while sitting inside a
-    * data-bws-mode/data-bws-driver row that is currently display:none — the
+    * data-bws-driver row that is currently display:none — the
     * browser still counts it during constraint validation (display:none does
     * NOT exempt a field from that, only e.g. type="hidden" or disabled do),
     * but can't focus it to report the error, so it just logs "An invalid
@@ -677,16 +653,11 @@
 
    /**
     * Hide the followup text area when posting a followup is turned off, react to
-    * the access mode selector, and load a followup template when one is picked.
+    * the Send driver selector, and load a followup template when one is picked.
     * Delegated, so it works on markup injected later by a tab load.
     */
    document.addEventListener('change', function (event) {
       if (!event.target) {
-         return;
-      }
-
-      if (event.target.id === 'cfg_backend') {
-         window.pluginBitwardensendToggleBackend();
          return;
       }
 

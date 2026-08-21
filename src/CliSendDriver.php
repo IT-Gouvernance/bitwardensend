@@ -34,17 +34,11 @@ namespace GlpiPlugin\Bitwardensend;
 use RuntimeException;
 
 /**
- * Bitwarden Send driver backed by the official client, one way or another.
+ * Bitwarden Send driver backed by the official client's local API
+ * (`bw serve`'s Vault Management API over HTTP).
  *
  * Formerly the plugin's only driver (as the class `Client`); renamed to sit
- * behind SendDriverInterface alongside NativeSendDriver. The internals below
- * are unchanged from that version — only the public surface (createSend()
- * instead of createTextSend(), isAvailable() added) was adapted to the
- * interface.
- *
- * Two modes are supported:
- *  - "serve" (recommended): Vault Management API exposed by `bw serve`
- *  - "cli":                 direct invocation of the `bw` binary
+ * behind SendDriverInterface alongside NativeSendDriver.
  */
 class CliSendDriver implements SendDriverInterface
 {
@@ -81,11 +75,6 @@ class CliSendDriver implements SendDriverInterface
 
     public function isAvailable(): bool
     {
-        if (($this->conf['backend'] ?? 'serve') === 'cli') {
-            $binary = (string) ($this->conf['cli_path'] ?? '');
-            return $binary !== '' && is_executable($binary) && Config::getCliSession() !== '';
-        }
-
         return trim((string) ($this->conf['api_url'] ?? '')) !== '';
     }
 
@@ -117,11 +106,7 @@ class CliSendDriver implements SendDriverInterface
             'hideEmail'      => (bool) ($options['hide_email'] ?? false),
         ];
 
-        $send = ($this->conf['backend'] ?? 'serve') === 'cli'
-            ? $this->createViaCli($payload)
-            : $this->createViaServe($payload);
-
-        return $this->normalize($send);
+        return $this->normalize($this->createViaServe($payload));
     }
 
     /**
@@ -131,11 +116,6 @@ class CliSendDriver implements SendDriverInterface
     {
         if ($uuid === '') {
             throw new RuntimeException(__('Unknown Send identifier', 'bitwardensend'));
-        }
-
-        if (($this->conf['backend'] ?? 'serve') === 'cli') {
-            $this->execCli(['delete', 'send', $uuid]);
-            return;
         }
 
         $this->ensureUnlocked();
@@ -154,12 +134,6 @@ class CliSendDriver implements SendDriverInterface
      */
     public function testConnection(): string
     {
-        if (($this->conf['backend'] ?? 'serve') === 'cli') {
-            $out  = $this->execCli(['status', '--raw']);
-            $data = json_decode($out, true);
-            return (string) ($data['status'] ?? $out);
-        }
-
         $status = $this->extractStatus($this->request('GET', '/status'));
 
         if ($status === 'locked' && Config::getMasterPassword() !== '') {
@@ -169,10 +143,6 @@ class CliSendDriver implements SendDriverInterface
 
         return $status;
     }
-
-    // ------------------------------------------------------------------
-    // "bw serve" mode
-    // ------------------------------------------------------------------
 
     /**
      * @param array<string,mixed> $payload
@@ -295,91 +265,6 @@ class CliSendDriver implements SendDriverInterface
         }
 
         return $decoded;
-    }
-
-    // ------------------------------------------------------------------
-    // CLI mode
-    // ------------------------------------------------------------------
-
-    /**
-     * @param array<string,mixed> $payload
-     * @return array<string,mixed>
-     */
-    private function createViaCli(array $payload): array
-    {
-        $encoded = base64_encode((string) json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        $output  = $this->execCli(['send', 'create', $encoded, '--fullObject']);
-
-        $data = json_decode($output, true);
-        if (!is_array($data)) {
-            throw new RuntimeException(sprintf(
-                __('Unexpected output from the Bitwarden client: %s', 'bitwardensend'),
-                mb_substr($output, 0, 300)
-            ));
-        }
-
-        return $data;
-    }
-
-    /**
-     * Run the bw binary.
-     *
-     * @param list<string> $args
-     */
-    private function execCli(array $args): string
-    {
-        $binary = (string) ($this->conf['cli_path'] ?? 'bw');
-        if ($binary === '' || !is_executable($binary)) {
-            throw new RuntimeException(sprintf(
-                __('Bitwarden CLI binary not found or not executable: %s', 'bitwardensend'),
-                $binary
-            ));
-        }
-
-        $session = Config::getCliSession();
-        if ($session === '') {
-            throw new RuntimeException(
-                __('No BW_SESSION value is configured for CLI mode.', 'bitwardensend')
-            );
-        }
-
-        $env = [
-            'BW_SESSION' => $session,
-            'PATH'       => getenv('PATH') ?: '/usr/local/bin:/usr/bin:/bin',
-            'HOME'       => getenv('HOME') ?: '/tmp',
-        ];
-        if (($this->conf['cli_appdata_dir'] ?? '') !== '') {
-            $env['BITWARDENCLI_APPDATA_DIR'] = (string) $this->conf['cli_appdata_dir'];
-        }
-
-        $command = escapeshellarg($binary) . ' ' . implode(' ', array_map('escapeshellarg', $args)) . ' --nointeraction';
-
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
-
-        $process = proc_open($command, $descriptors, $pipes, sys_get_temp_dir(), $env);
-        if (!is_resource($process)) {
-            throw new RuntimeException(__('Unable to start the Bitwarden client', 'bitwardensend'));
-        }
-
-        fclose($pipes[0]);
-        $stdout = (string) stream_get_contents($pipes[1]);
-        $stderr = (string) stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        $exit_code = proc_close($process);
-
-        if ($exit_code !== 0) {
-            throw new RuntimeException(sprintf(
-                __('The Bitwarden client returned an error: %s', 'bitwardensend'),
-                trim($stderr !== '' ? $stderr : $stdout)
-            ));
-        }
-
-        return trim($stdout);
     }
 
     // ------------------------------------------------------------------
