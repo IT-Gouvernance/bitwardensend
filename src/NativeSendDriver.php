@@ -141,10 +141,15 @@ class NativeSendDriver implements SendDriverInterface
             throw new RuntimeException(__('Bitwarden API URL is not configured', 'bitwardensend'));
         }
 
+        $encodedBody = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if ($encodedBody === false) {
+            throw new RuntimeException(__('Unable to encode the request body', 'bitwardensend'));
+        }
+
         $response = $this->httpRequest(
             'POST',
             $apiUrl . '/sends',
-            json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $encodedBody,
             ['Content-Type: application/json', 'Authorization: Bearer ' . $session['accessToken']]
         );
 
