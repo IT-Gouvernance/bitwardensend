@@ -74,7 +74,9 @@ class NativeSendDriver implements SendDriverInterface
         }
 
         foreach (['native_identity_url', 'native_api_url', 'native_web_vault_url', 'native_client_id', 'native_email'] as $field) {
-            if (trim((string) ($this->conf[$field] ?? '')) === '') {
+            $rawValue = $this->conf[$field] ?? '';
+            $value    = is_string($rawValue) ? $rawValue : '';
+            if (trim($value) === '') {
                 return false;
             }
         }
@@ -133,7 +135,8 @@ class NativeSendDriver implements SendDriverInterface
         SendCrypto::zero($userEncKey);
         SendCrypto::zero($userMacKey);
 
-        $apiUrl = rtrim((string) ($this->conf['native_api_url'] ?? ''), '/');
+        $rawApiUrl = $this->conf['native_api_url'] ?? '';
+        $apiUrl    = rtrim(is_string($rawApiUrl) ? $rawApiUrl : '', '/');
         if ($apiUrl === '') {
             throw new RuntimeException(__('Bitwarden API URL is not configured', 'bitwardensend'));
         }
@@ -145,20 +148,25 @@ class NativeSendDriver implements SendDriverInterface
             ['Content-Type: application/json', 'Authorization: Bearer ' . $session['accessToken']]
         );
 
-        $id       = (string) ($response['id'] ?? '');
-        $accessId = (string) ($response['accessId'] ?? '');
+        $rawId       = $response['id'] ?? '';
+        $id          = is_string($rawId) ? $rawId : '';
+        $rawAccessId = $response['accessId'] ?? '';
+        $accessId    = is_string($rawAccessId) ? $rawAccessId : '';
         if ($id === '' || $accessId === '') {
             throw new RuntimeException(__('Bitwarden did not return a Send id/accessId', 'bitwardensend'));
         }
 
-        $webVaultUrl = rtrim((string) ($this->conf['native_web_vault_url'] ?? ''), '/');
+        $rawWebVaultUrl = $this->conf['native_web_vault_url'] ?? '';
+        $webVaultUrl    = rtrim(is_string($rawWebVaultUrl) ? $rawWebVaultUrl : '', '/');
         $accessUrl = $webVaultUrl . '/#/send/' . $accessId . '/' . SendCrypto::base64UrlEncode($keyMaterial);
+
+        $rawDeletionDate = $response['deletionDate'] ?? null;
 
         return new SendResult(
             uuid: $id,
             accessId: $accessId,
             accessUrl: $accessUrl,
-            deletionDate: isset($response['deletionDate']) ? (string) $response['deletionDate'] : null,
+            deletionDate: is_string($rawDeletionDate) ? $rawDeletionDate : null,
         );
     }
 
@@ -172,7 +180,8 @@ class NativeSendDriver implements SendDriverInterface
         // need the user key, so skip the PBKDF2 run for nothing.
         $accessToken = $this->requestAccessToken()['accessToken'];
 
-        $apiUrl = rtrim((string) ($this->conf['native_api_url'] ?? ''), '/');
+        $rawApiUrl = $this->conf['native_api_url'] ?? '';
+        $apiUrl    = rtrim(is_string($rawApiUrl) ? $rawApiUrl : '', '/');
         if ($apiUrl === '') {
             throw new RuntimeException(__('Bitwarden API URL is not configured', 'bitwardensend'));
         }
@@ -212,7 +221,8 @@ class NativeSendDriver implements SendDriverInterface
             ));
         }
 
-        $email = (string) ($this->conf['native_email'] ?? '');
+        $rawEmail = $this->conf['native_email'] ?? '';
+        $email    = is_string($rawEmail) ? $rawEmail : '';
 
         try {
             $masterKey = SendCrypto::deriveMasterKey($masterPassword, $email, $kdfType, $token['kdfIterations']);
@@ -270,12 +280,14 @@ class NativeSendDriver implements SendDriverInterface
      */
     private function requestAccessToken(): array
     {
-        $identityUrl = rtrim((string) ($this->conf['native_identity_url'] ?? ''), '/');
+        $rawIdentityUrl = $this->conf['native_identity_url'] ?? '';
+        $identityUrl    = rtrim(is_string($rawIdentityUrl) ? $rawIdentityUrl : '', '/');
         if ($identityUrl === '') {
             throw new RuntimeException(__('Bitwarden identity URL is not configured.', 'bitwardensend'));
         }
 
-        $clientId = (string) ($this->conf['native_client_id'] ?? '');
+        $rawClientId = $this->conf['native_client_id'] ?? '';
+        $clientId    = is_string($rawClientId) ? $rawClientId : '';
         $clientSecret = $this->clientSecret;
         if ($clientId === '' || $clientSecret === '') {
             throw new RuntimeException(__(
@@ -365,10 +377,13 @@ class NativeSendDriver implements SendDriverInterface
             throw new RuntimeException(__('Unable to initialize cURL', 'bitwardensend'));
         }
 
+        $rawTimeout = $this->conf['timeout'] ?? 15;
+        $timeout    = is_numeric($rawTimeout) ? (int) $rawTimeout : 15;
+
         $options = [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CUSTOMREQUEST  => $method,
-            CURLOPT_TIMEOUT        => (int) ($this->conf['timeout'] ?? 15),
+            CURLOPT_TIMEOUT        => $timeout,
             CURLOPT_CONNECTTIMEOUT => 5,
             // No config flag to disable this — talking to Bitwarden's real
             // servers over an unverified connection defeats the point.
@@ -409,9 +424,10 @@ class NativeSendDriver implements SendDriverInterface
         $decoded = json_decode((string) $raw, true);
 
         if ($code < 200 || $code >= 300) {
-            $message = is_array($decoded)
-                ? (string) ($decoded['error_description'] ?? $decoded['message'] ?? $decoded['error'] ?? $code)
-                : (string) $code;
+            $rawMessage = is_array($decoded)
+                ? ($decoded['error_description'] ?? $decoded['message'] ?? $decoded['error'] ?? $code)
+                : $code;
+            $message = is_scalar($rawMessage) ? (string) $rawMessage : (string) $code;
             throw new RuntimeException(sprintf(__('Bitwarden API error: %s', 'bitwardensend'), $message));
         }
 

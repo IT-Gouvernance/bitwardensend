@@ -75,7 +75,10 @@ class CliSendDriver implements SendDriverInterface
 
     public function isAvailable(): bool
     {
-        return trim((string) ($this->conf['api_url'] ?? '')) !== '';
+        $apiUrl = $this->conf['api_url'] ?? '';
+        $apiUrl = is_string($apiUrl) ? $apiUrl : '';
+
+        return trim($apiUrl) !== '';
     }
 
     /**
@@ -86,8 +89,10 @@ class CliSendDriver implements SendDriverInterface
      */
     private function createTextSend(string $name, string $text, array $options = []): array
     {
-        $max_access = (int) ($options['max_access_count'] ?? 0);
-        $password   = (string) ($options['password'] ?? '');
+        $rawMaxAccess = $options['max_access_count'] ?? 0;
+        $max_access   = is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0;
+        $rawPassword  = $options['password'] ?? '';
+        $password     = is_string($rawPassword) ? $rawPassword : '';
 
         $payload = [
             'type'           => 0,
@@ -158,7 +163,18 @@ class CliSendDriver implements SendDriverInterface
         }
 
         $data = $response['data'] ?? [];
-        return is_array($data) ? $data : [];
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($data as $key => $value) {
+            if (is_string($key)) {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -197,12 +213,17 @@ class CliSendDriver implements SendDriverInterface
      */
     private function extractStatus(array $response): string
     {
-        $data = $response['data'] ?? [];
-        if (isset($data['template']['status'])) {
-            return (string) $data['template']['status'];
+        $data = $response['data'] ?? null;
+        if (!is_array($data)) {
+            return 'unknown';
         }
 
-        if (isset($data['status'])) {
+        $template = $data['template'] ?? null;
+        if (is_array($template) && isset($template['status']) && is_scalar($template['status'])) {
+            return (string) $template['status'];
+        }
+
+        if (isset($data['status']) && is_scalar($data['status'])) {
             return (string) $data['status'];
         }
 
@@ -217,7 +238,9 @@ class CliSendDriver implements SendDriverInterface
      */
     private function request(string $method, string $path, ?array $body = null): array
     {
-        $base = rtrim((string) ($this->conf['api_url'] ?? ''), '/');
+        $rawApiUrl = $this->conf['api_url'] ?? '';
+        $apiUrl    = is_string($rawApiUrl) ? $rawApiUrl : '';
+        $base      = rtrim($apiUrl, '/');
         if ($base === '') {
             throw new RuntimeException(__('Bitwarden API URL is not configured', 'bitwardensend'));
         }
