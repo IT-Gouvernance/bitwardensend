@@ -87,7 +87,7 @@ class Send extends CommonDBTM
             . "{url}\n\n"
             . "The link expires on {expiration} and can be opened {max_access} time(s).\n\n"
             . "Kind regards,",
-            'bitwardensend'
+            'bitwardensend',
         );
     }
 
@@ -151,7 +151,7 @@ class Send extends CommonDBTM
                     $table,
                     'entities_id',
                     $entitiesId,
-                    'auto'
+                    'auto',
                 );
             }
 
@@ -402,7 +402,7 @@ class Send extends CommonDBTM
             Session::addMessageAfterRedirect(
                 __('Unsupported item type.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -412,7 +412,7 @@ class Send extends CommonDBTM
             Session::addMessageAfterRedirect(
                 __('Item not found or access denied.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -423,7 +423,7 @@ class Send extends CommonDBTM
             Session::addMessageAfterRedirect(
                 __('The content to share is empty.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -444,7 +444,7 @@ class Send extends CommonDBTM
             Session::addMessageAfterRedirect(
                 __('Could not compute the expiration date.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -476,10 +476,10 @@ class Send extends CommonDBTM
             Session::addMessageAfterRedirect(
                 sprintf(
                     __('Could not create the Send: %s', 'bitwardensend'),
-                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES)
+                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES),
                 ),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -511,7 +511,7 @@ class Send extends CommonDBTM
                 $result->accessUrl,
                 $expiration_ts,
                 $max_access,
-                !empty($input['followup_is_private'])
+                !empty($input['followup_is_private']),
             );
         }
 
@@ -519,10 +519,10 @@ class Send extends CommonDBTM
             sprintf(
                 __('Bitwarden Send link created: %s', 'bitwardensend'),
                 '<a href="' . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '" target="_blank" rel="noopener">'
-                . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '</a>'
+                . htmlspecialchars($result->accessUrl, ENT_QUOTES) . '</a>',
             ),
             false,
-            INFO
+            INFO,
         );
 
         return true;
@@ -537,7 +537,7 @@ class Send extends CommonDBTM
         string $url,
         int $expiration_ts,
         int $max_access,
-        bool $is_private
+        bool $is_private,
     ): void {
         if (trim($template) === '') {
             $rawDefaultTemplate = Config::getConfig()['followup_template'] ?? '';
@@ -574,7 +574,7 @@ class Send extends CommonDBTM
                 Html::convDateTime(date('Y-m-d H:i:s', $expiration_ts)) ?? '',
                 $max_access > 0 ? (string) $max_access : __('an unlimited number of', 'bitwardensend'),
             ],
-            $template
+            $template,
         );
 
         // Stored as HTML, like a followup typed in the rich text editor.
@@ -593,7 +593,7 @@ class Send extends CommonDBTM
             Session::addMessageAfterRedirect(
                 __('The Send was created but the followup could not be added.', 'bitwardensend'),
                 false,
-                WARNING
+                WARNING,
             );
         }
     }
@@ -615,10 +615,10 @@ class Send extends CommonDBTM
             Session::addMessageAfterRedirect(
                 sprintf(
                     __('Could not revoke the link: %s', 'bitwardensend'),
-                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES)
+                    htmlspecialchars($throwable->getMessage(), ENT_QUOTES),
                 ),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -647,7 +647,7 @@ class Send extends CommonDBTM
             return [
                 'description' => __(
                     'Delete revoked or expired Bitwarden Send entries past the configured retention',
-                    'bitwardensend'
+                    'bitwardensend',
                 ),
                 'parameter'   => __('Retention (days)', 'bitwardensend'),
             ];

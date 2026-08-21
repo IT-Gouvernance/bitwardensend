@@ -150,7 +150,7 @@ class NativeSendDriver implements SendDriverInterface
             'POST',
             $apiUrl . '/sends',
             $encodedBody,
-            ['Content-Type: application/json', 'Authorization: Bearer ' . $session['accessToken']]
+            ['Content-Type: application/json', 'Authorization: Bearer ' . $session['accessToken']],
         );
 
         $rawId       = $response['id'] ?? '';
@@ -195,7 +195,7 @@ class NativeSendDriver implements SendDriverInterface
             'DELETE',
             $apiUrl . '/sends/' . rawurlencode($uuid),
             null,
-            ['Authorization: Bearer ' . $accessToken]
+            ['Authorization: Bearer ' . $accessToken],
         );
     }
 
@@ -330,7 +330,7 @@ class NativeSendDriver implements SendDriverInterface
             'POST',
             $identityUrl . '/connect/token',
             $encodedBody,
-            ['Content-Type: application/x-www-form-urlencoded']
+            ['Content-Type: application/x-www-form-urlencoded'],
         );
 
         $accessToken   = $response['access_token'] ?? $response['AccessToken'] ?? null;
@@ -394,7 +394,7 @@ class NativeSendDriver implements SendDriverInterface
                 // rejecting it as too old.
                 'Bitwarden-Client-Version: 2025.6.0',
             ],
-            $headers
+            $headers,
         );
 
         // Built as a single literal, not mutated afterwards — phpstan can't

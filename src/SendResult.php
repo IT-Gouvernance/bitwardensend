@@ -43,6 +43,5 @@ final readonly class SendResult
         public string $accessId,
         public string $accessUrl,
         public ?string $deletionDate = null,
-    ) {
-    }
+    ) {}
 }

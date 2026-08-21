@@ -57,8 +57,7 @@ final readonly class EncString implements Stringable
         public string $iv,
         public string $ciphertext,
         public string $mac,
-    ) {
-    }
+    ) {}
 
     /**
      * Parse a serialized EncString. Does not decrypt or verify the MAC —
@@ -134,7 +133,7 @@ final readonly class EncString implements Stringable
             'aes-256-cbc',
             $encKey,
             OPENSSL_RAW_DATA,
-            $iv
+            $iv,
         );
         if ($ciphertext === false) {
             throw new RuntimeException('AES-256-CBC encryption failed.');
@@ -173,7 +172,7 @@ final readonly class EncString implements Stringable
             'aes-256-cbc',
             $encKey,
             OPENSSL_RAW_DATA,
-            $this->iv
+            $this->iv,
         );
         if ($plaintext === false) {
             throw new RuntimeException('AES-256-CBC decryption failed.');
@@ -196,7 +195,7 @@ final readonly class EncString implements Stringable
             self::TYPE,
             base64_encode($this->iv),
             base64_encode($this->ciphertext),
-            base64_encode($this->mac)
+            base64_encode($this->mac),
         );
     }
 }

@@ -60,7 +60,7 @@ final class SendCrypto
         string $password,
         string $email,
         string $kdfType,
-        int $iterations
+        int $iterations,
     ): string {
         if ($kdfType !== 'pbkdf2') {
             // Not translated — no __() here, NativeSendDriver catches this
@@ -68,7 +68,7 @@ final class SendCrypto
             throw new RuntimeException(
                 'This account uses the Argon2id KDF, which the native driver cannot '
                 . 'reproduce in PHP. Use a service account configured with PBKDF2, or '
-                . 'switch this Send driver to "cli".'
+                . 'switch this Send driver to "cli".',
             );
         }
 

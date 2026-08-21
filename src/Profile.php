@@ -163,7 +163,7 @@ class Profile extends \Profile
             // action-specific right, so CREATE/UPDATE/PURGE are inert without it.
             'read_hint'    => __(
                 'The rights below require this one: every action in the tab checks it first.',
-                'bitwardensend'
+                'bitwardensend',
             ),
             'can_update'   => Session::haveRight('profile', UPDATE),
             'csrf_token'   => Session::getNewCSRFToken(),
@@ -188,7 +188,7 @@ class Profile extends \Profile
             Session::addMessageAfterRedirect(
                 __('No profile selected.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }
@@ -225,7 +225,7 @@ class Profile extends \Profile
             Session::addMessageAfterRedirect(
                 __('Could not update the rights.', 'bitwardensend'),
                 false,
-                ERROR
+                ERROR,
             );
             return false;
         }

@@ -191,14 +191,14 @@ class CliSendDriver implements SendDriverInterface
 
         if ($status === 'unauthenticated') {
             throw new RuntimeException(
-                __('The Bitwarden client is not logged in. Run "bw login" on the server.', 'bitwardensend')
+                __('The Bitwarden client is not logged in. Run "bw login" on the server.', 'bitwardensend'),
             );
         }
 
         $password = Config::getMasterPassword();
         if ($password === '') {
             throw new RuntimeException(
-                __('The Bitwarden vault is locked and no master password is configured.', 'bitwardensend')
+                __('The Bitwarden vault is locked and no master password is configured.', 'bitwardensend'),
             );
         }
 
@@ -360,7 +360,7 @@ class CliSendDriver implements SendDriverInterface
 
         if ($url === '') {
             throw new RuntimeException(
-                __('The Send was created but no access link was returned.', 'bitwardensend')
+                __('The Send was created but no access link was returned.', 'bitwardensend'),
             );
         }
 
