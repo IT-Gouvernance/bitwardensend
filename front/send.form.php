@@ -57,6 +57,7 @@ if (isset($_POST['revoke'], $_POST['id'])) {
     if ($send->getFromDB((int) $_POST['id']) && $send->canUpdateItem()) {
         $send->revoke();
     }
+
     Html::back();
 }
 
@@ -66,6 +67,7 @@ if (isset($_POST['purge'], $_POST['id'])) {
     if ($send->getFromDB((int) $_POST['id']) && $send->canPurgeItem()) {
         $send->delete(['id' => (int) $_POST['id']], true);
     }
+
     Html::back();
 }
 

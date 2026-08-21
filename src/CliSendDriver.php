@@ -201,9 +201,11 @@ class CliSendDriver implements SendDriverInterface
         if (isset($data['template']['status'])) {
             return (string) $data['template']['status'];
         }
+
         if (isset($data['status'])) {
             return (string) $data['status'];
         }
+
         return 'unknown';
     }
 
@@ -246,7 +248,7 @@ class CliSendDriver implements SendDriverInterface
         $raw   = curl_exec($handle);
         $errno = curl_errno($handle);
         $error = curl_error($handle);
-        $code  = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        $code  = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         curl_close($handle);
 
         if ($errno !== 0) {
@@ -281,9 +283,11 @@ class CliSendDriver implements SendDriverInterface
         if (!empty($response['message'])) {
             return (string) $response['message'];
         }
+
         if (!empty($response['data']['message'])) {
             return (string) $response['data']['message'];
         }
+
         return __('Unknown Bitwarden API error', 'bitwardensend');
     }
 

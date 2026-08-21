@@ -96,6 +96,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
                     $name
                 ));
             }
+
             $env[$name] = $value;
         }
 
@@ -140,7 +141,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
             $fragment = parse_url($result->accessUrl, PHP_URL_FRAGMENT) ?? '';
             $segments = explode('/', $fragment);
             $keyMaterialB64 = array_pop($segments);
-            $keyMaterial = self::base64UrlDecode($keyMaterialB64);
+            $keyMaterial = $this->base64UrlDecode($keyMaterialB64);
             self::assertSame(16, strlen($keyMaterial));
 
             $accessResponse = $this->httpGet(
@@ -181,7 +182,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
      * bitwarden_encoding's B64Url: "indifferent about padding when
      * decoding".
      */
-    private static function base64UrlDecode(string $value): string
+    private function base64UrlDecode(string $value): string
     {
         $padded = $value . str_repeat('=', (4 - strlen($value) % 4) % 4);
         return (string) base64_decode(strtr($padded, '-_', '+/'), true);
@@ -206,7 +207,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
             ],
         ]);
         $raw = curl_exec($handle);
-        $code = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         curl_close($handle);
 
         self::assertNotFalse($raw, 'GET ' . $url . ' failed at the transport level.');

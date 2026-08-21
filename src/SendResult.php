@@ -36,13 +36,13 @@ namespace GlpiPlugin\Bitwardensend;
  * driver produced it — Send::addFromInput() only ever deals with this shape,
  * never a driver's own raw API/CLI response.
  */
-final class SendResult
+final readonly class SendResult
 {
     public function __construct(
-        public readonly string $uuid,
-        public readonly string $accessId,
-        public readonly string $accessUrl,
-        public readonly ?string $deletionDate = null,
+        public string $uuid,
+        public string $accessId,
+        public string $accessUrl,
+        public ?string $deletionDate = null,
     ) {
     }
 }

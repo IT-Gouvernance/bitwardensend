@@ -45,8 +45,8 @@ function plugin_bitwardensend_install(): bool
 
     $config_table = Config::getTable();
     if (!$DB->tableExists($config_table)) {
-        $query = "CREATE TABLE `$config_table` (
-            `id` int $sign NOT NULL AUTO_INCREMENT,
+        $query = "CREATE TABLE `{$config_table}` (
+            `id` int {$sign} NOT NULL AUTO_INCREMENT,
             `api_url` varchar(255) NOT NULL DEFAULT 'http://127.0.0.1:8087',
             `send_base_url` varchar(255) NOT NULL DEFAULT 'https://send.bitwarden.com/#',
             `master_password` text,
@@ -70,19 +70,19 @@ function plugin_bitwardensend_install(): bool
             `native_master_password` text,
             `date_mod` timestamp NULL DEFAULT NULL,
             PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=$charset COLLATE=$collation ROW_FORMAT=DYNAMIC;";
+        ) ENGINE=InnoDB DEFAULT CHARSET={$charset} COLLATE={$collation} ROW_FORMAT=DYNAMIC;";
         $DB->doQuery($query);
     }
 
     $sends_table = Send::getTable();
     if (!$DB->tableExists($sends_table)) {
-        $query = "CREATE TABLE `$sends_table` (
-            `id` int $sign NOT NULL AUTO_INCREMENT,
+        $query = "CREATE TABLE `{$sends_table}` (
+            `id` int {$sign} NOT NULL AUTO_INCREMENT,
             `name` varchar(255) DEFAULT NULL,
             `itemtype` varchar(100) NOT NULL,
-            `items_id` int $sign NOT NULL DEFAULT 0,
-            `users_id` int $sign NOT NULL DEFAULT 0,
-            `entities_id` int $sign NOT NULL DEFAULT 0,
+            `items_id` int {$sign} NOT NULL DEFAULT 0,
+            `users_id` int {$sign} NOT NULL DEFAULT 0,
+            `entities_id` int {$sign} NOT NULL DEFAULT 0,
             `send_uuid` varchar(255) DEFAULT NULL,
             `access_id` varchar(255) DEFAULT NULL,
             `access_url` text,
@@ -97,7 +97,7 @@ function plugin_bitwardensend_install(): bool
             KEY `users_id` (`users_id`),
             KEY `entities_id` (`entities_id`),
             KEY `date_creation` (`date_creation`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=$charset COLLATE=$collation ROW_FORMAT=DYNAMIC;";
+        ) ENGINE=InnoDB DEFAULT CHARSET={$charset} COLLATE={$collation} ROW_FORMAT=DYNAMIC;";
         $DB->doQuery($query);
     }
 
@@ -176,7 +176,7 @@ function plugin_bitwardensend_uninstall(): bool
 
     foreach ([Send::getTable(), Config::getTable()] as $table) {
         if ($DB->tableExists($table)) {
-            $DB->doQuery("DROP TABLE `$table`");
+            $DB->doQuery(sprintf('DROP TABLE `%s`', $table));
         }
     }
 

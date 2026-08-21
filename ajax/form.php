@@ -47,7 +47,7 @@ if (!in_array($itemtype, Send::getSupportedItemtypes(), true)) {
 }
 
 $item = getItemForItemtype($itemtype);
-if (!$item || !$item->getFromDB($items_id) || !$item->canViewItem()) {
+if (!($item instanceof CommonITILObject) || !$item->getFromDB($items_id) || !$item->canViewItem()) {
     TemplateRenderer::getInstance()->display('@bitwardensend/_ajax_error.html.twig', [
         'message' => __('Item not found or access denied.', 'bitwardensend'),
     ]);

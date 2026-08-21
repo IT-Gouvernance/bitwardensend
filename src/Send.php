@@ -31,6 +31,8 @@
 
 namespace GlpiPlugin\Bitwardensend;
 
+use ITILFollowupTemplate;
+use Throwable;
 use CommonDBTM;
 use CommonGLPI;
 use CommonITILObject;
@@ -113,21 +115,21 @@ class Send extends CommonDBTM
         // must degrade to "no GLPI templates offered", not break the Send
         // creation dialog itself.
         try {
-            if (!class_exists(\ITILFollowupTemplate::class)) {
+            if (!class_exists(ITILFollowupTemplate::class)) {
                 return [];
             }
 
             // Matches GLPI's usual convention for these dropdown classes
             // (same as TaskTemplate/SolutionTemplate); falls back to the same
             // string if the property itself is not declared on this version.
-            $rightname = property_exists(\ITILFollowupTemplate::class, 'rightname')
-                ? \ITILFollowupTemplate::$rightname
+            $rightname = property_exists(ITILFollowupTemplate::class, 'rightname')
+                ? ITILFollowupTemplate::$rightname
                 : 'itilfollowuptemplate';
             if (!Session::haveRight($rightname, READ)) {
                 return [];
             }
 
-            $table = \ITILFollowupTemplate::getTable();
+            $table = ITILFollowupTemplate::getTable();
             if (!$DB->tableExists($table)) {
                 return [];
             }
@@ -136,6 +138,7 @@ class Send extends CommonDBTM
             if ($DB->fieldExists($table, 'is_active')) {
                 $where['is_active'] = 1;
             }
+
             if ($DB->fieldExists($table, 'entities_id')) {
                 // 'auto': includes is_recursive=1 templates from ancestor
                 // entities when the table has that column, same rule GLPI's
@@ -166,8 +169,8 @@ class Send extends CommonDBTM
             }
 
             return $templates;
-        } catch (\Throwable $e) {
-            Toolbox::logDebug('[bitwardensend] ' . $e->getMessage());
+        } catch (Throwable $throwable) {
+            Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
             return [];
         }
     }
@@ -195,9 +198,11 @@ class Send extends CommonDBTM
         if (!($item instanceof CommonITILObject) || $item->isNewItem()) {
             return [];
         }
+
         if (!in_array($item->getType(), self::getSupportedItemtypes(), true)) {
             return [];
         }
+
         if (!self::canCreate()) {
             return [];
         }
@@ -235,7 +240,11 @@ class Send extends CommonDBTM
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if (!in_array($item->getType(), self::getSupportedItemtypes(), true) || !self::canView()) {
+        if (
+            !($item instanceof CommonITILObject)
+            || !in_array($item->getType(), self::getSupportedItemtypes(), true)
+            || !self::canView()
+        ) {
             return '';
         }
 
@@ -255,6 +264,7 @@ class Send extends CommonDBTM
         if ($item instanceof CommonITILObject) {
             self::showForItem($item);
         }
+
         return true;
     }
 
@@ -344,9 +354,9 @@ class Send extends CommonDBTM
             'default_name'       => sprintf('%s #%d', $item->getTypeName(1), $item->getID()),
             'conf'               => $conf,
             'force_followup'     => $forceFollowup,
-            'followup_templates' => !empty($conf['allow_glpi_followup_templates'])
-                ? self::getFollowupTemplatesForItem($item)
-                : [],
+            'followup_templates' => empty($conf['allow_glpi_followup_templates'])
+                ? []
+                : self::getFollowupTemplatesForItem($item),
             'csrf_token'         => Session::getNewCSRFToken(),
         ];
     }
@@ -375,7 +385,7 @@ class Send extends CommonDBTM
         }
 
         $item = getItemForItemtype($itemtype);
-        if (!$item || !$item->getFromDB($items_id) || !$item->canViewItem()) {
+        if (!($item instanceof CommonITILObject) || !$item->getFromDB($items_id) || !$item->canViewItem()) {
             Session::addMessageAfterRedirect(
                 __('Item not found or access denied.', 'bitwardensend'),
                 false,
@@ -400,6 +410,7 @@ class Send extends CommonDBTM
         if ($days <= 0) {
             $days = (int) $conf['default_deletion_days'];
         }
+
         $days = max(1, min(31, $days));
 
         $expiration_ts = strtotime('+' . $days . ' days');
@@ -423,10 +434,10 @@ class Send extends CommonDBTM
                 password: $password,
                 hideEmail: !empty($input['hide_email']),
             ));
-        } catch (\Throwable $e) {
-            Toolbox::logDebug('[bitwardensend] ' . $e->getMessage());
+        } catch (Throwable $throwable) {
+            Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
             Session::addMessageAfterRedirect(
-                sprintf(__('Could not create the Send: %s', 'bitwardensend'), $e->getMessage()),
+                sprintf(__('Could not create the Send: %s', 'bitwardensend'), $throwable->getMessage()),
                 false,
                 ERROR
             );
@@ -442,7 +453,7 @@ class Send extends CommonDBTM
             'entities_id'           => (int) ($item->fields['entities_id'] ?? 0),
             'send_uuid'             => $result->uuid,
             'access_id'             => $result->accessId,
-            'access_url'            => !empty($conf['store_access_url']) ? $result->accessUrl : null,
+            'access_url'            => empty($conf['store_access_url']) ? null : $result->accessUrl,
             'deletion_date'         => date('Y-m-d H:i:s', $expiration_ts),
             'max_access_count'      => $max_access > 0 ? $max_access : null,
             'is_password_protected' => $password !== '' ? 1 : 0,
@@ -553,10 +564,10 @@ class Send extends CommonDBTM
     {
         try {
             SendDriverFactory::create()->deleteSend((string) $this->fields['send_uuid']);
-        } catch (\Throwable $e) {
-            Toolbox::logDebug('[bitwardensend] ' . $e->getMessage());
+        } catch (Throwable $throwable) {
+            Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
             Session::addMessageAfterRedirect(
-                sprintf(__('Could not revoke the link: %s', 'bitwardensend'), $e->getMessage()),
+                sprintf(__('Could not revoke the link: %s', 'bitwardensend'), $throwable->getMessage()),
                 false,
                 ERROR
             );
@@ -589,6 +600,7 @@ class Send extends CommonDBTM
                 'parameter'   => __('Retention (days)', 'bitwardensend'),
             ];
         }
+
         return [];
     }
 
@@ -603,6 +615,7 @@ class Send extends CommonDBTM
         if ($task->getFromDBbyName(self::class, 'cleanup')) {
             return CronTask::getFormURLWithID((int) $task->fields['id']);
         }
+
         return null;
     }
 
@@ -618,7 +631,7 @@ class Send extends CommonDBTM
     {
         global $DB;
 
-        $days = $task !== null ? (int) ($task->fields['param'] ?? 0) : 0;
+        $days = $task instanceof CronTask ? (int) ($task->fields['param'] ?? 0) : 0;
         if ($days <= 0) {
             return 0;
         }
@@ -648,7 +661,7 @@ class Send extends CommonDBTM
             }
         }
 
-        if ($task !== null) {
+        if ($task instanceof CronTask) {
             $task->addVolume($count);
         }
 
@@ -661,78 +674,58 @@ class Send extends CommonDBTM
 
     public function rawSearchOptions()
     {
-        $options = [];
-
-        $options[] = [
+        return [[
             'id'   => 'common',
             'name' => self::getTypeName(0),
-        ];
-
-        $options[] = [
+        ], [
             'id'            => 1,
             'table'         => self::getTable(),
             'field'         => 'name',
             'name'          => __('Name'),
             'datatype'      => 'itemlink',
             'massiveaction' => false,
-        ];
-
-        $options[] = [
+        ], [
             'id'       => 2,
             'table'    => self::getTable(),
             'field'    => 'id',
             'name'     => __('ID'),
             'datatype' => 'number',
-        ];
-
-        $options[] = [
+        ], [
             'id'       => 3,
             'table'    => self::getTable(),
             'field'    => 'itemtype',
             'name'     => __('Item type'),
             'datatype' => 'itemtypename',
-        ];
-
-        $options[] = [
+        ], [
             'id'       => 4,
             'table'    => self::getTable(),
             'field'    => 'items_id',
             'name'     => __('Item ID'),
             'datatype' => 'number',
-        ];
-
-        $options[] = [
+        ], [
             'id'       => 5,
             'table'    => 'glpi_users',
             'field'    => 'name',
             'name'     => __('Created by', 'bitwardensend'),
             'datatype' => 'dropdown',
-        ];
-
-        $options[] = [
+        ], [
             'id'       => 6,
             'table'    => self::getTable(),
             'field'    => 'date_creation',
             'name'     => __('Creation date'),
             'datatype' => 'datetime',
-        ];
-
-        $options[] = [
+        ], [
             'id'       => 7,
             'table'    => self::getTable(),
             'field'    => 'deletion_date',
             'name'     => __('Expiration', 'bitwardensend'),
             'datatype' => 'datetime',
-        ];
-
-        $options[] = [
+        ], [
             'id'       => 8,
             'table'    => self::getTable(),
             'field'    => 'is_revoked',
             'name'     => __('Revoked', 'bitwardensend'),
             'datatype' => 'bool',
-        ];
-
-        return $options;
+        ]];
     }
 }

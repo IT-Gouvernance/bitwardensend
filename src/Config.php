@@ -31,6 +31,8 @@
 
 namespace GlpiPlugin\Bitwardensend;
 
+use GLPIKey;
+use Throwable;
 use CommonDBTM;
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
@@ -149,8 +151,8 @@ class Config extends CommonDBTM
             return '';
         }
         try {
-            return (string) (new \GLPIKey())->decrypt($value);
-        } catch (\Throwable $e) {
+            return (string) (new GLPIKey())->decrypt($value);
+        } catch (Throwable) {
             return '';
         }
     }
@@ -160,7 +162,8 @@ class Config extends CommonDBTM
         if ($value === '') {
             return '';
         }
-        return (string) (new \GLPIKey())->encrypt($value);
+
+        return (new GLPIKey())->encrypt($value);
     }
 
     /**
@@ -181,6 +184,7 @@ class Config extends CommonDBTM
             if (trim((string) ($input['api_url'] ?? '')) === '') {
                 $errors[] = __('Local API URL', 'bitwardensend');
             }
+
             return $errors;
         }
 
@@ -225,13 +229,13 @@ class Config extends CommonDBTM
             'timeout'                       => max(1, (int) ($input['timeout'] ?? 15)),
             'default_deletion_days'         => max(1, (int) ($input['default_deletion_days'] ?? 7)),
             'default_max_access_count'      => max(0, (int) ($input['default_max_access_count'] ?? 1)),
-            'default_hide_email'            => !empty($input['default_hide_email']) ? 1 : 0,
-            'add_followup'                  => !empty($input['add_followup']) ? 1 : 0,
-            'followup_is_private'           => !empty($input['followup_is_private']) ? 1 : 0,
-            'store_access_url'              => !empty($input['store_access_url']) ? 1 : 0,
+            'default_hide_email'            => empty($input['default_hide_email']) ? 0 : 1,
+            'add_followup'                  => empty($input['add_followup']) ? 0 : 1,
+            'followup_is_private'           => empty($input['followup_is_private']) ? 0 : 1,
+            'store_access_url'              => empty($input['store_access_url']) ? 0 : 1,
             'followup_template'             => (string) ($input['followup_template'] ?? ''),
-            'allow_glpi_followup_templates' => !empty($input['allow_glpi_followup_templates']) ? 1 : 0,
-            'password_generator_enabled'    => !empty($input['password_generator_enabled']) ? 1 : 0,
+            'allow_glpi_followup_templates' => empty($input['allow_glpi_followup_templates']) ? 0 : 1,
+            'password_generator_enabled'    => empty($input['password_generator_enabled']) ? 0 : 1,
             'send_driver'                   => in_array($input['send_driver'] ?? 'cli', ['cli', 'native'], true)
                                                  ? $input['send_driver'] : 'cli',
             'native_identity_url'           => rtrim(trim((string) ($input['native_identity_url'] ?? '')), '/'),
@@ -246,18 +250,23 @@ class Config extends CommonDBTM
         if (($input['master_password'] ?? '') !== '') {
             $fields['master_password'] = self::encrypt((string) $input['master_password']);
         }
+
         if (($input['native_client_secret'] ?? '') !== '') {
             $fields['native_client_secret'] = self::encrypt((string) $input['native_client_secret']);
         }
+
         if (($input['native_master_password'] ?? '') !== '') {
             $fields['native_master_password'] = self::encrypt((string) $input['native_master_password']);
         }
+
         if (!empty($input['clear_master_password'])) {
             $fields['master_password'] = '';
         }
+
         if (!empty($input['clear_native_client_secret'])) {
             $fields['native_client_secret'] = '';
         }
+
         if (!empty($input['clear_native_master_password'])) {
             $fields['native_master_password'] = '';
         }
@@ -300,6 +309,7 @@ class Config extends CommonDBTM
             // don't pick the icon up from getIcon() alone.
             return self::createTabEntry(self::getTypeName(), 0, self::class, self::getIcon());
         }
+
         return '';
     }
 
@@ -308,6 +318,7 @@ class Config extends CommonDBTM
         if ($item instanceof \Config) {
             self::showConfigForm();
         }
+
         return true;
     }
 
