@@ -36,19 +36,19 @@ namespace GlpiPlugin\Bitwardensend;
  * driver ends up handling it (CLI or native). Immutable: built once from the
  * creation form's input, then handed as-is to whichever driver is active.
  */
-final class SendPayload
+final readonly class SendPayload
 {
     public function __construct(
-        public readonly string $name,
-        public readonly string $text,
-        public readonly ?string $notes = null,
-        public readonly bool $hidden = true,
-        public readonly ?int $maxAccessCount = null,
-        public readonly ?string $deletionDate = null,
-        public readonly ?string $expirationDate = null,
-        public readonly ?string $password = null,
-        public readonly bool $hideEmail = false,
-        public readonly bool $disabled = false,
+        public string $name,
+        public string $text,
+        public ?string $notes = null,
+        public bool $hidden = true,
+        public ?int $maxAccessCount = null,
+        public ?string $deletionDate = null,
+        public ?string $expirationDate = null,
+        public ?string $password = null,
+        public bool $hideEmail = false,
+        public bool $disabled = false,
     ) {
     }
 }

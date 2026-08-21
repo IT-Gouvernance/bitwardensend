@@ -79,6 +79,7 @@ class Profile extends \Profile
             && self::isCentralInterface($item)) {
             return self::createTabEntry(Send::getTypeName(0), 0, self::class, Send::getIcon());
         }
+
         return '';
     }
 
@@ -87,6 +88,7 @@ class Profile extends \Profile
         if ($item instanceof \Profile && !$item->isNewItem() && self::isCentralInterface($item)) {
             self::showForProfile((int) $item->getID());
         }
+
         return true;
     }
 

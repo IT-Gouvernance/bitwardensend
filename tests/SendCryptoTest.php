@@ -31,6 +31,7 @@
 
 namespace GlpiPlugin\Bitwardensend\Tests;
 
+use RuntimeException;
 use GlpiPlugin\Bitwardensend\SendCrypto;
 use PHPUnit\Framework\TestCase;
 
@@ -71,7 +72,7 @@ final class SendCryptoTest extends TestCase
 
     public function testDeriveSendKeyRejectsWrongLengthKeyMaterial(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         SendCrypto::deriveSendKey('too-short');
     }
 
@@ -93,7 +94,7 @@ final class SendCryptoTest extends TestCase
 
     public function testHashSendPasswordRejectsWrongLengthKeyMaterial(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         SendCrypto::hashSendPassword('password', 'too-short');
     }
 
@@ -115,7 +116,7 @@ final class SendCryptoTest extends TestCase
 
     public function testStretchKeyRejectsWrongLengthMasterKey(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         SendCrypto::stretchKey('too-short');
     }
 
@@ -131,7 +132,7 @@ final class SendCryptoTest extends TestCase
 
     public function testDeriveMasterKeyRejectsArgon2id(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         SendCrypto::deriveMasterKey('password', 'user@example.com', 'argon2id', 3);
     }
 
