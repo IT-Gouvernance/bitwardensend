@@ -36,6 +36,7 @@
  */
 
 use Glpi\Plugin\Hooks;
+use Glpi\Plugin\HookManager;
 use GlpiPlugin\Bitwardensend\Config;
 use GlpiPlugin\Bitwardensend\Profile;
 use GlpiPlugin\Bitwardensend\Send;
@@ -53,11 +54,12 @@ function plugin_init_bitwardensend(): void
     global $PLUGIN_HOOKS;
 
     // Served from public/ (GLPI 11's convention for plugin static assets —
-    // see public/js/bitwardensend.js and public/css/bitwardensend.css):
-    // the hook path itself never includes the "public/" prefix, GLPI's
-    // router adds it automatically when resolving /plugins/bitwardensend/...
-    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['bitwardensend'] = ['js/bitwardensend.js'];
-    $PLUGIN_HOOKS[Hooks::ADD_CSS]['bitwardensend']        = ['css/bitwardensend.css'];
+    // see public/js/bitwardensend.js and public/css/bitwardensend.css): the
+    // path given here never includes the "public/" prefix, GLPI's router
+    // adds it automatically when resolving /plugins/bitwardensend/...
+    $hookManager = new HookManager('bitwardensend');
+    $hookManager->registerJavascriptFile('js/bitwardensend.js');
+    $hookManager->registerCSSFile('css/bitwardensend.css');
 
     Plugin::registerClass(Config::class, ['addtabon' => ['Config']]);
     Plugin::registerClass(Send::class, ['addtabon' => Send::getSupportedItemtypes()]);

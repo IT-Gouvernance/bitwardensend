@@ -102,6 +102,10 @@ Initial release.
   in GLPI 11 (nothing reads it anymore — CSRF is now enforced unconditionally
   by GLPI's own request kernel, independently of this hook).
 - `setup.php` used the `'add_javascript'`/`'add_css'`/`'config_page'` hook
-  names as string literals. Switched to `Hooks::ADD_JAVASCRIPT`/
-  `Hooks::ADD_CSS`/`Hooks::CONFIG_PAGE`, matching the constant already used
-  for `Hooks::TIMELINE_ANSWER_ACTIONS`.
+  names as string literals. `config_page` now uses the `Hooks::CONFIG_PAGE`
+  constant, matching what was already done for
+  `Hooks::TIMELINE_ANSWER_ACTIONS` (GLPI has no other mechanism for this
+  one). JS/CSS registration moved to GLPI 11's `HookManager` class instead
+  (`registerJavascriptFile()`/`registerCSSFile()`) — the same approach used
+  by `pluginsGLPI/advancedforms`, one of the few official plugins that only
+  ever targeted GLPI 11.
