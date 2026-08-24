@@ -56,8 +56,8 @@ function plugin_init_bitwardensend(): void
     // see public/js/bitwardensend.js and public/css/bitwardensend.css):
     // the hook path itself never includes the "public/" prefix, GLPI's
     // router adds it automatically when resolving /plugins/bitwardensend/...
-    $PLUGIN_HOOKS['add_javascript']['bitwardensend'] = ['js/bitwardensend.js'];
-    $PLUGIN_HOOKS['add_css']['bitwardensend']        = ['css/bitwardensend.css'];
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['bitwardensend'] = ['js/bitwardensend.js'];
+    $PLUGIN_HOOKS[Hooks::ADD_CSS]['bitwardensend']        = ['css/bitwardensend.css'];
 
     Plugin::registerClass(Config::class, ['addtabon' => ['Config']]);
     Plugin::registerClass(Send::class, ['addtabon' => Send::getSupportedItemtypes()]);
@@ -71,7 +71,7 @@ function plugin_init_bitwardensend(): void
     }
 
     if (Session::haveRight('config', UPDATE)) {
-        $PLUGIN_HOOKS['config_page']['bitwardensend'] = 'front/config.form.php';
+        $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['bitwardensend'] = 'front/config.form.php';
     }
 
     // Entry in the timeline's "answer" split button, next to Followup/Task/

@@ -101,3 +101,7 @@ Initial release.
 - Removed the `csrf_compliant` plugin hook from `setup.php`: it is dead code
   in GLPI 11 (nothing reads it anymore — CSRF is now enforced unconditionally
   by GLPI's own request kernel, independently of this hook).
+- `setup.php` used the `'add_javascript'`/`'add_css'`/`'config_page'` hook
+  names as string literals. Switched to `Hooks::ADD_JAVASCRIPT`/
+  `Hooks::ADD_CSS`/`Hooks::CONFIG_PAGE`, matching the constant already used
+  for `Hooks::TIMELINE_ANSWER_ACTIONS`.
