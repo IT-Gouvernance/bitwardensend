@@ -93,3 +93,8 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
+- Every form's CSRF token was generated in PHP and threaded through
+  `TemplateRenderer::display()` as a `csrf_token` variable. Switched to
+  calling GLPI's own `{{ csrf_token() }}` Twig function directly in each
+  template instead — the documented approach for plugins, and one less thing
+  to remember to pass from PHP.
