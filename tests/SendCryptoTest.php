@@ -136,6 +136,23 @@ final class SendCryptoTest extends TestCase
         SendCrypto::deriveMasterKey('password', 'user@example.com', 'argon2id', 3);
     }
 
+    /**
+     * @dataProvider nonPositiveIterationCounts
+     */
+    public function testDeriveMasterKeyRejectsNonPositiveIterations(int $iterations): void
+    {
+        $this->expectException(RuntimeException::class);
+        SendCrypto::deriveMasterKey('password', 'user@example.com', 'pbkdf2', $iterations);
+    }
+
+    /**
+     * @return list<array{0:int}>
+     */
+    public static function nonPositiveIterationCounts(): array
+    {
+        return [[0], [-1]];
+    }
+
     public function testDeriveMasterKeyIsDeterministic(): void
     {
         $a = SendCrypto::deriveMasterKey('password', 'User@Example.COM', 'pbkdf2', 600000);
@@ -164,5 +181,26 @@ final class SendCryptoTest extends TestCase
 
         self::assertSame(16, strlen($a));
         self::assertNotSame($a, $b);
+    }
+
+    public function testZeroOverwritesTheVariableInPlace(): void
+    {
+        $secret = 'a secret value';
+        $length = strlen($secret);
+
+        SendCrypto::zero($secret);
+
+        // Whichever branch ran (sodium_memzero(), or the plain overwrite
+        // fallback), the caller is left with a same-length, all-zero-byte
+        // string — never the original plaintext.
+        self::assertSame($length, strlen($secret));
+        self::assertSame(str_repeat("\0", $length), $secret);
+    }
+
+    public function testZeroOnEmptyStringStaysEmpty(): void
+    {
+        $secret = '';
+        SendCrypto::zero($secret);
+        self::assertSame('', $secret);
     }
 }
