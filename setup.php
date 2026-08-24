@@ -52,8 +52,6 @@ function plugin_init_bitwardensend(): void
     /** @var array<string, array<string, mixed>> $PLUGIN_HOOKS */
     global $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS['csrf_compliant']['bitwardensend'] = true;
-
     // Served from public/ (GLPI 11's convention for plugin static assets —
     // see public/js/bitwardensend.js and public/css/bitwardensend.css):
     // the hook path itself never includes the "public/" prefix, GLPI's
