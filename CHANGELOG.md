@@ -93,3 +93,11 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
+- With "Keep the link in the GLPI database" enabled, the stored access URL
+  was plain text — but a Bitwarden Send URL carries its decryption key in
+  the fragment, so that column held a live, directly usable credential for
+  the shared secret, unlike every other secret this plugin stores (all
+  already encrypted with the GLPI key). Now encrypted the same way. Any
+  access URL already stored before this change will stop showing a copy
+  button (it can no longer be decrypted) — it still works as a Send until it
+  is revoked or expires on its own.

@@ -314,6 +314,11 @@ class Send extends CommonDBTM
             $deletionDate    = is_string($rawDeletionDate) ? $rawDeletionDate : null;
             $row['deletion_date_display'] = $deletionDate ? Html::convDateTime($deletionDate) : '';
 
+            $rawAccessUrl = $row['access_url'] ?? null;
+            $row['access_url'] = is_string($rawAccessUrl) && $rawAccessUrl !== ''
+                ? Config::decrypt($rawAccessUrl)
+                : null;
+
             $row['is_expired'] = empty($row['is_revoked']) && $deletionDate !== null && $deletionDate < $now;
             $sends[] = $row;
         }
@@ -499,7 +504,11 @@ class Send extends CommonDBTM
             'entities_id'           => $itemEntitiesId,
             'send_uuid'             => $result->uuid,
             'access_id'             => $result->accessId,
-            'access_url'            => empty($conf['store_access_url']) ? null : $result->accessUrl,
+            // The access URL's fragment carries the Send's decryption key —
+            // it is itself a bearer credential for the shared secret, not
+            // just a reference to it, so it is encrypted at rest exactly
+            // like the credentials on Config's own row.
+            'access_url'            => empty($conf['store_access_url']) ? null : Config::encrypt($result->accessUrl),
             'deletion_date'         => date('Y-m-d H:i:s', $expiration_ts),
             'max_access_count'      => $max_access > 0 ? $max_access : null,
             'is_password_protected' => $password !== '' ? 1 : 0,
