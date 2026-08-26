@@ -333,7 +333,6 @@ class Send extends CommonDBTM
             'can_create' => self::canCreate(),
             'can_update' => self::canUpdate(),
             'can_purge'  => self::canPurge(),
-            'csrf_token' => Session::getNewCSRFToken(),
         ]);
     }
 
@@ -364,7 +363,6 @@ class Send extends CommonDBTM
      *     default_name: string,
      *     conf: array<string,mixed>,
      *     followup_templates: list<array{id:int,name:string,content:string}>,
-     *     csrf_token: string,
      *     force_followup: bool
      * }
      */
@@ -389,7 +387,6 @@ class Send extends CommonDBTM
             'followup_templates' => empty($conf['allow_glpi_followup_templates'])
                 ? []
                 : self::getFollowupTemplatesForItem($item),
-            'csrf_token'         => Session::getNewCSRFToken(),
         ];
     }
 

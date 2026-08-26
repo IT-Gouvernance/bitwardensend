@@ -403,7 +403,6 @@ class Config extends CommonDBTM
             'has_native_master_password'    => self::getNativeMasterPassword() !== '',
             'cleanup_cron_url'              => Send::getCleanupCronUrl(),
             'cleanup_cron_name'             => Send::getTypeName(1) . ' — cleanup',
-            'csrf_token'                    => Session::getNewCSRFToken(),
             'can_update'                    => Session::haveRight('config', UPDATE),
         ]);
     }
