@@ -93,3 +93,9 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
+- Neither Send driver constrained which URL scheme its cURL handle would
+  follow, and the configuration form only checked that the API/identity/web
+  vault URL fields were non-empty, not that they were actually `http(s)`.
+  Both drivers now set `CURLOPT_PROTOCOLS` to `http`/`https` only, and
+  `Config::validateInput()` rejects any other scheme (`file://`,
+  `gopher://`, ...) before it is ever saved.

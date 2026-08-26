@@ -276,6 +276,16 @@ class CliSendDriver implements SendDriverInterface
             CURLOPT_CUSTOMREQUEST  => $method,
             CURLOPT_TIMEOUT        => $timeout,
             CURLOPT_CONNECTTIMEOUT => 5,
+            // The configured api_url is admin-supplied, not attacker-supplied
+            // under normal use — this is defense in depth, not the primary
+            // control. Restricting the scheme keeps a misconfigured (or
+            // tampered) URL from turning this into a local file reader
+            // (file://) or a protocol-smuggling primitive (gopher://, ...).
+            CURLOPT_PROTOCOLS      => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+            // libcurl verifies by default, but explicit beats implicit for
+            // a request carrying the vault master password.
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_POSTFIELDS     => $postFields,
             CURLOPT_HTTPHEADER     => $headers,
         ];

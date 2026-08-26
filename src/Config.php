@@ -177,6 +177,20 @@ class Config extends CommonDBTM
     }
 
     /**
+     * Rejects anything other than http(s) before it is ever handed to a
+     * driver's cURL handle — belt-and-suspenders alongside the drivers'
+     * own CURLOPT_PROTOCOLS restriction, but this is the point where a
+     * mistyped or malicious value (file://, gopher://, ...) is refused
+     * outright instead of just constrained at request time.
+     */
+    private static function hasHttpScheme(string $url): bool
+    {
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+
+        return is_string($scheme) && in_array(strtolower($scheme), ['http', 'https'], true);
+    }
+
+    /**
      * Checks the fields the selected driver/mode actually needs. Mirrors
      * NativeSendDriver/CliSendDriver's own runtime checks by hand.
      *
@@ -193,19 +207,29 @@ class Config extends CommonDBTM
         if ($driver === 'cli') {
             $rawApiUrl = $input['api_url'] ?? '';
             $apiUrl    = is_string($rawApiUrl) ? $rawApiUrl : '';
-            if (trim($apiUrl) === '') {
+            if (trim($apiUrl) === '' || !self::hasHttpScheme($apiUrl)) {
                 $errors[] = __('Local API URL', 'bitwardensend');
             }
 
             return $errors;
         }
 
-        $requiredNative = [
+        $requiredNativeUrls = [
             'native_identity_url'  => __('Identity URL', 'bitwardensend'),
             'native_api_url'       => __('API URL', 'bitwardensend'),
             'native_web_vault_url' => __('Web vault URL', 'bitwardensend'),
-            'native_client_id'     => __('API client ID', 'bitwardensend'),
-            'native_email'         => __('Account email', 'bitwardensend'),
+        ];
+        foreach ($requiredNativeUrls as $field => $label) {
+            $rawValue = $input[$field] ?? '';
+            $value    = is_string($rawValue) ? $rawValue : '';
+            if (trim($value) === '' || !self::hasHttpScheme($value)) {
+                $errors[] = $label;
+            }
+        }
+
+        $requiredNative = [
+            'native_client_id' => __('API client ID', 'bitwardensend'),
+            'native_email'     => __('Account email', 'bitwardensend'),
         ];
         foreach ($requiredNative as $field => $label) {
             $rawValue = $input[$field] ?? '';
