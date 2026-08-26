@@ -45,6 +45,16 @@ class Config extends CommonDBTM
 {
     public static $rightname = 'config';
 
+    // Masked by CommonDBTM::unsetUndisclosedFields() wherever core relies on
+    // it (the REST API's item/search/list output, Dropdown/Link rendering) -
+    // these are GLPIKey ciphertext, not plaintext, but there is no reason to
+    // expose them at all to a session that only has 'config' READ.
+    public static $undisclosedFields = [
+        'master_password',
+        'native_client_secret',
+        'native_master_password',
+    ];
+
     /** @var array<string,mixed>|null */
     private static ?array $cache = null;
 
