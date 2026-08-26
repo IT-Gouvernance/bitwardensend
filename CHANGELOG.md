@@ -93,3 +93,10 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
+- `Send::displayTabContentForItem()` and `Config::displayTabContentForItem()`
+  rendered their tab's content without re-checking the plugin's right —
+  `getTabNameForItem()` only gates the tab's label, not its content, and
+  GLPI's generic tab dispatcher (`ajax/common.tabs.php`) can reach the
+  content method directly with a deterministic tab key. Both methods (and
+  `Send::showForItem()`, which the first one calls) now check the right
+  themselves instead of relying on the label check having already run.
