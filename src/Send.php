@@ -271,7 +271,7 @@ class Send extends CommonDBTM
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof CommonITILObject) {
+        if ($item instanceof CommonITILObject && self::canView() && $item->canViewItem()) {
             self::showForItem($item);
         }
 
@@ -280,6 +280,15 @@ class Send extends CommonDBTM
 
     public static function showForItem(CommonITILObject $item): void
     {
+        // getTabNameForItem() only gates the tab's label — GLPI's generic
+        // tab dispatcher (ajax/common.tabs.php) can reach this method
+        // directly with a deterministic tab key, without going through
+        // that check. Re-checked here too so this method is safe on its
+        // own, regardless of caller.
+        if (!self::canView() || !$item->canViewItem()) {
+            return;
+        }
+
         global $DB;
 
         // Bitwarden deletes the Send itself once past this date; nothing here
@@ -324,7 +333,6 @@ class Send extends CommonDBTM
             'can_create' => self::canCreate(),
             'can_update' => self::canUpdate(),
             'can_purge'  => self::canPurge(),
-            'csrf_token' => Session::getNewCSRFToken(),
         ]);
     }
 
@@ -355,7 +363,6 @@ class Send extends CommonDBTM
      *     default_name: string,
      *     conf: array<string,mixed>,
      *     followup_templates: list<array{id:int,name:string,content:string}>,
-     *     csrf_token: string,
      *     force_followup: bool
      * }
      */
@@ -380,7 +387,6 @@ class Send extends CommonDBTM
             'followup_templates' => empty($conf['allow_glpi_followup_templates'])
                 ? []
                 : self::getFollowupTemplatesForItem($item),
-            'csrf_token'         => Session::getNewCSRFToken(),
         ];
     }
 
@@ -413,6 +419,23 @@ class Send extends CommonDBTM
         if (!($item instanceof CommonITILObject) || !$item->getFromDB($items_id) || !$item->canViewItem()) {
             Session::addMessageAfterRedirect(
                 __('Item not found or access denied.', 'bitwardensend'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+
+        // Checked before creating the Send, not just before posting the
+        // followup: the plugin's own CREATE right says nothing about GLPI's
+        // separate, actor-aware followup rights (ADDMY, ADD_AS_TECHNICIAN,
+        // closed-status handling, ...) that ITILFollowup::add() itself never
+        // enforces — the normal front/itilfollowup.form.php entry point
+        // checks this first, so this mirrors that instead of silently
+        // creating a Send that could never be delivered.
+        $wantsFollowup = !empty($input['add_followup']);
+        if ($wantsFollowup && !$item->canAddFollowups()) {
+            Session::addMessageAfterRedirect(
+                __('You are not allowed to add a followup on this item.', 'bitwardensend'),
                 false,
                 ERROR,
             );
@@ -506,15 +529,20 @@ class Send extends CommonDBTM
             'date_creation'         => $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s'),
         ]);
 
-        if (!empty($input['add_followup'])) {
+        if ($wantsFollowup) {
             $rawFollowupContent = $input['followup_content'] ?? '';
+            // Same gate core uses to decide whether a followup may be
+            // marked private: requesting it is not enough without the
+            // right to see private followups in the first place.
+            $isPrivate = !empty($input['followup_is_private'])
+                && Session::haveRight('followup', ITILFollowup::SEEPRIVATE);
             self::addFollowup(
                 $item,
                 is_string($rawFollowupContent) ? $rawFollowupContent : '',
                 $result->accessUrl,
                 $expiration_ts,
                 $max_access,
-                !empty($input['followup_is_private']),
+                $isPrivate,
             );
         }
 

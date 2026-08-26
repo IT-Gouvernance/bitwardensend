@@ -46,7 +46,7 @@
       action="{{ path('plugins/bitwardensend/front/send.form.php') }}"
       class="plugin-bitwardensend-form">
 
-   <input type="hidden" name="_glpi_csrf_token" value="{{ subitem.csrf_token }}">
+   <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
    <input type="hidden" name="itemtype" value="{{ subitem.itemtype }}">
    <input type="hidden" name="items_id" value="{{ subitem.items_id }}">
 

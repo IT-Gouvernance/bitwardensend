@@ -167,7 +167,6 @@ class Profile extends \Profile
                 'bitwardensend',
             ),
             'can_update'   => Session::haveRight('profile', UPDATE),
-            'csrf_token'   => Session::getNewCSRFToken(),
         ]);
     }
 

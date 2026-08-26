@@ -51,6 +51,10 @@ Initial release.
 - Community/contribution files: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
   `SECURITY.md`, a pull request template, and bug report/feature request issue
   forms.
+- More standalone PHPUnit coverage: `SendCrypto::zero()` and its non-positive
+  KDF iteration count rejection, plus `CliSendDriver`/`NativeSendDriver`'s
+  `isAvailable()` (both pure config checks, no GLPI bootstrap needed as long
+  as the config is passed explicitly to the constructor).
 
 ### Fixed
 

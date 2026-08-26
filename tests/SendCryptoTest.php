@@ -136,6 +136,23 @@ final class SendCryptoTest extends TestCase
         SendCrypto::deriveMasterKey('password', 'user@example.com', 'argon2id', 3);
     }
 
+    /**
+     * @dataProvider nonPositiveIterationCounts
+     */
+    public function testDeriveMasterKeyRejectsNonPositiveIterations(int $iterations): void
+    {
+        $this->expectException(RuntimeException::class);
+        SendCrypto::deriveMasterKey('password', 'user@example.com', 'pbkdf2', $iterations);
+    }
+
+    /**
+     * @return list<array{0:int}>
+     */
+    public static function nonPositiveIterationCounts(): array
+    {
+        return [[0], [-1]];
+    }
+
     public function testDeriveMasterKeyIsDeterministic(): void
     {
         $a = SendCrypto::deriveMasterKey('password', 'User@Example.COM', 'pbkdf2', 600000);
@@ -164,5 +181,28 @@ final class SendCryptoTest extends TestCase
 
         self::assertSame(16, strlen($a));
         self::assertNotSame($a, $b);
+    }
+
+    public function testZeroDestroysTheOriginalPlaintext(): void
+    {
+        $secret = 'a secret value';
+
+        SendCrypto::zero($secret);
+
+        // The exact result differs by environment: sodium_memzero() (used
+        // whenever the sodium extension is loaded, which is the common
+        // case) nulls the variable outright — this is PHP's own documented
+        // behavior for that function, not something this code controls —
+        // while the plain-PHP fallback instead leaves a same-length string
+        // of null bytes. Either way, the original plaintext must not
+        // survive; that is the one thing both branches guarantee.
+        self::assertNotSame('a secret value', $secret);
+    }
+
+    public function testZeroOnEmptyStringDoesNotError(): void
+    {
+        $secret = '';
+        SendCrypto::zero($secret);
+        self::assertTrue($secret === null || $secret === '');
     }
 }
