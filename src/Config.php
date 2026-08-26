@@ -154,7 +154,13 @@ class Config extends CommonDBTM
         return self::decrypt(is_string($rawValue) ? $rawValue : '');
     }
 
-    private static function decrypt(string $value): string
+    /**
+     * Decrypts a value encrypted with encrypt() below — public so other
+     * plugin classes storing their own GLPI-key-encrypted values (Send's
+     * stored access_url) share this one implementation instead of each
+     * wrapping GLPIKey themselves.
+     */
+    public static function decrypt(string $value): string
     {
         if ($value === '') {
             return '';
@@ -167,7 +173,10 @@ class Config extends CommonDBTM
         }
     }
 
-    private static function encrypt(string $value): string
+    /**
+     * @see decrypt()
+     */
+    public static function encrypt(string $value): string
     {
         if ($value === '') {
             return '';
