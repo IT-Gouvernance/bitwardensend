@@ -271,7 +271,7 @@ class Send extends CommonDBTM
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof CommonITILObject) {
+        if ($item instanceof CommonITILObject && self::canView() && $item->canViewItem()) {
             self::showForItem($item);
         }
 
@@ -280,6 +280,15 @@ class Send extends CommonDBTM
 
     public static function showForItem(CommonITILObject $item): void
     {
+        // getTabNameForItem() only gates the tab's label — GLPI's generic
+        // tab dispatcher (ajax/common.tabs.php) can reach this method
+        // directly with a deterministic tab key, without going through
+        // that check. Re-checked here too so this method is safe on its
+        // own, regardless of caller.
+        if (!self::canView() || !$item->canViewItem()) {
+            return;
+        }
+
         global $DB;
 
         // Bitwarden deletes the Send itself once past this date; nothing here

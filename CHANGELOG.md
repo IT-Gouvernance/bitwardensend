@@ -97,19 +97,10 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
-- Every form's CSRF token was generated in PHP and threaded through
-  `TemplateRenderer::display()` as a `csrf_token` variable. Switched to
-  calling GLPI's own `{{ csrf_token() }}` Twig function directly in each
-  template instead — the documented approach for plugins, and one less thing
-  to remember to pass from PHP.
-- Removed the `csrf_compliant` plugin hook from `setup.php`: it is dead code
-  in GLPI 11 (nothing reads it anymore — CSRF is now enforced unconditionally
-  by GLPI's own request kernel, independently of this hook).
-- `setup.php` used the `'add_javascript'`/`'add_css'`/`'config_page'` hook
-  names as string literals. `config_page` now uses the `Hooks::CONFIG_PAGE`
-  constant, matching what was already done for
-  `Hooks::TIMELINE_ANSWER_ACTIONS` (GLPI has no other mechanism for this
-  one). JS/CSS registration moved to GLPI 11's `HookManager` class instead
-  (`registerJavascriptFile()`/`registerCSSFile()`) — the same approach used
-  by `pluginsGLPI/advancedforms`, one of the few official plugins that only
-  ever targeted GLPI 11.
+- `Send::displayTabContentForItem()` and `Config::displayTabContentForItem()`
+  rendered their tab's content without re-checking the plugin's right —
+  `getTabNameForItem()` only gates the tab's label, not its content, and
+  GLPI's generic tab dispatcher (`ajax/common.tabs.php`) can reach the
+  content method directly with a deterministic tab key. Both methods (and
+  `Send::showForItem()`, which the first one calls) now check the right
+  themselves instead of relying on the label check having already run.
