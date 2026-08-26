@@ -97,11 +97,9 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
-- `Send::createFromInput()` posted the followup through `ITILFollowup::add()`
-  directly, which does not enforce GLPI's own actor-aware followup rights
-  (`ADDMY`, `ADD_AS_TECHNICIAN`, closed-status handling, ...) the way
-  `front/itilfollowup.form.php` does. The plugin's own CREATE right on the
-  Send does not imply the right to add a followup on the item — now checked
-  explicitly with `canAddFollowups()` before creating the Send at all, and
-  the "private" flag is only honored when the requesting user actually has
-  the right to see private followups.
+- Revoking or purging a Send only checked the Send record's own entity
+  (`canUpdateItem()`/`canPurgeItem()`), not whether the requesting user can
+  actually see the ticket/change/problem it is attached to. `front/send.form.php`
+  now also resolves that parent item and requires `canViewItem()` on it before
+  acting, the same check `createFromInput()` already applies on the creation
+  side.
