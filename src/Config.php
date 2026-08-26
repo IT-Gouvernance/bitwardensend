@@ -385,7 +385,7 @@ class Config extends CommonDBTM
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof \Config) {
+        if ($item instanceof \Config && Session::haveRight('config', UPDATE)) {
             self::showConfigForm();
         }
 
@@ -394,6 +394,15 @@ class Config extends CommonDBTM
 
     public static function showConfigForm(): void
     {
+        // getTabNameForItem() does not check this either — GLPI's generic
+        // tab dispatcher (ajax/common.tabs.php) can reach this method
+        // directly with a deterministic tab key, without going through
+        // that label check. Re-checked here too so this method is safe on
+        // its own, regardless of caller.
+        if (!Session::haveRight('config', UPDATE)) {
+            return;
+        }
+
         $conf = self::getConfig(true);
 
         TemplateRenderer::getInstance()->display('@bitwardensend/config.html.twig', [
@@ -403,7 +412,6 @@ class Config extends CommonDBTM
             'has_native_master_password'    => self::getNativeMasterPassword() !== '',
             'cleanup_cron_url'              => Send::getCleanupCronUrl(),
             'cleanup_cron_name'             => Send::getTypeName(1) . ' — cleanup',
-            'csrf_token'                    => Session::getNewCSRFToken(),
             'can_update'                    => Session::haveRight('config', UPDATE),
         ]);
     }

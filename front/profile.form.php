@@ -33,9 +33,10 @@ use GlpiPlugin\Bitwardensend\Profile;
 
 Session::checkRight('profile', UPDATE);
 
-// The CSRF token is validated automatically by GLPI (the plugin declares
-// "csrf_compliant" in setup.php). Tokens are single use, so calling
-// Session::checkCSRF() again here would always fail.
+// The CSRF token (see {{ csrf_token() }} in this form's template) is
+// validated automatically by GLPI's own request kernel before this script
+// even runs. Tokens are single use, so calling Session::checkCSRF() again
+// here would always fail.
 
 if (isset($_POST['update'])) {
     Profile::saveFromInput($_POST);
