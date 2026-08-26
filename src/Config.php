@@ -45,6 +45,16 @@ class Config extends CommonDBTM
 {
     public static $rightname = 'config';
 
+    // Masked by CommonDBTM::unsetUndisclosedFields() wherever core relies on
+    // it (the REST API's item/search/list output, Dropdown/Link rendering) -
+    // these are GLPIKey ciphertext, not plaintext, but there is no reason to
+    // expose them at all to a session that only has 'config' READ.
+    public static $undisclosedFields = [
+        'master_password',
+        'native_client_secret',
+        'native_master_password',
+    ];
+
     /** @var array<string,mixed>|null */
     private static ?array $cache = null;
 
@@ -154,7 +164,13 @@ class Config extends CommonDBTM
         return self::decrypt(is_string($rawValue) ? $rawValue : '');
     }
 
-    private static function decrypt(string $value): string
+    /**
+     * Decrypts a value encrypted with encrypt() below — public so other
+     * plugin classes storing their own GLPI-key-encrypted values (Send's
+     * stored access_url) share this one implementation instead of each
+     * wrapping GLPIKey themselves.
+     */
+    public static function decrypt(string $value): string
     {
         if ($value === '') {
             return '';
@@ -167,7 +183,10 @@ class Config extends CommonDBTM
         }
     }
 
-    private static function encrypt(string $value): string
+    /**
+     * @see decrypt()
+     */
+    public static function encrypt(string $value): string
     {
         if ($value === '') {
             return '';
@@ -400,7 +419,7 @@ class Config extends CommonDBTM
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof \Config) {
+        if ($item instanceof \Config && Session::haveRight('config', UPDATE)) {
             self::showConfigForm();
         }
 
@@ -409,6 +428,15 @@ class Config extends CommonDBTM
 
     public static function showConfigForm(): void
     {
+        // getTabNameForItem() does not check this either — GLPI's generic
+        // tab dispatcher (ajax/common.tabs.php) can reach this method
+        // directly with a deterministic tab key, without going through
+        // that label check. Re-checked here too so this method is safe on
+        // its own, regardless of caller.
+        if (!Session::haveRight('config', UPDATE)) {
+            return;
+        }
+
         $conf = self::getConfig(true);
 
         TemplateRenderer::getInstance()->display('@bitwardensend/config.html.twig', [
@@ -418,7 +446,6 @@ class Config extends CommonDBTM
             'has_native_master_password'    => self::getNativeMasterPassword() !== '',
             'cleanup_cron_url'              => Send::getCleanupCronUrl(),
             'cleanup_cron_name'             => Send::getTypeName(1) . ' — cleanup',
-            'csrf_token'                    => Session::getNewCSRFToken(),
             'can_update'                    => Session::haveRight('config', UPDATE),
         ]);
     }
