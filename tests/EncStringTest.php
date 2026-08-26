@@ -175,4 +175,13 @@ final class EncStringTest extends TestCase
         $this->expectException(RuntimeException::class);
         EncString::encrypt('text', 'too-short', random_bytes(32));
     }
+
+    public function testDecryptRejectsWrongKeyLengths(): void
+    {
+        [$encKey, $macKey] = $this->keys();
+        $serialized = (string) EncString::encrypt('text', $encKey, $macKey);
+
+        $this->expectException(RuntimeException::class);
+        EncString::parse($serialized)->decrypt('too-short', $macKey);
+    }
 }

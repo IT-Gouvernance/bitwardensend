@@ -36,6 +36,7 @@
  */
 
 use Glpi\Plugin\Hooks;
+use Glpi\Plugin\HookManager;
 use GlpiPlugin\Bitwardensend\Config;
 use GlpiPlugin\Bitwardensend\Profile;
 use GlpiPlugin\Bitwardensend\Send;
@@ -52,14 +53,13 @@ function plugin_init_bitwardensend(): void
     /** @var array<string, array<string, mixed>> $PLUGIN_HOOKS */
     global $PLUGIN_HOOKS;
 
-    $PLUGIN_HOOKS['csrf_compliant']['bitwardensend'] = true;
-
     // Served from public/ (GLPI 11's convention for plugin static assets —
-    // see public/js/bitwardensend.js and public/css/bitwardensend.css):
-    // the hook path itself never includes the "public/" prefix, GLPI's
-    // router adds it automatically when resolving /plugins/bitwardensend/...
-    $PLUGIN_HOOKS['add_javascript']['bitwardensend'] = ['js/bitwardensend.js'];
-    $PLUGIN_HOOKS['add_css']['bitwardensend']        = ['css/bitwardensend.css'];
+    // see public/js/bitwardensend.js and public/css/bitwardensend.css): the
+    // path given here never includes the "public/" prefix, GLPI's router
+    // adds it automatically when resolving /plugins/bitwardensend/...
+    $hookManager = new HookManager('bitwardensend');
+    $hookManager->registerJavascriptFile('js/bitwardensend.js');
+    $hookManager->registerCSSFile('css/bitwardensend.css');
 
     Plugin::registerClass(Config::class, ['addtabon' => ['Config']]);
     Plugin::registerClass(Send::class, ['addtabon' => Send::getSupportedItemtypes()]);
@@ -73,7 +73,7 @@ function plugin_init_bitwardensend(): void
     }
 
     if (Session::haveRight('config', UPDATE)) {
-        $PLUGIN_HOOKS['config_page']['bitwardensend'] = 'front/config.form.php';
+        $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['bitwardensend'] = 'front/config.form.php';
     }
 
     // Entry in the timeline's "answer" split button, next to Followup/Task/
