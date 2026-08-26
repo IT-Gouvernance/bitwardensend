@@ -419,6 +419,23 @@ class Send extends CommonDBTM
             return false;
         }
 
+        // Checked before creating the Send, not just before posting the
+        // followup: the plugin's own CREATE right says nothing about GLPI's
+        // separate, actor-aware followup rights (ADDMY, ADD_AS_TECHNICIAN,
+        // closed-status handling, ...) that ITILFollowup::add() itself never
+        // enforces — the normal front/itilfollowup.form.php entry point
+        // checks this first, so this mirrors that instead of silently
+        // creating a Send that could never be delivered.
+        $wantsFollowup = !empty($input['add_followup']);
+        if ($wantsFollowup && !$item->canAddFollowups()) {
+            Session::addMessageAfterRedirect(
+                __('You are not allowed to add a followup on this item.', 'bitwardensend'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+
         $rawSecret = $input['secret'] ?? '';
         $secret    = is_string($rawSecret) ? $rawSecret : '';
         if (trim($secret) === '') {
@@ -506,15 +523,20 @@ class Send extends CommonDBTM
             'date_creation'         => $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s'),
         ]);
 
-        if (!empty($input['add_followup'])) {
+        if ($wantsFollowup) {
             $rawFollowupContent = $input['followup_content'] ?? '';
+            // Same gate core uses to decide whether a followup may be
+            // marked private: requesting it is not enough without the
+            // right to see private followups in the first place.
+            $isPrivate = !empty($input['followup_is_private'])
+                && Session::haveRight('followup', ITILFollowup::SEEPRIVATE);
             self::addFollowup(
                 $item,
                 is_string($rawFollowupContent) ? $rawFollowupContent : '',
                 $result->accessUrl,
                 $expiration_ts,
                 $max_access,
-                !empty($input['followup_is_private']),
+                $isPrivate,
             );
         }
 
