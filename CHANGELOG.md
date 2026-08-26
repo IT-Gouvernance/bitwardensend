@@ -93,3 +93,9 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
+- Revoking or purging a Send only checked the Send record's own entity
+  (`canUpdateItem()`/`canPurgeItem()`), not whether the requesting user can
+  actually see the ticket/change/problem it is attached to. `front/send.form.php`
+  now also resolves that parent item and requires `canViewItem()` on it before
+  acting, the same check `createFromInput()` already applies on the creation
+  side.
