@@ -93,3 +93,7 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
+- `Config` did not declare `$undisclosedFields`, so its three encrypted
+  secret columns were not masked out anywhere core relies on that property
+  (the REST API's item/search/list output, `Dropdown`/`Link` rendering).
+  Declared it, matching how core's own `AuthLDAP`/`APIClient` do it.
