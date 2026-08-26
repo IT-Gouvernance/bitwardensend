@@ -97,10 +97,11 @@ Initial release.
 - Two error messages added along with the type-safety fixes above ("Could not
   compute the expiration date.", "Unable to encode the request body") had no
   French translation, so `tools/build-locales.py` failed. Added them.
-- `Send::displayTabContentForItem()` and `Config::displayTabContentForItem()`
-  rendered their tab's content without re-checking the plugin's right —
-  `getTabNameForItem()` only gates the tab's label, not its content, and
-  GLPI's generic tab dispatcher (`ajax/common.tabs.php`) can reach the
-  content method directly with a deterministic tab key. Both methods (and
-  `Send::showForItem()`, which the first one calls) now check the right
-  themselves instead of relying on the label check having already run.
+- `Send::createFromInput()` posted the followup through `ITILFollowup::add()`
+  directly, which does not enforce GLPI's own actor-aware followup rights
+  (`ADDMY`, `ADD_AS_TECHNICIAN`, closed-status handling, ...) the way
+  `front/itilfollowup.form.php` does. The plugin's own CREATE right on the
+  Send does not imply the right to add a followup on the item — now checked
+  explicitly with `canAddFollowups()` before creating the Send at all, and
+  the "private" flag is only honored when the requesting user actually has
+  the right to see private followups.
