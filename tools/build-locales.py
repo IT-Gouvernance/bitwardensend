@@ -315,6 +315,11 @@ FR = {
     'The link will no longer be viewable. This cannot be undone.':
         'Le lien ne sera plus consultable. Cette action est irréversible.',
     'Revoked': 'Révoqué',
+    'Pre-fills the three URLs below.': 'Pré-remplit les trois URL ci-dessous.',
+    'Self-hosted / custom': 'Auto-hébergé / personnalisé',
+    'Server': 'Serveur',
+    'US — bitwarden.com': 'US — bitwarden.com',
+    'EU — bitwarden.eu': 'EU — bitwarden.eu',
     'Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are '
     'separate — an account on one does not work with the other\'s URLs.':
         "Auto-hébergé : ajustez ces trois URL. Bitwarden.com et bitwarden.eu sont "

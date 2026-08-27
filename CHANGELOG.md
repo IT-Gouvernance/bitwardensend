@@ -55,6 +55,12 @@ Initial release. Currently shipping as `1.0.0-beta3`.
   KDF iteration count rejection, plus `CliSendDriver`/`NativeSendDriver`'s
   `isAvailable()` (both pure config checks, no GLPI bootstrap needed as long
   as the config is passed explicitly to the constructor).
+- "Server" preset selector next to the native driver's Identity/API/Web vault
+  URL fields: picking "US — bitwarden.com" or "EU — bitwarden.eu" fills in
+  the three official URLs for that region; "Self-hosted / custom" leaves them
+  as they are. A convenience only — nothing new is stored, it just writes
+  into the three existing fields, and pre-selects itself on reload by
+  matching their current values against the two known presets.
 
 ### Fixed
 

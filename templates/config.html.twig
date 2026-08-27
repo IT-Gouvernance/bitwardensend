@@ -129,6 +129,20 @@
             </div>
 
             <div class="row mb-3">
+               <label class="col-form-label col-md-4" for="cfg_native_region">
+                  <i class="ti ti-world me-1 text-secondary"></i>{{ __('Server', 'bitwardensend') }}
+               </label>
+               <div class="col-md-8">
+                  <select id="cfg_native_region" class="form-select">
+                     <option value="custom">{{ __('Self-hosted / custom', 'bitwardensend') }}</option>
+                     <option value="us">{{ __('US — bitwarden.com', 'bitwardensend') }}</option>
+                     <option value="eu">{{ __('EU — bitwarden.eu', 'bitwardensend') }}</option>
+                  </select>
+                  <div class="form-hint">{{ __('Pre-fills the three URLs below.', 'bitwardensend') }}</div>
+               </div>
+            </div>
+
+            <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_identity_url">
                   <i class="ti ti-link me-1 text-secondary"></i>{{ __('Identity URL', 'bitwardensend') }}
                   <span class="text-danger">*</span>
@@ -365,4 +379,5 @@
    tab was loaded with the page or injected by AJAX. #}
 <script>
    pluginBitwardensendToggleSendDriver();
+   pluginBitwardensendSyncNativeRegion();
 </script>

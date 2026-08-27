@@ -210,6 +210,74 @@
     };
 
     /**
+     * Bitwarden's own official server URLs — bitwarden.com (US) and
+     * bitwarden.eu (EU) are separate deployments, an account on one does not
+     * work with the other's URLs. Self-hosted (Vaultwarden, Bitwarden
+     * Unified) has no fixed URLs, so "custom" just leaves the three fields
+     * alone rather than clearing them.
+     */
+    const NATIVE_REGION_PRESETS = {
+        us: {
+            identity: 'https://identity.bitwarden.com',
+            api: 'https://api.bitwarden.com',
+            webVault: 'https://vault.bitwarden.com',
+        },
+        eu: {
+            identity: 'https://identity.bitwarden.eu',
+            api: 'https://api.bitwarden.eu',
+            webVault: 'https://vault.bitwarden.eu',
+        },
+    };
+
+    /**
+     * Fill the three native driver URL fields from the picked region preset.
+     * Not stored anywhere itself (#cfg_native_region has no name attribute) —
+     * it only ever writes into the three fields that already are.
+     */
+    window.pluginBitwardensendApplyNativeRegion = function () {
+        const select = document.getElementById('cfg_native_region');
+        const preset = select && NATIVE_REGION_PRESETS[select.value];
+        if (!preset) {
+            return;
+        }
+
+        const identity = document.getElementById('cfg_native_identity_url');
+        const api = document.getElementById('cfg_native_api_url');
+        const webVault = document.getElementById('cfg_native_web_vault_url');
+        if (identity) {
+            identity.value = preset.identity;
+        }
+        if (api) {
+            api.value = preset.api;
+        }
+        if (webVault) {
+            webVault.value = preset.webVault;
+        }
+    };
+
+    /**
+     * Preselect #cfg_native_region on load by matching the three stored URLs
+     * against the known presets — "custom" (self-hosted) when none match.
+     */
+    window.pluginBitwardensendSyncNativeRegion = function () {
+        const select = document.getElementById('cfg_native_region');
+        const identity = document.getElementById('cfg_native_identity_url');
+        const api = document.getElementById('cfg_native_api_url');
+        const webVault = document.getElementById('cfg_native_web_vault_url');
+        if (!select || !identity || !api || !webVault) {
+            return;
+        }
+
+        const match = Object.keys(NATIVE_REGION_PRESETS).find((key) => {
+            const preset = NATIVE_REGION_PRESETS[key];
+            return preset.identity === identity.value
+                && preset.api === api.value
+                && preset.webVault === webVault.value;
+        });
+        select.value = match || 'custom';
+    };
+
+    /**
      * Keep the "required" property in sync with actual visibility.
      *
      * A field can carry the HTML required attribute while sitting inside a
@@ -504,6 +572,11 @@
 
         if (event.target.id === 'cfg_send_driver') {
             window.pluginBitwardensendToggleSendDriver();
+            return;
+        }
+
+        if (event.target.id === 'cfg_native_region') {
+            window.pluginBitwardensendApplyNativeRegion();
             return;
         }
 
