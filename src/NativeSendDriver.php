@@ -405,6 +405,13 @@ class NativeSendDriver implements SendDriverInterface
             CURLOPT_CUSTOMREQUEST  => $method,
             CURLOPT_TIMEOUT        => $timeout,
             CURLOPT_CONNECTTIMEOUT => 5,
+            // The configured *_url settings are admin-supplied, not
+            // attacker-supplied under normal use — this is defense in
+            // depth, not the primary control. Restricting the scheme keeps
+            // a misconfigured (or tampered) URL from turning this into a
+            // local file reader (file://) or a protocol-smuggling
+            // primitive (gopher://, ...).
+            CURLOPT_PROTOCOLS      => CURLPROTO_HTTP | CURLPROTO_HTTPS,
             // No config flag to disable this — talking to Bitwarden's real
             // servers over an unverified connection defeats the point.
             CURLOPT_SSL_VERIFYPEER => true,

@@ -33,9 +33,10 @@ use GlpiPlugin\Bitwardensend\Send;
 
 Session::checkRight(Send::$rightname, READ);
 
-// The CSRF token is validated automatically by GLPI (the plugin declares
-// "csrf_compliant" in setup.php). Tokens are single use, so calling
-// Session::checkCSRF() again here would always fail.
+// The CSRF token (see {{ csrf_token() }} in this form's template) is
+// validated automatically by GLPI's own request kernel before this script
+// even runs. Tokens are single use, so calling Session::checkCSRF() again
+// here would always fail.
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     Html::back();
@@ -55,9 +56,17 @@ if (isset($_POST['revoke'], $_POST['id'])) {
     // checkRight() above only confirms the global right; canUpdateItem()
     // additionally checks this specific record's entity, so a user cannot
     // revoke a Send belonging to an entity they have no access to just by
-    // guessing its id.
+    // guessing its id. That alone still says nothing about the parent
+    // ITIL object itself, which is checked separately below.
     if ($send->getFromDB($sendId) && $send->canUpdateItem()) {
-        $send->revoke();
+        $rawItemtype = $send->fields['itemtype'] ?? '';
+        $itemtype    = is_string($rawItemtype) ? $rawItemtype : '';
+        $rawItemsId  = $send->fields['items_id'] ?? 0;
+        $itemsId     = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
+        $parent      = getItemForItemtype($itemtype);
+        if ($parent instanceof CommonITILObject && $parent->getFromDB($itemsId) && $parent->canViewItem()) {
+            $send->revoke();
+        }
     }
 
     Html::back();
@@ -69,7 +78,14 @@ if (isset($_POST['purge'], $_POST['id'])) {
     $rawId = $_POST['id'];
     $sendId = is_numeric($rawId) ? (int) $rawId : 0;
     if ($send->getFromDB($sendId) && $send->canPurgeItem()) {
-        $send->delete(['id' => $sendId], true);
+        $rawItemtype = $send->fields['itemtype'] ?? '';
+        $itemtype    = is_string($rawItemtype) ? $rawItemtype : '';
+        $rawItemsId  = $send->fields['items_id'] ?? 0;
+        $itemsId     = is_numeric($rawItemsId) ? (int) $rawItemsId : 0;
+        $parent      = getItemForItemtype($itemtype);
+        if ($parent instanceof CommonITILObject && $parent->getFromDB($itemsId) && $parent->canViewItem()) {
+            $send->delete(['id' => $sendId], true);
+        }
     }
 
     Html::back();

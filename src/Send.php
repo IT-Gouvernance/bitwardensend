@@ -271,7 +271,7 @@ class Send extends CommonDBTM
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof CommonITILObject) {
+        if ($item instanceof CommonITILObject && self::canView() && $item->canViewItem()) {
             self::showForItem($item);
         }
 
@@ -280,6 +280,15 @@ class Send extends CommonDBTM
 
     public static function showForItem(CommonITILObject $item): void
     {
+        // getTabNameForItem() only gates the tab's label — GLPI's generic
+        // tab dispatcher (ajax/common.tabs.php) can reach this method
+        // directly with a deterministic tab key, without going through
+        // that check. Re-checked here too so this method is safe on its
+        // own, regardless of caller.
+        if (!self::canView() || !$item->canViewItem()) {
+            return;
+        }
+
         global $DB;
 
         // Bitwarden deletes the Send itself once past this date; nothing here
@@ -314,6 +323,11 @@ class Send extends CommonDBTM
             $deletionDate    = is_string($rawDeletionDate) ? $rawDeletionDate : null;
             $row['deletion_date_display'] = $deletionDate ? Html::convDateTime($deletionDate) : '';
 
+            $rawAccessUrl = $row['access_url'] ?? null;
+            $row['access_url'] = is_string($rawAccessUrl) && $rawAccessUrl !== ''
+                ? Config::decrypt($rawAccessUrl)
+                : null;
+
             $row['is_expired'] = empty($row['is_revoked']) && $deletionDate !== null && $deletionDate < $now;
             $sends[] = $row;
         }
@@ -324,7 +338,6 @@ class Send extends CommonDBTM
             'can_create' => self::canCreate(),
             'can_update' => self::canUpdate(),
             'can_purge'  => self::canPurge(),
-            'csrf_token' => Session::getNewCSRFToken(),
         ]);
     }
 
@@ -355,7 +368,6 @@ class Send extends CommonDBTM
      *     default_name: string,
      *     conf: array<string,mixed>,
      *     followup_templates: list<array{id:int,name:string,content:string}>,
-     *     csrf_token: string,
      *     force_followup: bool
      * }
      */
@@ -380,7 +392,6 @@ class Send extends CommonDBTM
             'followup_templates' => empty($conf['allow_glpi_followup_templates'])
                 ? []
                 : self::getFollowupTemplatesForItem($item),
-            'csrf_token'         => Session::getNewCSRFToken(),
         ];
     }
 
@@ -516,7 +527,11 @@ class Send extends CommonDBTM
             'entities_id'           => $itemEntitiesId,
             'send_uuid'             => $result->uuid,
             'access_id'             => $result->accessId,
-            'access_url'            => empty($conf['store_access_url']) ? null : $result->accessUrl,
+            // The access URL's fragment carries the Send's decryption key —
+            // it is itself a bearer credential for the shared secret, not
+            // just a reference to it, so it is encrypted at rest exactly
+            // like the credentials on Config's own row.
+            'access_url'            => empty($conf['store_access_url']) ? null : Config::encrypt($result->accessUrl),
             'deletion_date'         => date('Y-m-d H:i:s', $expiration_ts),
             'max_access_count'      => $max_access > 0 ? $max_access : null,
             'is_password_protected' => $password !== '' ? 1 : 0,
