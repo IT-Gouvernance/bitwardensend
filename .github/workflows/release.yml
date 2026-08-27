@@ -12,6 +12,10 @@ name: Release on version bump
 #
 # Version strings containing a hyphen (e.g. 1.0.0-beta1) are published as a
 # GitHub pre-release automatically.
+#
+# Tags have no "v" prefix, matching the GLPI marketplace convention (see
+# pluginsGLPI plugins' own releases). Existing v1.0.0-beta1/beta2/beta3 tags
+# predate this and are left as they are — only tags from here on are bare.
 
 on:
   workflow_dispatch: {}
@@ -45,7 +49,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          if gh release view "v$VERSION" >/dev/null 2>&1; then
+          if gh release view "$VERSION" >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
@@ -70,8 +74,8 @@ jobs:
           if [[ "$VERSION" == *-* ]]; then
             prerelease_flag=(--prerelease)
           fi
-          gh release create "v$VERSION" \
+          gh release create "$VERSION" \
             "glpi-bitwardensend-$VERSION.tar.bz2" \
-            --title "v$VERSION" \
+            --title "$VERSION" \
             --generate-notes \
             "${prerelease_flag[@]}"
