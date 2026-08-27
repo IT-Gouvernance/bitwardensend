@@ -391,6 +391,8 @@ FR = {
     'the link then exists in the followup only.':
         'Désactivé, GLPI ne conserve que les métadonnées : '
         "le lien n'existe alors que dans le suivi.",
+    'You are not allowed to add a followup on this item.':
+        "Vous n'êtes pas autorisé à ajouter un suivi sur cet élément.",
     'an unlimited number of': 'un nombre illimité de',
     'day': 'jour',
     'days': 'jours',
