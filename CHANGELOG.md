@@ -108,3 +108,10 @@ Initial release. Currently shipping as `1.0.0-beta3`.
 - The error message added along with the followup authorization fix above
   ("You are not allowed to add a followup on this item.") had no French
   translation, so `tools/build-locales.py` failed. Added it.
+- The CLI driver's "Send link base URL" (the fallback used to build the
+  access link when the local API response omits it) was saved with no
+  scheme check, unlike every other configured URL. Since this one becomes
+  part of the link handed to end users rather than a URL the server itself
+  calls, a non-`http(s)` value here was a phishing/credential-harvesting
+  risk rather than an SSRF one. Now validated the same way, only when a
+  value is actually set (it stays optional).
