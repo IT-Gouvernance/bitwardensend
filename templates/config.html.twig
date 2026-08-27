@@ -142,38 +142,40 @@
                </div>
             </div>
 
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_identity_url">
-                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Identity URL', 'bitwardensend') }}
-                  <span class="text-danger">*</span>
-               </label>
-               <div class="col-md-8">
-                  <input type="text" id="cfg_native_identity_url" name="native_identity_url" class="form-control"
-                         value="{{ conf.native_identity_url }}" data-bws-required="1">
+            <div data-bws-region="custom">
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_native_identity_url">
+                     <i class="ti ti-link me-1 text-secondary"></i>{{ __('Identity URL', 'bitwardensend') }}
+                     <span class="text-danger">*</span>
+                  </label>
+                  <div class="col-md-8">
+                     <input type="text" id="cfg_native_identity_url" name="native_identity_url" class="form-control"
+                            value="{{ conf.native_identity_url }}" data-bws-required="1">
+                  </div>
                </div>
-            </div>
 
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_api_url">
-                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('API URL', 'bitwardensend') }}
-                  <span class="text-danger">*</span>
-               </label>
-               <div class="col-md-8">
-                  <input type="text" id="cfg_native_api_url" name="native_api_url" class="form-control"
-                         value="{{ conf.native_api_url }}" data-bws-required="1">
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_native_api_url">
+                     <i class="ti ti-link me-1 text-secondary"></i>{{ __('API URL', 'bitwardensend') }}
+                     <span class="text-danger">*</span>
+                  </label>
+                  <div class="col-md-8">
+                     <input type="text" id="cfg_native_api_url" name="native_api_url" class="form-control"
+                            value="{{ conf.native_api_url }}" data-bws-required="1">
+                  </div>
                </div>
-            </div>
 
-            <div class="row mb-3">
-               <label class="col-form-label col-md-4" for="cfg_native_web_vault_url">
-                  <i class="ti ti-link me-1 text-secondary"></i>{{ __('Web vault URL', 'bitwardensend') }}
-                  <span class="text-danger">*</span>
-               </label>
-               <div class="col-md-8">
-                  <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
-                         value="{{ conf.native_web_vault_url }}" data-bws-required="1">
-                  <div class="form-hint">
-                     {{ __('Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}
+               <div class="row mb-3">
+                  <label class="col-form-label col-md-4" for="cfg_native_web_vault_url">
+                     <i class="ti ti-link me-1 text-secondary"></i>{{ __('Web vault URL', 'bitwardensend') }}
+                     <span class="text-danger">*</span>
+                  </label>
+                  <div class="col-md-8">
+                     <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
+                            value="{{ conf.native_web_vault_url }}" data-bws-required="1">
+                     <div class="form-hint">
+                        {{ __('Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}
+                     </div>
                   </div>
                </div>
             </div>

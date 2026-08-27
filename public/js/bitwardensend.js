@@ -230,34 +230,58 @@
     };
 
     /**
-     * Fill the three native driver URL fields from the picked region preset.
-     * Not stored anywhere itself (#cfg_native_region has no name attribute) —
-     * it only ever writes into the three fields that already are.
+     * Show the three URL fields only for "Self-hosted / custom" — for US/EU
+     * they are a fixed, known value, not something to edit. Hidden inputs
+     * are still submitted (same reasoning as the driver toggle above), and
+     * pluginBitwardensendApplyNativeRegion() below already wrote the right
+     * values into them before this ever hides them.
+     */
+    window.pluginBitwardensendToggleNativeRegion = function () {
+        const select = document.getElementById('cfg_native_region');
+        if (!select) {
+            return;
+        }
+
+        const isCustom = select.value === 'custom';
+        const rows = document.querySelectorAll('[data-bws-region="custom"]');
+        Array.prototype.forEach.call(rows, (row) => {
+            row.style.display = isCustom ? '' : 'none';
+        });
+
+        window.pluginBitwardensendUpdateRequiredFields();
+    };
+
+    /**
+     * Fill the three native driver URL fields from the picked region preset,
+     * then show/hide them accordingly. Not stored anywhere itself
+     * (#cfg_native_region has no name attribute) — it only ever writes into
+     * the three fields that already are.
      */
     window.pluginBitwardensendApplyNativeRegion = function () {
         const select = document.getElementById('cfg_native_region');
         const preset = select && NATIVE_REGION_PRESETS[select.value];
-        if (!preset) {
-            return;
+        if (preset) {
+            const identity = document.getElementById('cfg_native_identity_url');
+            const api = document.getElementById('cfg_native_api_url');
+            const webVault = document.getElementById('cfg_native_web_vault_url');
+            if (identity) {
+                identity.value = preset.identity;
+            }
+            if (api) {
+                api.value = preset.api;
+            }
+            if (webVault) {
+                webVault.value = preset.webVault;
+            }
         }
 
-        const identity = document.getElementById('cfg_native_identity_url');
-        const api = document.getElementById('cfg_native_api_url');
-        const webVault = document.getElementById('cfg_native_web_vault_url');
-        if (identity) {
-            identity.value = preset.identity;
-        }
-        if (api) {
-            api.value = preset.api;
-        }
-        if (webVault) {
-            webVault.value = preset.webVault;
-        }
+        window.pluginBitwardensendToggleNativeRegion();
     };
 
     /**
      * Preselect #cfg_native_region on load by matching the three stored URLs
-     * against the known presets — "custom" (self-hosted) when none match.
+     * against the known presets ("custom"/self-hosted when none match), then
+     * show/hide them to match.
      */
     window.pluginBitwardensendSyncNativeRegion = function () {
         const select = document.getElementById('cfg_native_region');
@@ -275,6 +299,8 @@
                 && preset.webVault === webVault.value;
         });
         select.value = match || 'custom';
+
+        window.pluginBitwardensendToggleNativeRegion();
     };
 
     /**
