@@ -231,10 +231,12 @@
 
     /**
      * Show the three URL fields only for "Self-hosted / custom" — for US/EU
-     * they are a fixed, known value, not something to edit. Hidden inputs
-     * are still submitted (same reasoning as the driver toggle above), and
-     * pluginBitwardensendApplyNativeRegion() below already wrote the right
-     * values into them before this ever hides them.
+     * they are a fixed, known value, not something to edit. The "pre-fills"
+     * hint is the opposite: only meaningful while a preset is actually about
+     * to fill something in, not once the fields are already shown for
+     * editing. Hidden inputs are still submitted (same reasoning as the
+     * driver toggle above), and pluginBitwardensendApplyNativeRegion() below
+     * already wrote the right values into them before this ever hides them.
      */
     window.pluginBitwardensendToggleNativeRegion = function () {
         const select = document.getElementById('cfg_native_region');
@@ -243,9 +245,11 @@
         }
 
         const isCustom = select.value === 'custom';
-        const rows = document.querySelectorAll('[data-bws-region="custom"]');
-        Array.prototype.forEach.call(rows, (row) => {
+        Array.prototype.forEach.call(document.querySelectorAll('[data-bws-region="custom"]'), (row) => {
             row.style.display = isCustom ? '' : 'none';
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('[data-bws-region="preset"]'), (row) => {
+            row.style.display = isCustom ? 'none' : '';
         });
 
         window.pluginBitwardensendUpdateRequiredFields();
