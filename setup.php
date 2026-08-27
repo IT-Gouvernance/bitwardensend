@@ -41,7 +41,7 @@ use GlpiPlugin\Bitwardensend\Config;
 use GlpiPlugin\Bitwardensend\Profile;
 use GlpiPlugin\Bitwardensend\Send;
 
-define('PLUGIN_BITWARDENSEND_VERSION', '1.0.0-beta2');
+define('PLUGIN_BITWARDENSEND_VERSION', '1.0.0-beta3');
 define('PLUGIN_BITWARDENSEND_MIN_GLPI', '11.0.0');
 define('PLUGIN_BITWARDENSEND_MAX_GLPI', '11.0.99');
 
