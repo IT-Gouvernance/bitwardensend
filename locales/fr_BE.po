@@ -25,19 +25,19 @@ msgstr "(Configuration > Actions automatiques)."
 msgid "0 means unlimited until expiration."
 msgstr "0 signifie illimité jusqu'à l'expiration."
 
-#: src/Config.php:205, templates/config.html.twig:144
+#: src/Config.php:238, templates/config.html.twig:144
 msgid "API URL"
 msgstr "URL de l'API"
 
-#: src/Config.php:207, templates/config.html.twig:169
+#: src/Config.php:250, templates/config.html.twig:169
 msgid "API client ID"
 msgstr "ID client de l'API"
 
-#: src/Config.php:222, templates/config.html.twig:180
+#: src/Config.php:265, templates/config.html.twig:180
 msgid "API client secret"
 msgstr "Secret client de l'API"
 
-#: src/Config.php:208, templates/config.html.twig:200
+#: src/Config.php:251, templates/config.html.twig:200
 msgid "Account email"
 msgstr "E-mail du compte"
 
@@ -74,11 +74,11 @@ msgstr "L'URL de l'API Bitwarden n'est pas configurée"
 msgid "Bitwarden API client credentials are not configured."
 msgstr "Les identifiants client de l'API Bitwarden ne sont pas configurés."
 
-#: src/NativeSendDriver.php:438
+#: src/NativeSendDriver.php:445
 msgid "Bitwarden API error: %s"
 msgstr "Erreur de l'API Bitwarden : %s"
 
-#: src/Send.php:523
+#: src/Send.php:560
 msgid "Bitwarden Send link created: %s"
 msgstr "Lien Bitwarden Send créé : %s"
 
@@ -110,19 +110,19 @@ msgstr "L'URL d'identité Bitwarden n'est pas configurée."
 msgid "CLI / bw serve — recommended"
 msgstr "CLI / bw serve — recommandé"
 
-#: src/CliSendDriver.php:293, src/NativeSendDriver.php:426
+#: src/CliSendDriver.php:303, src/NativeSendDriver.php:433
 msgid "Cannot reach the Bitwarden API (%s)"
 msgstr "Impossible de joindre l'API Bitwarden (%s)"
 
-#: front/config.form.php:47
+#: front/config.form.php:48
 msgid "Configuration not saved: required fields are missing: %s"
 msgstr "Configuration non enregistrée : champs obligatoires manquants : %s"
 
-#: front/config.form.php:54
+#: front/config.form.php:55
 msgid "Configuration saved."
 msgstr "Configuration enregistrée."
 
-#: front/config.form.php:68
+#: front/config.form.php:69
 msgid "Connected, vault unlocked. The plugin is ready to use."
 msgstr "Connexion établie, coffre déverrouillé. Le plugin est opérationnel."
 
@@ -134,11 +134,11 @@ msgstr "Contenu à partager"
 msgid "Copy link"
 msgstr "Copier le lien"
 
-#: src/Send.php:447
+#: src/Send.php:475
 msgid "Could not compute the expiration date."
 msgstr "Impossible de calculer la date d'expiration."
 
-#: src/Send.php:481
+#: src/Send.php:509
 msgid "Could not create the Send: %s"
 msgstr "Échec de la création du Send : %s"
 
@@ -147,15 +147,15 @@ msgid "Could not decrypt the account user key: wrong master password?"
 msgstr ""
 "Impossible de déchiffrer la clé utilisateur du compte : mot de passe maître incorrect ?"
 
-#: src/Send.php:620
+#: src/Send.php:657
 msgid "Could not revoke the link: %s"
 msgstr "Échec de la révocation du lien : %s"
 
-#: front/config.form.php:56
+#: front/config.form.php:57
 msgid "Could not save the configuration."
 msgstr "Échec de l'enregistrement de la configuration."
 
-#: src/Profile.php:228
+#: src/Profile.php:227
 msgid "Could not update the rights."
 msgstr "Échec de la mise à jour des droits."
 
@@ -167,7 +167,7 @@ msgstr "Créer des liens Send"
 msgid "Create link"
 msgstr "Créer le lien"
 
-#: src/Send.php:777, templates/list.html.twig:50
+#: src/Send.php:814, templates/list.html.twig:50
 msgid "Created by"
 msgstr "Créé par"
 
@@ -183,7 +183,7 @@ msgstr "Expiration par défaut (jours)"
 msgid "Default maximum views"
 msgstr "Nombre maximal d'ouvertures par défaut"
 
-#: hook.php:138, src/Send.php:651
+#: hook.php:138, src/Send.php:688
 msgid ""
 "Delete revoked or expired Bitwarden Send entries past the configured retention"
 msgstr ""
@@ -219,7 +219,7 @@ msgid ""
 msgstr ""
 "Chiffré avec la clé GLPI. Sert à déverrouiller automatiquement le coffre. Laissez vide si vous déverrouillez le service vous-même."
 
-#: src/Send.php:789, templates/list.html.twig:52
+#: src/Send.php:826, templates/list.html.twig:52
 msgid "Expiration"
 msgstr "Expiration"
 
@@ -300,11 +300,11 @@ msgstr "Masquer par défaut l'adresse e-mail de l'expéditeur"
 msgid "Hide the text by default when opened"
 msgstr "Masquer le texte par défaut à l'ouverture"
 
-#: src/Config.php:204, templates/config.html.twig:133
+#: src/Config.php:237, templates/config.html.twig:133
 msgid "Identity URL"
 msgstr "URL d'identité"
 
-#: ajax/form.php:54, src/Send.php:415
+#: ajax/form.php:54, src/Send.php:426
 msgid "Item not found or access denied."
 msgstr "Élément introuvable ou accès refusé."
 
@@ -332,7 +332,7 @@ msgstr "Options du lien"
 msgid "Link password (optional)"
 msgstr "Mot de passe du lien (facultatif)"
 
-#: src/Send.php:635
+#: src/Send.php:672
 msgid "Link revoked."
 msgstr "Lien révoqué."
 
@@ -340,7 +340,7 @@ msgstr "Lien révoqué."
 msgid "Local API (bw serve) — recommended"
 msgstr "API locale (bw serve) — recommandé"
 
-#: src/Config.php:197, templates/config.html.twig:70
+#: src/Config.php:230, templates/config.html.twig:70
 msgid "Local API URL"
 msgstr "URL de l'API locale"
 
@@ -348,7 +348,7 @@ msgstr "URL de l'API locale"
 msgid "Lowercase"
 msgstr "Minuscules"
 
-#: src/Config.php:229, templates/config.html.twig:90, templates/config.html.twig:211
+#: src/Config.php:272, templates/config.html.twig:90, templates/config.html.twig:211
 msgid "Master password"
 msgstr "Mot de passe maître"
 
@@ -382,7 +382,7 @@ msgstr "Aucun lien Bitwarden Send n'a encore été créé pour cet élément."
 msgid "No master password is configured for the native driver."
 msgstr "Aucun mot de passe maître n'est configuré pour le driver natif."
 
-#: src/Profile.php:190
+#: src/Profile.php:189
 msgid "No profile selected."
 msgstr "Aucun profil sélectionné."
 
@@ -442,7 +442,7 @@ msgstr "Suivi privé par défaut"
 msgid "Replace the current text? Your changes will be lost."
 msgstr "Remplacer le texte actuel ? Vos modifications seront perdues."
 
-#: src/Send.php:655
+#: src/Send.php:692
 msgid "Retention (days)"
 msgstr "Rétention (jours)"
 
@@ -458,11 +458,11 @@ msgstr "Révoquer des liens Send"
 msgid "Revoke this link?"
 msgstr "Révoquer ce lien ?"
 
-#: src/Send.php:795, templates/list.html.twig:80
+#: src/Send.php:832, templates/list.html.twig:80
 msgid "Revoked"
 msgstr "Révoqué"
 
-#: src/Profile.php:247
+#: src/Profile.php:246
 msgid "Rights updated."
 msgstr "Droits mis à jour."
 
@@ -524,15 +524,15 @@ msgid "The Bitwarden vault is locked and no master password is configured."
 msgstr ""
 "Le coffre Bitwarden est verrouillé et aucun mot de passe maître n'est configuré."
 
-#: src/CliSendDriver.php:364
+#: src/CliSendDriver.php:374
 msgid "The Send was created but no access link was returned."
 msgstr "Le Send a été créé mais aucun lien d'accès n'a été retourné."
 
-#: src/Send.php:597
+#: src/Send.php:634
 msgid "The Send was created but the followup could not be added."
 msgstr "Le Send a été créé mais le suivi n'a pas pu être ajouté."
 
-#: src/Send.php:426
+#: src/Send.php:454
 msgid "The content to share is empty."
 msgstr "Le contenu à partager est vide."
 
@@ -546,13 +546,13 @@ msgid ""
 msgstr ""
 "Les droits ci-dessous nécessitent celui-ci : chaque action de l'onglet le vérifie en premier."
 
-#: front/config.form.php:82
+#: front/config.form.php:83
 msgid ""
 "The service answers but no account is logged in. Run \"bw login --apikey\" on the server as the service user."
 msgstr ""
 "Le service répond mais aucun compte n'est connecté. Exécutez « bw login --apikey » sur le serveur avec l'utilisateur du service."
 
-#: front/config.form.php:73
+#: front/config.form.php:74
 msgid ""
 "The service answers but the vault is locked. Set the master password below so the plugin can unlock it, or unlock the service manually on the server."
 msgstr ""
@@ -587,15 +587,15 @@ msgstr "Impossible d'encoder le corps de la requête"
 msgid "Unable to initialize cURL"
 msgstr "Impossible d'initialiser cURL"
 
-#: src/CliSendDriver.php:301, src/NativeSendDriver.php:448
+#: src/CliSendDriver.php:311, src/NativeSendDriver.php:455
 msgid "Unexpected response from the Bitwarden API (HTTP %d)"
 msgstr "Réponse inattendue de l'API Bitwarden (HTTP %d)"
 
-#: front/config.form.php:91
+#: front/config.form.php:92
 msgid "Unexpected vault status: %s"
 msgstr "État du coffre inattendu : %s"
 
-#: src/CliSendDriver.php:340
+#: src/CliSendDriver.php:350
 msgid "Unknown Bitwarden API error"
 msgstr "Erreur inconnue de l'API Bitwarden"
 
@@ -607,7 +607,7 @@ msgstr "Identifiant de Send inconnu"
 msgid "Unlimited"
 msgstr "Illimité"
 
-#: ajax/form.php:46, src/Send.php:405
+#: ajax/form.php:46, src/Send.php:416
 msgid "Unsupported item type."
 msgstr "Type d'élément non pris en charge."
 
@@ -625,7 +625,7 @@ msgid ""
 msgstr ""
 "Variables : {url} (lien prêt à cliquer), {url_raw} (juste l'adresse, pour votre propre lien), {expiration}, {max_access}"
 
-#: src/Config.php:206, templates/config.html.twig:155
+#: src/Config.php:239, templates/config.html.twig:155
 msgid "Web vault URL"
 msgstr "URL du coffre web"
 
@@ -635,7 +635,11 @@ msgid ""
 msgstr ""
 "Désactivé, GLPI ne conserve que les métadonnées : le lien n'existe alors que dans le suivi."
 
-#: src/Send.php:578, templates/_send_form_fields.html.twig:199
+#: src/Send.php:443
+msgid "You are not allowed to add a followup on this item."
+msgstr "Vous n'êtes pas autorisé à ajouter un suivi sur cet élément."
+
+#: src/Send.php:615, templates/_send_form_fields.html.twig:199
 msgid "an unlimited number of"
 msgstr "un nombre illimité de"
 
