@@ -101,3 +101,6 @@ Initial release.
   explicitly with `canAddFollowups()` before creating the Send at all, and
   the "private" flag is only honored when the requesting user actually has
   the right to see private followups.
+- The error message added along with the followup authorization fix above
+  ("You are not allowed to add a followup on this item.") had no French
+  translation, so `tools/build-locales.py` failed. Added it.
