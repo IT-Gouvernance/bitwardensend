@@ -315,7 +315,8 @@ FR = {
     'The link will no longer be viewable. This cannot be undone.':
         'Le lien ne sera plus consultable. Cette action est irréversible.',
     'Revoked': 'Révoqué',
-    'The three URLs are set automatically.': 'Les trois URL sont renseignées automatiquement.',
+    'Configured automatically with the default URLs.':
+        'Configuré automatiquement avec les URL par défaut.',
     'Self-hosted / custom': 'Auto-hébergé / personnalisé',
     'Server': 'Serveur',
     'US — bitwarden.com': 'US — bitwarden.com',
