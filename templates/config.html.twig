@@ -131,6 +131,8 @@
             <div class="row mb-3">
                <label class="col-form-label col-md-4" for="cfg_native_region">
                   <i class="ti ti-world me-1 text-secondary"></i>{{ __('Server', 'bitwardensend') }}
+                  <i class="ti ti-info-circle text-secondary ms-1"
+                     title="{{ __('Bitwarden.com and bitwarden.eu are separate platforms — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}"></i>
                </label>
                <div class="col-md-8">
                   <select id="cfg_native_region" class="form-select">
@@ -173,9 +175,6 @@
                   <div class="col-md-8">
                      <input type="text" id="cfg_native_web_vault_url" name="native_web_vault_url" class="form-control"
                             value="{{ conf.native_web_vault_url }}" data-bws-required="1">
-                     <div class="form-hint">
-                        {{ __('Self-hosted: adjust these three URLs. Bitwarden.com and bitwarden.eu are separate — an account on one does not work with the other\'s URLs.', 'bitwardensend') }}
-                     </div>
                   </div>
                </div>
             </div>
