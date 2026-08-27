@@ -7,7 +7,7 @@ for why the version string matters beyond being a label).
 
 ## [1.0.0] - Unreleased
 
-Initial release.
+Initial release. Currently shipping as `1.0.0-beta3`.
 
 ### Added
 
