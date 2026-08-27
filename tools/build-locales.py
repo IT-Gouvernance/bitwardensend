@@ -318,6 +318,8 @@ FR = {
     'Configured automatically with the default URLs.':
         'Configuré automatiquement avec les URL par défaut.',
     'Self-hosted / custom': 'Auto-hébergé / personnalisé',
+    'Self-hosted / custom: adjust these three URLs above.':
+        'Auto-hébergé / personnalisé : ajustez ces trois URL ci-dessus.',
     'Server': 'Serveur',
     'US — bitwarden.com': 'US — bitwarden.com',
     'EU — bitwarden.eu': 'EU — bitwarden.eu',
