@@ -2,12 +2,15 @@
 
 All notable changes to this plugin are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); this project is pre-1.0 and currently
-ships as `1.0.0-betaN` pre-releases (see [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md)
-for why the version string matters beyond being a label).
+ships as `1.0.0-betaN`/`1.0.0-rcN` pre-releases (see
+[docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
+beyond being a label). No upgrade path is supported between pre-releases yet, betas or
+RCs alike — reinstall rather than upgrade in place; a real migration path arrives with
+the first stable 1.0.0.
 
 ## [1.0.0] - Unreleased
 
-Initial release. Currently shipping as `1.0.0-beta3`.
+Initial release. Currently shipping as `1.0.0-rc1`.
 
 ### Added
 
