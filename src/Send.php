@@ -643,6 +643,39 @@ class Send extends CommonDBTM
     // ------------------------------------------------------------------
 
     /**
+     * A still-active Send (never revoked, not past its own expiration) is
+     * revoked on the Bitwarden side before its local row is purged — the
+     * "Delete" action in the tab only ever offers that button once a Send
+     * is already revoked or expired (templates/list.html.twig), but this is
+     * the endpoint's own guarantee, independent of what the UI happens to
+     * show or which caller reaches delete() (front/send.form.php only
+     * today, but not the only path CommonDBTM exposes). Without this, a
+     * purge of an active Send would drop GLPI's only record of it
+     * (send_uuid) while the Bitwarden Send itself keeps working for
+     * whoever still has the link, for up to its full 31-day expiration cap
+     * with no way left to revoke or even notice it.
+     *
+     * revoke() itself reports the error and leaves the row untouched when
+     * the Bitwarden side can't be reached, which aborts the purge here too
+     * (returning false from pre_deleteItem() blocks the delete).
+     */
+    public function pre_deleteItem(): bool
+    {
+        if (!empty($this->fields['is_revoked'])) {
+            return true;
+        }
+
+        $rawDeletionDate = $this->fields['deletion_date'] ?? null;
+        $deletionDate    = is_string($rawDeletionDate) ? $rawDeletionDate : null;
+        $now             = $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s');
+        if ($deletionDate !== null && $deletionDate < $now) {
+            return true;
+        }
+
+        return $this->revoke();
+    }
+
+    /**
      * Delete the link on the Bitwarden side, then flag the row as revoked.
      */
     public function revoke(): bool

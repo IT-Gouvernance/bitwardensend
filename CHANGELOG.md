@@ -122,3 +122,13 @@ Initial release. Currently shipping as `1.0.0-beta3`.
   calls, a non-`http(s)` value here was a phishing/credential-harvesting
   risk rather than an SSRF one. Now validated the same way, only when a
   value is actually set (it stays optional).
+- Deleting a Send from the tab only ever required the plugin's PURGE right
+  and the parent item's visibility — nothing checked whether the Send was
+  actually revoked or expired first, unlike the "Delete" button itself,
+  which the list only ever shows for one of those two states. Deleting a
+  still-active Send dropped GLPI's only record of it (`send_uuid`) while
+  the Bitwarden Send kept working for anyone who already had the link, for
+  up to its full expiration, with no way left to revoke it or even notice
+  it existed. `Send::pre_deleteItem()` now revokes an active Send on the
+  Bitwarden side before its local row can be purged, and blocks the purge
+  entirely if that revoke fails.
