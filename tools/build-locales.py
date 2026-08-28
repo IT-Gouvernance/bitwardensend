@@ -198,8 +198,8 @@ FR = {
         "L'URL d'identité Bitwarden n'est pas configurée.",
     'Cannot reach the Bitwarden API (%s)': "Impossible de joindre l'API Bitwarden (%s)",
     'CLI / bw serve — recommended': 'CLI / bw serve — recommandé',
-    'Configuration not saved: required fields are missing: %s':
-        "Configuration non enregistrée : champs obligatoires manquants : %s",
+    'Configuration not saved: check these fields: %s':
+        "Configuration non enregistrée : vérifiez ces champs : %s",
     'Configuration saved.': 'Configuration enregistrée.',
     'Connected, vault unlocked. The plugin is ready to use.':
         'Connexion établie, coffre déverrouillé. Le plugin est opérationnel.',

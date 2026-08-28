@@ -230,6 +230,18 @@ class Config extends CommonDBTM
                 $errors[] = __('Local API URL', 'bitwardensend');
             }
 
+            // Optional (falls back to Bitwarden's own cloud URL when empty),
+            // so unlike the URLs above this one is not rejected for being
+            // blank - only for having an actual value with a bad scheme.
+            // The server never fetches it, but CliSendDriver::normalize()
+            // uses it verbatim as the base of the link handed to end users,
+            // so a non-http(s) value here is still worth refusing outright.
+            $rawSendBaseUrl = $input['send_base_url'] ?? '';
+            $sendBaseUrl    = is_string($rawSendBaseUrl) ? $rawSendBaseUrl : '';
+            if (trim($sendBaseUrl) !== '' && !self::hasHttpScheme($sendBaseUrl)) {
+                $errors[] = __('Send link base URL', 'bitwardensend');
+            }
+
             return $errors;
         }
 

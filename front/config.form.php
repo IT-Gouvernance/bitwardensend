@@ -40,13 +40,16 @@ Session::checkRight('config', UPDATE);
 // here would always fail.
 
 if (isset($_POST['update'])) {
-    $missingFields = Config::validateInput($_POST);
+    // Despite the variable's name, this can also flag a field that isn't
+    // empty but has an invalid value (send_base_url's scheme) - see
+    // Config::validateInput().
+    $invalidFields = Config::validateInput($_POST);
 
-    if ($missingFields !== []) {
+    if ($invalidFields !== []) {
         Session::addMessageAfterRedirect(
             sprintf(
-                __('Configuration not saved: required fields are missing: %s', 'bitwardensend'),
-                implode(', ', $missingFields),
+                __('Configuration not saved: check these fields: %s', 'bitwardensend'),
+                implode(', ', $invalidFields),
             ),
             false,
             ERROR,

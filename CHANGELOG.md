@@ -115,34 +115,10 @@ Initial release. Currently shipping as `1.0.0-beta3`.
 - The error message added along with the followup authorization fix above
   ("You are not allowed to add a followup on this item.") had no French
   translation, so `tools/build-locales.py` failed. Added it.
-- `Send::displayTabContentForItem()` and `Config::displayTabContentForItem()`
-  rendered their tab's content without re-checking the plugin's right —
-  `getTabNameForItem()` only gates the tab's label, not its content, and
-  GLPI's generic tab dispatcher (`ajax/common.tabs.php`) can reach the
-  content method directly with a deterministic tab key. Both methods (and
-  `Send::showForItem()`, which the first one calls) now check the right
-  themselves instead of relying on the label check having already run.
-- With "Keep the link in the GLPI database" enabled, the stored access URL
-  was plain text — but a Bitwarden Send URL carries its decryption key in
-  the fragment, so that column held a live, directly usable credential for
-  the shared secret, unlike every other secret this plugin stores (all
-  already encrypted with the GLPI key). Now encrypted the same way. Any
-  access URL already stored before this change will stop showing a copy
-  button (it can no longer be decrypted) — it still works as a Send until it
-  is revoked or expires on its own.
-- Revoking or purging a Send only checked the Send record's own entity
-  (`canUpdateItem()`/`canPurgeItem()`), not whether the requesting user can
-  actually see the ticket/change/problem it is attached to. `front/send.form.php`
-  now also resolves that parent item and requires `canViewItem()` on it before
-  acting, the same check `createFromInput()` already applies on the creation
-  side.
-- `Config` did not declare `$undisclosedFields`, so its three encrypted
-  secret columns were not masked out anywhere core relies on that property
-  (the REST API's item/search/list output, `Dropdown`/`Link` rendering).
-  Declared it, matching how core's own `AuthLDAP`/`APIClient` do it.
-- Neither Send driver constrained which URL scheme its cURL handle would
-  follow, and the configuration form only checked that the API/identity/web
-  vault URL fields were non-empty, not that they were actually `http(s)`.
-  Both drivers now set `CURLOPT_PROTOCOLS` to `http`/`https` only, and
-  `Config::validateInput()` rejects any other scheme (`file://`,
-  `gopher://`, ...) before it is ever saved.
+- The CLI driver's "Send link base URL" (the fallback used to build the
+  access link when the local API response omits it) was saved with no
+  scheme check, unlike every other configured URL. Since this one becomes
+  part of the link handed to end users rather than a URL the server itself
+  calls, a non-`http(s)` value here was a phishing/credential-harvesting
+  risk rather than an SSRF one. Now validated the same way, only when a
+  value is actually set (it stays optional).
