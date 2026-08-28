@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: bitwardensend 1.0.0-beta3\n"
+"Project-Id-Version: bitwardensend 1.0.0-rc1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-31 00:00+0000\n"
 "PO-Revision-Date: 2026-07-31 00:00+0000\n"
@@ -193,7 +193,7 @@ msgstr "Expiration par défaut (jours)"
 msgid "Default maximum views"
 msgstr "Nombre maximal d'ouvertures par défaut"
 
-#: hook.php:138, src/Send.php:721
+#: hook.php:145, src/Send.php:721
 msgid ""
 "Delete revoked or expired Bitwarden Send entries past the configured retention"
 msgstr ""
