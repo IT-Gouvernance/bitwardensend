@@ -458,6 +458,12 @@
             node.remove();
         });
 
+        // Matched by local name (after any "prefix:"), not just the bare
+        // name: SVG's <a> uses xlink:href, whose attr.name is the literal
+        // string "xlink:href" - it would otherwise match neither 'href' nor
+        // 'src' and sail through untouched.
+        const navigatingAttributes = ['href', 'src', 'action', 'formaction', 'poster', 'data'];
+
         const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT);
         let node = walker.currentNode;
         while (node) {
@@ -469,7 +475,9 @@
                     node.removeAttribute(attr.name);
                     return;
                 }
-                if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(attr.value)) {
+                const localName = name.replace(/^[^:]+:/, '');
+                if (navigatingAttributes.indexOf(localName) !== -1
+                    && /^\s*(javascript|data|vbscript):/i.test(attr.value)) {
                     node.removeAttribute(attr.name);
                 }
             });
