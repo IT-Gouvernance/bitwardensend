@@ -366,7 +366,15 @@ class Send extends CommonDBTM
      *     itemtype: string,
      *     items_id: int,
      *     default_name: string,
-     *     conf: array<string,mixed>,
+     *     conf: array{
+     *         password_generator_enabled: mixed,
+     *         default_deletion_days: mixed,
+     *         default_max_access_count: mixed,
+     *         default_hide_email: mixed,
+     *         add_followup: mixed,
+     *         followup_is_private: mixed,
+     *         followup_template: string
+     *     },
      *     followup_templates: list<array{id:int,name:string,content:string}>,
      *     force_followup: bool
      * }
@@ -381,13 +389,31 @@ class Send extends CommonDBTM
         // between paragraphs would otherwise collapse into a single run-on
         // paragraph the first time this form renders.
         $rawFollowupTemplate = $conf['followup_template'] ?? '';
-        $conf['followup_template'] = nl2br(htmlspecialchars(is_string($rawFollowupTemplate) ? $rawFollowupTemplate : ''));
+        $followupTemplate    = nl2br(htmlspecialchars(is_string($rawFollowupTemplate) ? $rawFollowupTemplate : ''));
+
+        // Only what _send_form_fields.html.twig actually reads — not the
+        // full config row, which also holds the encrypted credential
+        // fields (master_password, native_client_secret,
+        // native_master_password). This becomes $subitem below, which
+        // GLPI core's timeline machinery gets handed directly
+        // (getTimelineAnswerActions()) - core is not expected to ever
+        // serialize it, but there is no reason to hand it ciphertext it
+        // has no use for either.
+        $formConf = [
+            'password_generator_enabled' => $conf['password_generator_enabled'] ?? 1,
+            'default_deletion_days'      => $conf['default_deletion_days'] ?? 7,
+            'default_max_access_count'   => $conf['default_max_access_count'] ?? 1,
+            'default_hide_email'         => $conf['default_hide_email'] ?? 0,
+            'add_followup'               => $conf['add_followup'] ?? 1,
+            'followup_is_private'        => $conf['followup_is_private'] ?? 0,
+            'followup_template'          => $followupTemplate,
+        ];
 
         return [
             'itemtype'           => $item->getType(),
             'items_id'           => $item->getID(),
             'default_name'       => sprintf('%s #%d', $item->getTypeName(1), $item->getID()),
-            'conf'               => $conf,
+            'conf'               => $formConf,
             'force_followup'     => $forceFollowup,
             'followup_templates' => empty($conf['allow_glpi_followup_templates'])
                 ? []
