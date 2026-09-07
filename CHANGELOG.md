@@ -181,3 +181,5 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   `javascript:`. The `data:` addition can hide a pasted inline image in the
   live preview (harmless — the real, submitted followup is unaffected, only
   this preview rendering).
+- `bitwardensend.xml`'s `<tags>` gained an `<en>` and a `<fr>` block but no
+  `<es>` one when Spanish support was added. Added it.
