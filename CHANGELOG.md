@@ -172,3 +172,12 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   of these at a remote host while leaving it on `http://` sent that secret
   in the clear. `http://` is now only accepted for a loopback host
   (`127.0.0.1`, `::1`, `localhost`); anything else must be `https://`.
+- The followup preview sanitizer's scheme check only matched the exact
+  attribute names `href`/`src`, so an SVG `<a xlink:href="javascript:...">`
+  (whose attribute name is literally `xlink:href`) sailed through untouched.
+  Now matched by local name (after any `prefix:`), covers a few more
+  navigating attributes (`action`, `formaction`, `poster`, `data`), and the
+  blocked-scheme pattern also covers `data:`/`vbscript:`, not just
+  `javascript:`. The `data:` addition can hide a pasted inline image in the
+  live preview (harmless — the real, submitted followup is unaffected, only
+  this preview rendering).
