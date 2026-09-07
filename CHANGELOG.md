@@ -135,6 +135,13 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   it existed. `Send::pre_deleteItem()` now revokes an active Send on the
   Bitwarden side before its local row can be purged, and blocks the purge
   entirely if that revoke fails.
+- The followup live preview assigned the rich text editor's content to
+  `innerHTML` as-is. The plain `<textarea>` fallback was already escaped
+  first, but the TinyMCE path was not — and that content can come from a
+  GLPI followup template authored by anyone holding `itilfollowuptemplate`
+  UPDATE, not only an admin. Both paths now go through a small sanitizer
+  (parses into a detached document, strips `<script>`/`<iframe>`/etc.,
+  `on*` attributes and `javascript:` hrefs/srcs) before reaching the page.
 - `Profile::displayTabContentForItem()` was the one tab-content method in the
   plugin that did not re-check its own right — `Config`'s and `Send`'s
   already do, since `getTabNameForItem()` only gates the tab's label, not
