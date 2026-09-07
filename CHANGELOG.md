@@ -135,3 +135,8 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   it existed. `Send::pre_deleteItem()` now revokes an active Send on the
   Bitwarden side before its local row can be purged, and blocks the purge
   entirely if that revoke fails.
+- The Send creation form's context (`Send::buildFormContext()`) carried the
+  entire configuration row, including the encrypted credential fields
+  (`master_password`, `native_client_secret`, `native_master_password`) —
+  only seven non-secret settings are actually used by the form. It now
+  passes just those.
