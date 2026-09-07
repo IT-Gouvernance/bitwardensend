@@ -160,6 +160,14 @@ TPL_FR = ("Bonjour,\n\n"
           "Ce lien expire le {expiration} et peut être ouvert {max_access} fois.\n\n"
           "Cordialement,")
 
+TPL_ES = ("Hola,\n\n"
+          "Aquí tiene un enlace seguro para recuperar la información confidencial "
+          "de esta solicitud:\n\n"
+          "{url}\n\n"
+          "El enlace caduca el {expiration} y puede abrirse un máximo de "
+          "{max_access} veces.\n\n"
+          "Saludos cordiales,")
+
 FR = {
     '(Setup > Automatic actions).':
         '(Configuration > Actions automatiques).',
@@ -411,33 +419,290 @@ FR = {
 # Brand name: kept identical in both forms.
 FR_PLURAL = {('Bitwarden Send', 'Bitwarden Sends'): ('Bitwarden Send', 'Bitwarden Sends')}
 
-HEADER_PO = '''# French translation for the GLPI Bitwarden Send plugin.
-# Copyright (C) 2026
-# This file is distributed under the same license as the plugin.
-#
-msgid ""
-msgstr ""
-"Project-Id-Version: bitwardensend __VERSION__\\n"
-"Report-Msgid-Bugs-To: \\n"
-"POT-Creation-Date: 2026-07-31 00:00+0000\\n"
-"PO-Revision-Date: 2026-07-31 00:00+0000\\n"
-"Last-Translator: \\n"
-"Language-Team: French\\n"
-"Language: fr_FR\\n"
-"MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
-"Content-Transfer-Encoding: 8bit\\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\\n"
-'''
+ES = {
+    '(Setup > Automatic actions).':
+        '(Configuración > Acciones automáticas).',
+    '0 means unlimited until expiration.':
+        '0 significa ilimitado hasta la expiración.',
+    'API URL': 'URL de la API',
+    'API client ID': 'ID de cliente de la API',
+    'API client secret': 'Secreto de cliente de la API',
+    'Account email': 'Correo electrónico de la cuenta',
+    'Active': 'Activo',
+    'Advanced options': 'Opciones avanzadas',
+    'Allow choosing a GLPI followup template when creating a Send':
+        'Permitir elegir una plantilla de seguimiento de GLPI al crear un Send',
+    'Automatic deletion of revoked or expired entries is configured on the automatic action':
+        'La eliminación automática de las entradas revocadas o caducadas se configura en la acción automática',
+    'Available variables: {url} (ready-to-click link), {url_raw} (just the address, '
+    'for your own link), {expiration}, {max_access}':
+        'Variables disponibles: {url} (enlace listo para usar), {url_raw} (solo la '
+        'dirección, para su propio enlace), {expiration}, {max_access}',
+    'Bitwarden API URL is not configured':
+        'La URL de la API de Bitwarden no está configurada',
+    'Bitwarden API client credentials are not configured.':
+        'Las credenciales de cliente de la API de Bitwarden no están configuradas.',
+    'Bitwarden API error: %s': 'Error de la API de Bitwarden: %s',
+    'Bitwarden Send link created: %s': 'Enlace de Bitwarden Send creado: %s',
+    'Bitwarden connection': 'Conexión con Bitwarden',
+    'Bitwarden did not return KDF parameters.':
+        'Bitwarden no devolvió los parámetros KDF.',
+    'Bitwarden did not return a Send id/accessId':
+        'Bitwarden no devolvió un id/accessId de Send',
+    'Bitwarden did not return an access token.':
+        'Bitwarden no devolvió un token de acceso.',
+    'Bitwarden did not return the account user key.':
+        'Bitwarden no devolvió la clave de usuario de la cuenta.',
+    'Bitwarden identity URL is not configured.':
+        'La URL de identidad de Bitwarden no está configurada.',
+    'Cannot reach the Bitwarden API (%s)': 'No se puede acceder a la API de Bitwarden (%s)',
+    'CLI / bw serve — recommended': 'CLI / bw serve — recomendado',
+    'Configuration not saved: check these fields: %s':
+        'Configuración no guardada: revise estos campos: %s',
+    'Configuration saved.': 'Configuración guardada.',
+    'Connected, vault unlocked. The plugin is ready to use.':
+        'Conectado, bóveda desbloqueada. El plugin está listo para usarse.',
+    'Content to share': 'Contenido a compartir',
+    'Copy link': 'Copiar enlace',
+    'Could not compute the expiration date.':
+        'No se pudo calcular la fecha de expiración.',
+    'Could not create the Send: %s': 'No se pudo crear el Send: %s',
+    'Could not decrypt the account user key: wrong master password?':
+        'No se pudo descifrar la clave de usuario de la cuenta: ¿contraseña maestra incorrecta?',
+    'Could not revoke the link: %s': 'No se pudo revocar el enlace: %s',
+    'Could not save the configuration.': 'No se pudo guardar la configuración.',
+    'Create link': 'Crear enlace',
+    'Created by': 'Creado por',
+    'Decrypted user key has an unexpected length.':
+        'La clave de usuario descifrada tiene una longitud inesperada.',
+    'Default expiration (days)': 'Expiración predeterminada (días)',
+    'Default maximum views': 'Número máximo de vistas predeterminado',
+    'Delete revoked or expired Bitwarden Send entries past the configured retention':
+        'Elimina las entradas de Bitwarden Send revocadas o caducadas que superen la retención configurada',
+    'Delete the stored password': 'Eliminar la contraseña guardada',
+    'Delete the stored secret': 'Eliminar el secreto guardado',
+    'Delete this entry?': '¿Eliminar esta entrada?',
+    'Encrypted with the GLPI key. Used to unlock the vault automatically. '
+    'Leave empty if you unlock the service yourself.':
+        'Cifrado con la clave de GLPI. Se usa para desbloquear la bóveda '
+        'automáticamente. Déjelo vacío si desbloquea el servicio usted mismo.',
+    'Encrypted with the GLPI key.': 'Cifrado con la clave de GLPI.',
+    'Encrypted with the GLPI key. PBKDF2 accounts only — see the README.':
+        'Cifrado con la clave de GLPI. Solo cuentas PBKDF2 — consulte el README.',
+    'Expiration': 'Expiración',
+    'Expired': 'Caducado',
+    'Expires in': 'Caduca en',
+    'Followup configuration': 'Configuración del seguimiento',
+    'Followup template': 'Plantilla de seguimiento',
+    'Followup text': 'Texto del seguimiento',
+    'For example http://127.0.0.1:8087 — never expose this port publicly.':
+        'Por ejemplo http://127.0.0.1:8087 — nunca exponga este puerto públicamente.',
+    'GLPI followup templates': 'Plantillas de seguimiento de GLPI',
+    'GLPI will store this account\'s credentials (encrypted). Use a dedicated, '
+    'revocable service account — never your own.':
+        'GLPI almacenará las credenciales de esta cuenta (cifradas). Use una '
+        'cuenta de servicio dedicada y revocable — nunca la suya propia.',
+    'Generate a password': 'Generar una contraseña',
+    'Generate a random password': 'Generar una contraseña aleatoria',
+    TPL_EN: TPL_ES,
+    'Hide my email address from the recipient':
+        'Ocultar mi dirección de correo al destinatario',
+    'Hide the sender email address by default':
+        'Ocultar la dirección de correo del remitente de forma predeterminada',
+    'Hide the text by default when opened':
+        'Ocultar el texto de forma predeterminada al abrirlo',
+    'Identity URL': 'URL de identidad',
+    'Item not found or access denied.': 'Elemento no encontrado o acceso denegado.',
+    'Keep the link in the GLPI database': 'Conservar el enlace en la base de datos de GLPI',
+    'Leave empty to require none': 'Déjelo vacío para no exigir ninguno',
+    'Length': 'Longitud',
+    'Link defaults': 'Valores predeterminados del enlace',
+    'Link options': 'Opciones del enlace',
+    'Link password (optional)': 'Contraseña del enlace (opcional)',
+    'Link revoked.': 'Enlace revocado.',
+    'Local API (bw serve) — recommended': 'API local (bw serve) — recomendado',
+    'Local API URL': 'URL de la API local',
+    'Lowercase': 'Minúsculas',
+    'Master password': 'Contraseña maestra',
+    'Max views': 'Vistas máx.',
+    'Maximum number of views': 'Número máximo de vistas',
+    'Native (PHP only)': 'Nativo (solo PHP)',
+    'Native works without shell access on the server (e.g. GLPI Cloud) but only '
+    'supports service accounts using the PBKDF2 KDF — see the README.':
+        'El modo nativo funciona sin acceso shell al servidor (por ejemplo, GLPI '
+        'Cloud), pero solo admite cuentas de servicio con KDF PBKDF2 — consulte '
+        'el README.',
+    'New Bitwarden Send': 'Nuevo Bitwarden Send',
+    'No Bitwarden Send link has been created for this item yet.':
+        'Todavía no se ha creado ningún enlace de Bitwarden Send para este elemento.',
+    'No master password is configured for the native driver.':
+        'No hay ninguna contraseña maestra configurada para el driver nativo.',
+    'Not set': 'No configurado',
+    'Numbers': 'Números',
+    'Only needed if the vault is locked. Not required if it is already unlocked, '
+    'for example if you unlocked it yourself on the server.':
+        'Solo es necesario si la bóveda está bloqueada. No se requiere si ya '
+        'está desbloqueada, por ejemplo si la desbloqueó usted mismo en el '
+        'servidor.',
+    'Only used when the API does not return the access URL. '
+    'Cloud: https://send.bitwarden.com/# — self-hosted: https://vault.example.com/#/send/':
+        'Solo se usa cuando la API no devuelve la URL de acceso. '
+        'Nube: https://send.bitwarden.com/# — autoalojado: https://vault.example.com/#/send/',
+    'Only visible in your Bitwarden vault.':
+        'Visible únicamente en su bóveda de Bitwarden.',
+    'Password generator options': 'Opciones del generador de contraseñas',
+    'Password protected': 'Protegido con contraseña',
+    'Plugin default template': 'Plantilla predeterminada del plugin',
+    'Post the link as a followup': 'Publicar el enlace como seguimiento',
+    'Post the link as a followup by default':
+        'Publicar el enlace como seguimiento de forma predeterminada',
+    'Private followup (hidden from the requester)':
+        'Seguimiento privado (oculto para el solicitante)',
+    'Private followup by default': 'Seguimiento privado de forma predeterminada',
+    'Replace the current text? Your changes will be lost.':
+        '¿Reemplazar el texto actual? Se perderán sus cambios.',
+    'Retention (days)': 'Retención (días)',
+    'Revoke': 'Revocar',
+    'Rights updated.': 'Derechos actualizados.',
+    'See the Bitwarden Sends tab': 'Ver la pestaña Bitwarden Sends',
+    'Create Send links': 'Crear enlaces Send',
+    'Revoke Send links': 'Revocar enlaces Send',
+    'Delete stored Send entries': 'Eliminar entradas Send guardadas',
+    'Could not update the rights.': 'No se pudieron actualizar los derechos.',
+    'No profile selected.': 'Ningún perfil seleccionado.',
+    'Revoke this link?': '¿Revocar este enlace?',
+    'The link will no longer be viewable. This cannot be undone.':
+        'El enlace dejará de estar disponible. Esta acción no se puede deshacer.',
+    'Revoked': 'Revocado',
+    'Configured automatically with the default URLs.':
+        'Configurado automáticamente con las URL predeterminadas.',
+    'Self-hosted / custom': 'Autoalojado / personalizado',
+    'Self-hosted / custom: adjust these three URLs above.':
+        'Autoalojado / personalizado: ajuste estas tres URL indicadas arriba.',
+    'Server': 'Servidor',
+    'US — bitwarden.com': 'US — bitwarden.com',
+    'EU — bitwarden.eu': 'EU — bitwarden.eu',
+    'Bitwarden.com and bitwarden.eu are separate platforms — an account on one '
+    'does not work with the other\'s URLs.':
+        'Bitwarden.com y bitwarden.eu son dos plataformas independientes — una '
+        'cuenta de una no funciona con las URL de la otra.',
+    'Send driver': 'Driver de Send',
+    'Send it over another channel, by phone or text message for instance.':
+        'Envíelo por otro canal, por ejemplo por teléfono o mensaje de texto.',
+    'Send link base URL': 'URL base de los enlaces Send',
+    'Send name': 'Nombre del Send',
+    'Show a random password generator on the creation form':
+        'Mostrar un generador de contraseñas aleatorias en el formulario de creación',
+    'Stored encrypted in Bitwarden. GLPI only keeps the link and its metadata.':
+        'Almacenado cifrado en Bitwarden. GLPI solo conserva el enlace y sus metadatos.',
+    'Stored — type a new one to replace it':
+        'Guardado — escriba uno nuevo para reemplazarlo',
+    'Symbols': 'Símbolos',
+    'Test connection': 'Probar conexión',
+    'The rights below require this one: every action in the tab checks it first.':
+        'Los derechos siguientes requieren este: cada acción de la pestaña lo comprueba primero.',
+    'The Bitwarden client is not logged in. Run "bw login" on the server.':
+        'El cliente de Bitwarden no ha iniciado sesión. Ejecute «bw login» en el servidor.',
+    'The Bitwarden vault is locked and no master password is configured.':
+        'La bóveda de Bitwarden está bloqueada y no hay ninguna contraseña maestra configurada.',
+    'The Send access link has an unexpected scheme.':
+        'El enlace de acceso del Send tiene un protocolo inesperado.',
+    'The Send was created but no access link was returned.':
+        'El Send se creó, pero no se devolvió ningún enlace de acceso.',
+    'The Send was created but the followup could not be added.':
+        'El Send se creó, pero no se pudo añadir el seguimiento.',
+    'The content to share is empty.': 'El contenido a compartir está vacío.',
+    'This is the default text proposed when creating a Send. If the option '
+    'above is enabled, the technician can instead pick one of the GLPI '
+    'followup templates (Setup > Templates > Followup templates) — the same '
+    'variables also work in those.':
+        'Este es el texto predeterminado propuesto al crear un Send. Si la '
+        'opción anterior está activada, el técnico puede elegir en su lugar '
+        'una de las plantillas de seguimiento de GLPI (Configuración > '
+        'Plantillas > Plantillas de seguimiento) — las mismas variables '
+        'también funcionan en ellas.',
+    'This account uses the Argon2id KDF, which the native driver cannot reproduce '
+    'in PHP. Use a service account configured with PBKDF2, or switch this Send '
+    'driver to "cli".':
+        'Esta cuenta usa el KDF Argon2id, que el driver nativo no puede '
+        'reproducir en PHP. Use una cuenta de servicio configurada con '
+        'PBKDF2, o cambie este driver de Send a «cli».',
+    'This only removes the record from GLPI. This cannot be undone.':
+        'Esto solo elimina el registro de GLPI. Esta acción no se puede deshacer.',
+    'The service answers but no account is logged in. '
+    'Run "bw login --apikey" on the server as the service user.':
+        'El servicio responde, pero ninguna cuenta ha iniciado sesión. '
+        'Ejecute «bw login --apikey» en el servidor con el usuario del servicio.',
+    'The service answers but the vault is locked. Set the master password below so the '
+    'plugin can unlock it, or unlock the service manually on the server.':
+        'El servicio responde, pero la bóveda está bloqueada. Indique la '
+        'contraseña maestra a continuación para que el plugin pueda '
+        'desbloquearla, o desbloquee el servicio manualmente en el servidor.',
+    'Timeout (seconds)': 'Tiempo de espera (segundos)',
+    'Unable to encode the request body': 'No se pudo codificar el cuerpo de la solicitud',
+    'Unable to initialize cURL': 'No se pudo inicializar cURL',
+    'Uppercase': 'Mayúsculas',
+    'Unexpected response from the Bitwarden API (HTTP %d)':
+        'Respuesta inesperada de la API de Bitwarden (HTTP %d)',
+    'Unexpected vault status: %s': 'Estado de la bóveda inesperado: %s',
+    'Unknown Bitwarden API error': 'Error desconocido de la API de Bitwarden',
+    'Unknown Send identifier': 'Identificador de Send desconocido',
+    'Unlimited': 'Ilimitado',
+    'Unsupported item type.': 'Tipo de elemento no admitido.',
+    'Use a GLPI followup template': 'Usar una plantilla de seguimiento de GLPI',
+    'Variables: {url} (ready-to-click link), {url_raw} (just the address, for your '
+    'own link), {expiration}, {max_access}':
+        'Variables: {url} (enlace listo para usar), {url_raw} (solo la dirección, '
+        'para su propio enlace), {expiration}, {max_access}',
+    'Web vault URL': 'URL de la bóveda web',
+    'When disabled, GLPI only keeps metadata: '
+    'the link then exists in the followup only.':
+        'Si está desactivado, GLPI solo conserva los metadatos: el enlace '
+        'entonces solo existe en el seguimiento.',
+    'You are not allowed to add a followup on this item.':
+        'No tiene permiso para añadir un seguimiento en este elemento.',
+    'an unlimited number of': 'un número ilimitado de',
+    'day': 'día',
+    'days': 'días',
+    'the link (created once you submit)': 'el enlace (creado al enviar el formulario)',
+}
 
-HEADER_MO = (
-    'Project-Id-Version: bitwardensend __VERSION__\n'
-    'MIME-Version: 1.0\n'
-    'Content-Type: text/plain; charset=UTF-8\n'
-    'Content-Transfer-Encoding: 8bit\n'
-    'Language: fr_FR\n'
-    'Plural-Forms: nplurals=2; plural=(n > 1);\n'
-)
+# Brand name: kept identical in both forms (Bitwarden's own Spanish
+# localization does not translate "Send" either).
+ES_PLURAL = {('Bitwarden Send', 'Bitwarden Sends'): ('Bitwarden Send', 'Bitwarden Sends')}
+
+
+def header_po(team, locale, version):
+    return ('# %s translation for the GLPI Bitwarden Send plugin.\n'
+            '# Copyright (C) 2026\n'
+            '# This file is distributed under the same license as the plugin.\n'
+            '#\n'
+            'msgid ""\n'
+            'msgstr ""\n'
+            '"Project-Id-Version: bitwardensend %s\\n"\n'
+            '"Report-Msgid-Bugs-To: \\n"\n'
+            '"POT-Creation-Date: 2026-07-31 00:00+0000\\n"\n'
+            '"PO-Revision-Date: 2026-07-31 00:00+0000\\n"\n'
+            '"Last-Translator: \\n"\n'
+            '"Language-Team: %s\\n"\n'
+            '"Language: %s\\n"\n'
+            '"MIME-Version: 1.0\\n"\n'
+            '"Content-Type: text/plain; charset=UTF-8\\n"\n'
+            '"Content-Transfer-Encoding: 8bit\\n"\n'
+            '"Plural-Forms: nplurals=2; plural=(n > 1);\\n"\n'
+            % (team, version, team, locale))
+
+
+def header_mo(locale, version):
+    return (
+        'Project-Id-Version: bitwardensend %s\n'
+        'MIME-Version: 1.0\n'
+        'Content-Type: text/plain; charset=UTF-8\n'
+        'Content-Transfer-Encoding: 8bit\n'
+        'Language: %s\n'
+        'Plural-Forms: nplurals=2; plural=(n > 1);\n'
+        % (version, locale)
+    )
 
 
 def po_escape(text):
@@ -473,8 +738,8 @@ def plugin_version(root):
 VERSION = '0.0.0'
 
 
-def write_po(path, singles, plurals, refs, translated):
-    out = [HEADER_PO.replace('__VERSION__', VERSION)]
+def write_po(path, singles, plurals, refs, translated, plural_forms, header):
+    out = [header]
     for msgid in sorted(singles):
         out.append('\n#: %s' % ', '.join(refs['singles'][msgid]))
         out.append('msgid %s' % po_string(msgid))
@@ -484,7 +749,7 @@ def write_po(path, singles, plurals, refs, translated):
         out.append('\n#: %s' % ', '.join(refs['plurals'][key]))
         out.append('msgid %s' % po_string(sing))
         out.append('msgid_plural %s' % po_string(plur))
-        forms = FR_PLURAL.get((sing, plur), ('', '')) if translated else ('', '')
+        forms = plural_forms.get((sing, plur), ('', '')) if translated else ('', '')
         out.append('msgstr[0] %s' % po_string(forms[0]))
         out.append('msgstr[1] %s' % po_string(forms[1]))
     open(path, 'w', encoding='utf-8').write('\n'.join(out) + '\n')
@@ -522,6 +787,17 @@ def write_mo(path, entries):
 
 # Locales sharing the French catalog.
 FRENCH_LOCALES = ['fr_FR', 'fr_BE', 'fr_CA', 'fr']
+
+# Locales sharing the Spanish catalog.
+SPANISH_LOCALES = ['es_ES', 'es']
+
+# Add a language: append an entry here (team name, its locale list, its
+# translation dict, its plural-forms dict) - everything below iterates this,
+# nothing else needs to change.
+LANGUAGES = [
+    {'team': 'French', 'locales': FRENCH_LOCALES, 'dict': FR, 'plural': FR_PLURAL},
+    {'team': 'Spanish', 'locales': SPANISH_LOCALES, 'dict': ES, 'plural': ES_PLURAL},
+]
 
 
 def extract(root):
@@ -572,46 +848,52 @@ def main():
     single_ids = sorted(singles)
     plural_ids = sorted(plurals)
 
-    write_po(os.path.join(locales, 'bitwardensend.pot'), single_ids, plural_ids, refs, None)
+    write_po(os.path.join(locales, 'bitwardensend.pot'), single_ids, plural_ids, refs, None,
+             {}, header_po('LANGUAGE', '', VERSION))
 
-    missing = [m for m in single_ids if m not in FR]
-    obsolete = [m for m in FR if m not in single_ids]
-    if missing:
-        print('Missing French translations (%d):' % len(missing))
-        for m in missing:
-            print('   ', repr(m))
-    if obsolete:
-        print('Obsolete French entries (%d):' % len(obsolete))
-        for m in obsolete:
-            print('   ', repr(m))
-    if missing or obsolete:
+    # Check every language before failing on any one of them, so a single run
+    # reports every problem instead of only the first language's.
+    ok = True
+    for lang in LANGUAGES:
+        missing = [m for m in single_ids if m not in lang['dict']]
+        obsolete = [m for m in lang['dict'] if m not in single_ids]
+        if missing:
+            print('Missing %s translations (%d):' % (lang['team'], len(missing)))
+            for m in missing:
+                print('   ', repr(m))
+        if obsolete:
+            print('Obsolete %s entries (%d):' % (lang['team'], len(obsolete)))
+            for m in obsolete:
+                print('   ', repr(m))
+        if missing or obsolete:
+            ok = False
+    if not ok:
         return 1
 
-    body = []
-    for msgid in single_ids:
-        body.append((msgid.encode('utf-8'), FR[msgid].encode('utf-8')))
-    for pair in plural_ids:
-        forms = FR_PLURAL[pair]
-        body.append((
-            pair[0].encode('utf-8') + b'\x00' + pair[1].encode('utf-8'),
-            forms[0].encode('utf-8') + b'\x00' + forms[1].encode('utf-8'),
-        ))
+    for lang in LANGUAGES:
+        translations, plural_forms = lang['dict'], lang['plural']
 
-    for locale in FRENCH_LOCALES:
-        po = os.path.join(locales, locale + '.po')
-        write_po(po, single_ids, plural_ids, refs, FR)
-        if locale != 'fr_FR':
-            content = open(po, encoding='utf-8').read()
-            content = content.replace('"Language: fr_FR', '"Language: ' + locale)
-            open(po, 'w', encoding='utf-8').write(content)
-        header = (HEADER_MO.replace('Language: fr_FR', 'Language: ' + locale)
-                           .replace('__VERSION__', VERSION))
-        write_mo(os.path.join(locales, locale + '.mo'),
-                 [(b'', header.encode('utf-8'))] + body)
+        body = []
+        for msgid in single_ids:
+            body.append((msgid.encode('utf-8'), translations[msgid].encode('utf-8')))
+        for pair in plural_ids:
+            forms = plural_forms[pair]
+            body.append((
+                pair[0].encode('utf-8') + b'\x00' + pair[1].encode('utf-8'),
+                forms[0].encode('utf-8') + b'\x00' + forms[1].encode('utf-8'),
+            ))
 
-    print('%d entries (%d singular + %d plural) written for %s at version %s'
-          % (len(body) + 1, len(single_ids), len(plural_ids),
-             ', '.join(FRENCH_LOCALES), VERSION))
+        for locale in lang['locales']:
+            po = os.path.join(locales, locale + '.po')
+            write_po(po, single_ids, plural_ids, refs, translations, plural_forms,
+                     header_po(lang['team'], locale, VERSION))
+            write_mo(os.path.join(locales, locale + '.mo'),
+                     [(b'', header_mo(locale, VERSION).encode('utf-8'))] + body)
+
+        print('%d entries (%d singular + %d plural) written for %s at version %s'
+              % (len(body) + 1, len(single_ids), len(plural_ids),
+                 ', '.join(lang['locales']), VERSION))
+
     return 0
 
 
