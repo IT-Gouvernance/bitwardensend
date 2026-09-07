@@ -141,6 +141,13 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   its content, and GLPI's generic tab dispatcher can reach the content
   method directly. Now checks `profile` READ itself too, matching the other
   two.
+- The CLI driver accepted the configured endpoint's `accessUrl` response
+  field with no scheme check, unlike the `send_base_url` fallback used when
+  that field is absent (already scheme-checked before being saved). That
+  value ends up in a followup's `href`, so a compromised or malicious
+  endpoint answering with e.g. a `javascript:` URL would have reached it
+  as-is. Now validated the same way regardless of which of the two sources
+  it came from.
 - The Send creation form's context (`Send::buildFormContext()`) carried the
   entire configuration row, including the encrypted credential fields
   (`master_password`, `native_client_secret`, `native_master_password`) —
