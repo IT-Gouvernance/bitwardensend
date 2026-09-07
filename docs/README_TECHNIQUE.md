@@ -247,9 +247,9 @@ options :
 
 ## Traductions
 
-L'interface est disponible en anglais et en français (`fr`, `fr_FR`, `fr_BE`, `fr_CA`).
-GLPI affiche automatiquement le catalogue correspondant à la langue d'interface de
-chaque utilisateur — rien à configurer.
+L'interface est disponible en anglais, en français (`fr`, `fr_FR`, `fr_BE`, `fr_CA`) et
+en espagnol (`es`, `es_ES`). GLPI affiche automatiquement le catalogue correspondant à
+la langue d'interface de chaque utilisateur — rien à configurer.
 
 Le modèle de suivi par défaut est traduit uniquement à l'installation : il est
 enregistré dans la langue utilisée pour installer le plugin. Pour l'avoir dans une

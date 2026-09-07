@@ -238,9 +238,9 @@ item's entity.
 
 ## Translations
 
-The interface is available in English and French (`fr`, `fr_FR`, `fr_BE`, `fr_CA`).
-GLPI automatically shows the catalog matching each user's interface language — nothing
-to configure.
+The interface is available in English, French (`fr`, `fr_FR`, `fr_BE`, `fr_CA`) and
+Spanish (`es`, `es_ES`). GLPI automatically shows the catalog matching each user's
+interface language — nothing to configure.
 
 The default followup template is translated at install time only: it is saved in the
 language used to install the plugin. To get it in another language, edit it directly

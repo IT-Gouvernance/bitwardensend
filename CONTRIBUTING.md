@@ -64,10 +64,11 @@ regenerate the catalogs:
 python3 tools/build-locales.py
 ```
 
-The script fails loudly if a new string has no French translation yet, or if
-`locales/bitwardensend.pot` has an entry no longer referenced anywhere — add
-the missing translation (or remove the stale one) directly in
-`tools/build-locales.py`'s own `FR` dictionary, then rerun it.
+The script fails loudly if a new string has no translation yet in any of the
+languages it builds (French, Spanish), or if `locales/bitwardensend.pot` has an
+entry no longer referenced anywhere — add the missing translation (or remove
+the stale one) directly in `tools/build-locales.py`'s own `FR`/`ES`
+dictionaries, then rerun it.
 
 ## Commit and pull request conventions
 
