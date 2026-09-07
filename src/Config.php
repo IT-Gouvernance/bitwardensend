@@ -201,12 +201,47 @@ class Config extends CommonDBTM
      * own CURLOPT_PROTOCOLS restriction, but this is the point where a
      * mistyped or malicious value (file://, gopher://, ...) is refused
      * outright instead of just constrained at request time.
+     *
+     * http is only accepted for a loopback host. Several of these URLs
+     * carry secrets in the request body itself (the CLI driver's vault
+     * master password on /unlock, the native driver's client secret and
+     * master password on /connect/token) — fine in plaintext to the
+     * default local `bw serve`, but plain http to anything else would
+     * send those secrets in the clear over the network the moment an
+     * admin points one of these at a remote host (a shared `bw serve`
+     * instance, a self-hosted Vaultwarden behind a plain-http proxy).
      */
     private static function hasHttpScheme(string $url): bool
     {
-        $scheme = parse_url($url, PHP_URL_SCHEME);
+        $rawScheme = parse_url($url, PHP_URL_SCHEME);
+        if (!is_string($rawScheme)) {
+            return false;
+        }
 
-        return is_string($scheme) && in_array(strtolower($scheme), ['http', 'https'], true);
+        $scheme = strtolower($rawScheme);
+        if ($scheme === 'https') {
+            return true;
+        }
+
+        if ($scheme !== 'http') {
+            return false;
+        }
+
+        $rawHost = parse_url($url, PHP_URL_HOST);
+
+        return is_string($rawHost) && self::isLoopbackHost($rawHost);
+    }
+
+    /**
+     * @see hasHttpScheme()
+     */
+    private static function isLoopbackHost(string $host): bool
+    {
+        $host = strtolower($host);
+
+        return $host === 'localhost'
+            || $host === '::1'
+            || preg_match('/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $host) === 1;
     }
 
     /**
