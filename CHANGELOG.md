@@ -135,6 +135,12 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   it existed. `Send::pre_deleteItem()` now revokes an active Send on the
   Bitwarden side before its local row can be purged, and blocks the purge
   entirely if that revoke fails.
+- `Profile::displayTabContentForItem()` was the one tab-content method in the
+  plugin that did not re-check its own right — `Config`'s and `Send`'s
+  already do, since `getTabNameForItem()` only gates the tab's label, not
+  its content, and GLPI's generic tab dispatcher can reach the content
+  method directly. Now checks `profile` READ itself too, matching the other
+  two.
 - The CLI driver accepted the configured endpoint's `accessUrl` response
   field with no scheme check, unlike the `send_base_url` fallback used when
   that field is absent (already scheme-checked before being saved). That
