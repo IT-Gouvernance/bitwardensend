@@ -170,6 +170,11 @@ Bitwarden Send**, like any other GLPI scheduled action:
 - A master password stored in GLPI grants access to the service account vault: use a
   dedicated account holding nothing beyond what is needed. This applies to both
   drivers — the native driver's own service account needs the same isolation.
+- The CLI driver's Local API URL and the native driver's three URLs accept plain
+  `http://` only for a loopback host (`127.0.0.1`, `::1`, `localhost`) — anything else
+  must be `https://`. Several of these requests carry a secret in the body itself (the
+  vault master password, the native driver's client secret), so a remote endpoint over
+  plain http would send it in the clear.
 - **File** Sends are not supported in this version (text only).
 - The native driver only supports service accounts using the PBKDF2 KDF — see "Native
   driver" above for why.
