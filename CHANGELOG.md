@@ -10,7 +10,7 @@ the first stable 1.0.0.
 
 ## [1.0.0] - Unreleased
 
-Initial release. Currently shipping as `1.0.0-rc1`.
+Initial release. Currently shipping as `1.0.0-rc2`.
 
 ### Added
 
