@@ -375,6 +375,19 @@ class CliSendDriver implements SendDriverInterface
             );
         }
 
+        // Config::validateInput() already scheme-checks send_base_url before it
+        // is ever saved, but $url can also come straight from the configured
+        // endpoint's JSON response (the branch above) - that value has no such
+        // guarantee. It ends up in an href (Send::addFollowup()), so a
+        // compromised or hostile endpoint answering with a javascript: URL
+        // would otherwise reach the followup as-is.
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        if (!is_string($scheme) || !in_array(strtolower($scheme), ['http', 'https'], true)) {
+            throw new RuntimeException(
+                __('The Send access link has an unexpected scheme.', 'bitwardensend'),
+            );
+        }
+
         $rawId = $send['id'] ?? '';
         $uuid  = is_string($rawId) ? $rawId : '';
 

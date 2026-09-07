@@ -135,3 +135,10 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   it existed. `Send::pre_deleteItem()` now revokes an active Send on the
   Bitwarden side before its local row can be purged, and blocks the purge
   entirely if that revoke fails.
+- The CLI driver accepted the configured endpoint's `accessUrl` response
+  field with no scheme check, unlike the `send_base_url` fallback used when
+  that field is absent (already scheme-checked before being saved). That
+  value ends up in a followup's `href`, so a compromised or malicious
+  endpoint answering with e.g. a `javascript:` URL would have reached it
+  as-is. Now validated the same way regardless of which of the two sources
+  it came from.
