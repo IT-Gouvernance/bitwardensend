@@ -142,6 +142,19 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   UPDATE, not only an admin. Both paths now go through a small sanitizer
   (parses into a detached document, strips `<script>`/`<iframe>`/etc.,
   `on*` attributes and `javascript:` hrefs/srcs) before reaching the page.
+- `Profile::displayTabContentForItem()` was the one tab-content method in the
+  plugin that did not re-check its own right — `Config`'s and `Send`'s
+  already do, since `getTabNameForItem()` only gates the tab's label, not
+  its content, and GLPI's generic tab dispatcher can reach the content
+  method directly. Now checks `profile` READ itself too, matching the other
+  two.
+- The CLI driver accepted the configured endpoint's `accessUrl` response
+  field with no scheme check, unlike the `send_base_url` fallback used when
+  that field is absent (already scheme-checked before being saved). That
+  value ends up in a followup's `href`, so a compromised or malicious
+  endpoint answering with e.g. a `javascript:` URL would have reached it
+  as-is. Now validated the same way regardless of which of the two sources
+  it came from.
 - The Send creation form's context (`Send::buildFormContext()`) carried the
   entire configuration row, including the encrypted credential fields
   (`master_password`, `native_client_secret`, `native_master_password`) —

@@ -346,6 +346,8 @@ FR = {
         "Le client Bitwarden n'est pas connecté. Exécutez « bw login » sur le serveur.",
     'The Bitwarden vault is locked and no master password is configured.':
         "Le coffre Bitwarden est verrouillé et aucun mot de passe maître n'est configuré.",
+    'The Send access link has an unexpected scheme.':
+        "Le lien d'accès du Send a un protocole inattendu.",
     'The Send was created but no access link was returned.':
         "Le Send a été créé mais aucun lien d'accès n'a été retourné.",
     'The Send was created but the followup could not be added.':
