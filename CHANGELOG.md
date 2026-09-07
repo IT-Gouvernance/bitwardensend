@@ -141,3 +141,15 @@ Initial release. Currently shipping as `1.0.0-rc1`.
   its content, and GLPI's generic tab dispatcher can reach the content
   method directly. Now checks `profile` READ itself too, matching the other
   two.
+- The Send creation form's context (`Send::buildFormContext()`) carried the
+  entire configuration row, including the encrypted credential fields
+  (`master_password`, `native_client_secret`, `native_master_password`) —
+  only seven non-secret settings are actually used by the form. It now
+  passes just those.
+- The configured URLs (CLI driver's Local API URL, the native driver's three
+  URLs) accepted plain `http://` for any host, not just the default loopback
+  one. Several of the requests they receive carry a secret in the body (the
+  vault master password, the native driver's client secret), so pointing one
+  of these at a remote host while leaving it on `http://` sent that secret
+  in the clear. `http://` is now only accepted for a loopback host
+  (`127.0.0.1`, `::1`, `localhost`); anything else must be `https://`.
