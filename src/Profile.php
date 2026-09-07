@@ -85,7 +85,16 @@ class Profile extends \Profile
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof \Profile && !$item->isNewItem() && self::isCentralInterface($item)) {
+        // getTabNameForItem() above already requires this, but only gates the
+        // tab's label — GLPI's generic tab dispatcher (ajax/common.tabs.php)
+        // can reach this method directly with a deterministic tab key,
+        // independently of that check. Re-checked here so this method is
+        // safe on its own, matching Config::displayTabContentForItem() and
+        // Send::showForItem().
+        if (
+            $item instanceof \Profile && !$item->isNewItem() && Session::haveRight('profile', READ)
+            && self::isCentralInterface($item)
+        ) {
             self::showForProfile((int) $item->getID());
         }
 
