@@ -436,6 +436,50 @@
     };
 
     /**
+     * Strips scripting-capable markup before it is ever assigned to
+     * innerHTML. The <textarea> fallback path is already escaped text by
+     * the time it reaches here, but the TinyMCE path assigns
+     * editor.getContent() as close to verbatim — its own sanitizer runs
+     * on setContent(), not necessarily on whatever getContent() returns
+     * back, and that content can come from a GLPI followup template
+     * authored by anyone holding itilfollowuptemplate UPDATE, not just an
+     * admin.
+     *
+     * Parsed into a detached document via DOMParser rather than
+     * regexing scripting out of a string, so this follows the same rules
+     * a browser's own HTML parser does; walks every element removing
+     * disallowed tags/attributes, then re-serializes.
+     */
+    function pluginBitwardensendSanitizeRichText(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+
+        const disallowed = ['script', 'iframe', 'object', 'embed', 'style', 'link', 'meta', 'base', 'form'];
+        Array.prototype.forEach.call(doc.querySelectorAll(disallowed.join(',')), (node) => {
+            node.remove();
+        });
+
+        const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT);
+        let node = walker.currentNode;
+        while (node) {
+            // Array.from(), not the live NamedNodeMap directly: removing an
+            // attribute while iterating it in place would skip the next one.
+            Array.prototype.slice.call(node.attributes || []).forEach((attr) => {
+                const name = attr.name.toLowerCase();
+                if (name.indexOf('on') === 0) {
+                    node.removeAttribute(attr.name);
+                    return;
+                }
+                if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(attr.value)) {
+                    node.removeAttribute(attr.name);
+                }
+            });
+            node = walker.nextNode();
+        }
+
+        return doc.body.innerHTML;
+    }
+
+    /**
      * Refresh the followup preview, substituting {expiration}/{max_access}
      * with the current form values. {url} stays a placeholder — the real
      * link doesn't exist until the Send is created.
@@ -487,7 +531,7 @@
         html = html.split('{expiration}').join(escapeHtml(expiration));
         html = html.split('{max_access}').join(escapeHtml(maxAccessText));
 
-        preview.innerHTML = html;
+        preview.innerHTML = pluginBitwardensendSanitizeRichText(html);
 
         // Lazily capture the "nothing edited yet" baseline for the followup
         // template selector's overwrite confirmation, the first time the rich
