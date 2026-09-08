@@ -3,10 +3,7 @@
 All notable changes to this plugin are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/) (see
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
-beyond being a label). None of the `1.0.0-betaN`/`1.0.0-rcN` pre-releases were ever used
-in production, so 1.0.0 ships with no upgrade path from them — reinstall rather than
-upgrade in place if you were running one. From here on, a schema change that needs one
-gets a proper migration.
+beyond being a label).
 
 ## [1.0.0] - 2026-09-08
 

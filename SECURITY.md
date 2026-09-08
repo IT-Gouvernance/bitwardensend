@@ -3,10 +3,7 @@
 ## Supported versions
 
 Only the latest released version is supported — please make sure you can
-reproduce an issue there before reporting it. If you were running a
-`1.0.0-betaN`/`1.0.0-rcN` pre-release, note that 1.0.0 has no upgrade path
-from those (none were ever used in production): reinstall rather than
-upgrading in place.
+reproduce an issue there before reporting it.
 
 ## Reporting a vulnerability
 
