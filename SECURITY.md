@@ -2,11 +2,11 @@
 
 ## Supported versions
 
-This plugin is pre-1.0 (currently shipping `1.0.0-betaN`/`1.0.0-rcN`
-pre-releases). Only the latest released version is supported — please make
-sure you can reproduce an issue there before reporting it. There is no
-upgrade path between pre-releases yet: if reproducing on the latest version
-means upgrading, reinstall rather than upgrading in place.
+Only the latest released version is supported — please make sure you can
+reproduce an issue there before reporting it. If you were running a
+`1.0.0-betaN`/`1.0.0-rcN` pre-release, note that 1.0.0 has no upgrade path
+from those (none were ever used in production): reinstall rather than
+upgrading in place.
 
 ## Reporting a vulnerability
 
