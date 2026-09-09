@@ -52,6 +52,14 @@ class Send extends CommonDBTM
 {
     public static $rightname = 'plugin_bitwardensend_send';
 
+    // Masked by CommonDBTM::unsetUndisclosedFields() wherever core relies on
+    // it (the REST API's item/search/list output, Dropdown/Link rendering) -
+    // same reasoning as Config::$undisclosedFields: this is GLPIKey
+    // ciphertext, not plaintext, and only ever decrypted in showForItem()
+    // behind its own right/entity checks, but there is no reason to expose
+    // even the ciphertext to a session that only has plugin READ.
+    public static $undisclosedFields = ['access_url'];
+
     public $dohistory = false;
 
     public static function getTable($classname = null): string
