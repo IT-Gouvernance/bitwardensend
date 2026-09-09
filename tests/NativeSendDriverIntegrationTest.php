@@ -144,13 +144,18 @@ final class NativeSendDriverIntegrationTest extends TestCase
             $keyMaterial = $this->base64UrlDecode($keyMaterialB64);
             self::assertSame(16, strlen($keyMaterial));
 
-            // POST, not GET: this is Bitwarden's actual anonymous Send-access
-            // route (confirmed against Vaultwarden's server source, which
-            // implements the same contract as the real API -
-            // POST /sends/access/<access_id>, body optional/empty for a
-            // Send with no password). A GET here 404s.
+            // Anonymous Send access is not served from the same host as the
+            // authenticated API (native_api_url/BW_TEST_API_URL) - confirmed
+            // against the official CLI's own receive.command.ts, whose
+            // getApiUrl() resolves it from the access URL's own origin (the
+            // web vault) plus "/api" in the general case, which is what
+            // covers both the real Bitwarden cloud (web vault
+            // vault.bitwarden.com, "/api" appended) and a typical
+            // self-hosted/Vaultwarden instance (single combined origin).
+            // POST, not GET, either way - body optional/empty for a Send
+            // with no password.
             $accessResponse = $this->httpPostAccess(
-                rtrim($this->env['BW_TEST_API_URL'], '/') . '/sends/access/' . $result->accessId,
+                rtrim($this->env['BW_TEST_WEB_VAULT_URL'], '/') . '/api/sends/access/' . $result->accessId,
             );
 
             $sendKey = SendCrypto::deriveSendKey($keyMaterial);
@@ -223,9 +228,9 @@ final class NativeSendDriverIntegrationTest extends TestCase
         $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         curl_close($handle);
 
-        self::assertNotFalse($raw, 'GET ' . $url . ' failed at the transport level.');
+        self::assertNotFalse($raw, 'POST ' . $url . ' failed at the transport level.');
         $decoded = json_decode((string) $raw, true);
-        self::assertIsArray($decoded, sprintf('GET %s returned non-JSON (HTTP %d).', $url, $code));
+        self::assertIsArray($decoded, sprintf('POST %s returned non-JSON (HTTP %d).', $url, $code));
 
         return $decoded;
     }
