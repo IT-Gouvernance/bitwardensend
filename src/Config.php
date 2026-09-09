@@ -486,6 +486,12 @@ class Config extends CommonDBTM
 
         $conf = self::getConfig(true);
 
+        // Ciphertext, not plaintext (still GLPIKey-encrypted), but the
+        // template only ever reads the has_* booleans below for these three
+        // fields — no reason to hand the render context values nothing in
+        // it actually uses.
+        unset($conf['master_password'], $conf['native_client_secret'], $conf['native_master_password']);
+
         TemplateRenderer::getInstance()->display('@bitwardensend/config.html.twig', [
             'conf'                          => $conf,
             'has_master_password'           => self::getMasterPassword() !== '',

@@ -30,6 +30,15 @@ beyond being a label).
   against the item through `Glpi\ContentTemplates\TemplateManager` — the same
   call GLPI's own `ajax/itilfollowup.php` makes when picking a template for a
   plain followup — falling back to the raw content if rendering fails.
+- `Send` did not declare `$undisclosedFields` for `access_url`, unlike
+  `Config`'s own three encrypted fields — added it, so the stored (still
+  GLPIKey-encrypted) value is masked the same way wherever core relies on
+  that property (REST API item output, search/list, Dropdown/Link
+  rendering).
+- `Config::showConfigForm()` passed the entire configuration row, including
+  the three encrypted secret fields, into the config page's Twig context —
+  the template only ever reads the pre-computed `has_*` booleans for those.
+  Removed the three raw values from the context before rendering.
 
 ## [1.0.0] - 2026-09-08
 
