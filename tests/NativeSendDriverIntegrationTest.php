@@ -144,7 +144,12 @@ final class NativeSendDriverIntegrationTest extends TestCase
             $keyMaterial = $this->base64UrlDecode($keyMaterialB64);
             self::assertSame(16, strlen($keyMaterial));
 
-            $accessResponse = $this->httpGet(
+            // POST, not GET: this is Bitwarden's actual anonymous Send-access
+            // route (confirmed against Vaultwarden's server source, which
+            // implements the same contract as the real API -
+            // POST /sends/access/<access_id>, body optional/empty for a
+            // Send with no password). A GET here 404s.
+            $accessResponse = $this->httpPostAccess(
                 rtrim($this->env['BW_TEST_API_URL'], '/') . '/sends/access/' . $result->accessId,
             );
 
@@ -189,9 +194,14 @@ final class NativeSendDriverIntegrationTest extends TestCase
     }
 
     /**
+     * POSTs to Bitwarden's anonymous Send-access route. Always a POST, even
+     * to read a Send with no password: the API has no GET equivalent (a
+     * request body is how a password hash would be supplied, if the Send
+     * had one — this test's Send never does, hence the empty body).
+     *
      * @return array<string,mixed>
      */
-    private function httpGet(string $url): array
+    private function httpPostAccess(string $url): array
     {
         $handle = curl_init($url);
         curl_setopt_array($handle, [
@@ -199,10 +209,13 @@ final class NativeSendDriverIntegrationTest extends TestCase
             CURLOPT_TIMEOUT        => 15,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => '{}',
             // Same requirement as NativeSendDriver's own httpRequest() — see
             // its comment for why this specific value.
             CURLOPT_HTTPHEADER     => [
                 'Accept: application/json',
+                'Content-Type: application/json',
                 'Bitwarden-Client-Version: 2025.6.0',
             ],
         ]);
