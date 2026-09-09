@@ -28,7 +28,7 @@
  * @link      https://github.com/IT-Gouvernance/bitwardensend/
  * -------------------------------------------------------------------------
  *
- * Bitwarden Send plugin for GLPI 11
+ * Bitwarden Send plugin for GLPI 12
  *
  * Adds a button to the ITIL timeline that lets a technician share a secret
  * (password, key, token...) through a Bitwarden Send link, and posts that link
@@ -41,9 +41,9 @@ use GlpiPlugin\Bitwardensend\Config;
 use GlpiPlugin\Bitwardensend\Profile;
 use GlpiPlugin\Bitwardensend\Send;
 
-define('PLUGIN_BITWARDENSEND_VERSION', '1.0.0');
-define('PLUGIN_BITWARDENSEND_MIN_GLPI', '11.0.0');
-define('PLUGIN_BITWARDENSEND_MAX_GLPI', '11.0.99');
+define('PLUGIN_BITWARDENSEND_VERSION', '2.0.0');
+define('PLUGIN_BITWARDENSEND_MIN_GLPI', '12.0.0');
+define('PLUGIN_BITWARDENSEND_MAX_GLPI', '12.0.99');
 
 /**
  * Plugin initialization.
@@ -102,7 +102,7 @@ function plugin_version_bitwardensend(): array
                 'max' => PLUGIN_BITWARDENSEND_MAX_GLPI,
             ],
             'php' => [
-                'min' => '8.2',
+                'min' => '8.3',
             ],
         ],
     ];

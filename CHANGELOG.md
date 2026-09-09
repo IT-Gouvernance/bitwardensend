@@ -7,6 +7,10 @@ beyond being a label).
 
 ## [Unreleased]
 
+### Added
+
+- GLPI 12 compatibility (`2.0.0`, GLPI 11 no longer supported).
+
 ### Fixed
 
 - `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
