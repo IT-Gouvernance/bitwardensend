@@ -15,6 +15,13 @@ beyond being a label).
   the same contract as the real Bitwarden API), so a `GET` there 404s. Only
   the optional integration test is affected; `NativeSendDriver` itself never
   calls this route.
+- Same test, still 404ing after the fix above: the anonymous Send-access
+  route isn't served from the same host as the authenticated API
+  (`native_api_url`/`BW_TEST_API_URL`) — confirmed against the official
+  CLI's own `receive.command.ts`, whose URL-resolution logic falls back to
+  the access URL's own origin (the web vault) plus `/api` for both the real
+  Bitwarden cloud and a typical self-hosted/Vaultwarden instance. Switched
+  to `BW_TEST_WEB_VAULT_URL` + `/api/sends/access/...`.
 
 ## [1.0.0] - 2026-09-08
 
