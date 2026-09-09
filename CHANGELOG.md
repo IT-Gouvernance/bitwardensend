@@ -9,19 +9,18 @@ beyond being a label).
 
 ### Fixed
 
-- `tests/NativeSendDriverIntegrationTest.php` read a created Send back
-  through the anonymous Send-access route with a `GET` — that route is a
-  `POST` (confirmed against Vaultwarden's server source, which implements
-  the same contract as the real Bitwarden API), so a `GET` there 404s. Only
-  the optional integration test is affected; `NativeSendDriver` itself never
-  calls this route.
-- Same test, still 404ing after the fix above: the anonymous Send-access
-  route isn't served from the same host as the authenticated API
-  (`native_api_url`/`BW_TEST_API_URL`) — confirmed against the official
-  CLI's own `receive.command.ts`, whose URL-resolution logic falls back to
-  the access URL's own origin (the web vault) plus `/api` for both the real
-  Bitwarden cloud and a typical self-hosted/Vaultwarden instance. Switched
-  to `BW_TEST_WEB_VAULT_URL` + `/api/sends/access/...`.
+- `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
+  back the way a real recipient would, to independently verify its
+  encrypted content — the premise turned out to be wrong once actually run
+  against a real account: that route is not anonymous on current Bitwarden.
+  The real backend (`bitwarden/server`'s `SendsController`) requires a
+  Bearer token carrying the Send's id as a claim, obtained through a
+  separate token exchange this test never implemented (two earlier attempts
+  assumed a plain unauthenticated `GET`/`POST` and both 404'd against a real
+  account). Simplified the test to what it can actually prove without that
+  token exchange: that creating and revoking a Send round-trips against a
+  live account. `NativeSendDriver` itself never reads a Send back this way,
+  so the plugin's own behavior is unaffected either way.
 
 ## [1.0.0] - 2026-09-08
 
