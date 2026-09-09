@@ -58,9 +58,9 @@ class Send extends CommonDBTM
     // ciphertext, not plaintext, and only ever decrypted in showForItem()
     // behind its own right/entity checks, but there is no reason to expose
     // even the ciphertext to a session that only has plugin READ.
-    public static $undisclosedFields = ['access_url'];
+    public static array $undisclosedFields = ['access_url'];
 
-    public $dohistory = false;
+    public bool $dohistory = false;
 
     public static function getTable($classname = null): string
     {

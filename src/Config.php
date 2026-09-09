@@ -49,7 +49,7 @@ class Config extends CommonDBTM
     // it (the REST API's item/search/list output, Dropdown/Link rendering) -
     // these are GLPIKey ciphertext, not plaintext, but there is no reason to
     // expose them at all to a session that only has 'config' READ.
-    public static $undisclosedFields = [
+    public static array $undisclosedFields = [
         'master_password',
         'native_client_secret',
         'native_master_password',
