@@ -29,6 +29,15 @@ beyond being a label).
   as a working `javascript:` URI once clicked. Now strips those characters
   before testing, matching the WHATWG URL Standard's own first parsing
   step.
+- A GLPI followup template picked on the creation form (as an alternative to
+  the plugin's own configured template) was inserted as raw, unrendered
+  text. A template using GLPI's own Twig-based content placeholders (e.g.
+  `{% for user in ticket.requesters.users %}{{ user.firstname }}{% endfor %}`)
+  showed those tags literally instead of the data they resolve to.
+  `Send::getFollowupTemplatesForItem()` now renders each template's content
+  against the item through `Glpi\ContentTemplates\TemplateManager` — the same
+  call GLPI's own `ajax/itilfollowup.php` makes when picking a template for a
+  plain followup — falling back to the raw content if rendering fails.
 
 ## [1.0.0] - 2026-09-08
 

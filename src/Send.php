@@ -39,6 +39,7 @@ use CommonGLPI;
 use CommonITILObject;
 use CronTask;
 use Glpi\Application\View\TemplateRenderer;
+use Glpi\ContentTemplates\TemplateManager;
 use Html;
 use ITILFollowup;
 use Session;
@@ -100,6 +101,15 @@ class Send extends CommonDBTM
      * addFollowup() runs on whatever ends up in that field regardless of where
      * it came from, so a GLPI template using those same placeholders works
      * exactly like the plugin's own default.
+     *
+     * A GLPI followup template's own content can carry its own Twig-based
+     * placeholders (`{% for user in ticket.requesters.users %}...{% endfor %}`,
+     * etc. — see Glpi\ContentTemplates\TemplateManager, since GLPI 10.0):
+     * rendered here against $item exactly like GLPI's own
+     * ajax/itilfollowup.php does when a technician picks one for a plain
+     * followup, so this offers the same rendered content rather than the raw,
+     * unrendered tags. Falls back to the raw content on a Twig error, matching
+     * AbstractITILChildTemplate::getRenderedContent()'s own fallback.
      *
      * Returns [] when the class does not exist (older GLPI without followup
      * templates), the current user lacks read rights on it, or none are visible
@@ -171,10 +181,19 @@ class Send extends CommonDBTM
                 $rawId      = $row['id'] ?? 0;
                 $rawName    = $row['name'] ?? '';
                 $rawContent = $row['content'] ?? '';
+                $content    = is_string($rawContent) ? $rawContent : '';
+
+                if ($content !== '' && class_exists(TemplateManager::class)) {
+                    $rendered = TemplateManager::renderContentForCommonITIL($item, $content);
+                    if ($rendered !== null) {
+                        $content = $rendered;
+                    }
+                }
+
                 $templates[] = [
                     'id'      => is_numeric($rawId) ? (int) $rawId : 0,
                     'name'    => is_string($rawName) ? $rawName : '',
-                    'content' => is_string($rawContent) ? $rawContent : '',
+                    'content' => $content,
                 ];
             }
 
