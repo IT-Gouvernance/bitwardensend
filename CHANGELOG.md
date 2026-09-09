@@ -21,6 +21,14 @@ beyond being a label).
   token exchange: that creating and revoking a Send round-trips against a
   live account. `NativeSendDriver` itself never reads a Send back this way,
   so the plugin's own behavior is unaffected either way.
+- The followup preview's rich-text sanitizer stripped `javascript:`/`data:`/
+  `vbscript:` from `href`/`src`/etc. but only checked the scheme after
+  leading whitespace, not after removing embedded tab/newline/CR characters
+  the way a browser itself does before resolving a URL — a scheme like
+  `jav` + tab + `ascript:` slipped past the check unmodified but still ran
+  as a working `javascript:` URI once clicked. Now strips those characters
+  before testing, matching the WHATWG URL Standard's own first parsing
+  step.
 - A GLPI followup template picked on the creation form (as an alternative to
   the plugin's own configured template) was inserted as raw, unrendered
   text. A template using GLPI's own Twig-based content placeholders (e.g.

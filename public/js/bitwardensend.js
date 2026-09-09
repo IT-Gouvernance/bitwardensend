@@ -476,8 +476,15 @@
                     return;
                 }
                 const localName = name.replace(/^[^:]+:/, '');
+                // Browsers strip every ASCII tab/newline/CR from a URL
+                // before parsing it for navigation (WHATWG URL Standard's
+                // own first parsing step) - do the same before testing the
+                // scheme, or e.g. "jav\tascript:" (a tab hidden inside the
+                // word) slips past this check untouched here but still
+                // resolves to a working javascript: URI on click.
+                const normalizedValue = attr.value.replace(/[\t\n\r]/g, '');
                 if (navigatingAttributes.indexOf(localName) !== -1
-                    && /^\s*(javascript|data|vbscript):/i.test(attr.value)) {
+                    && /^\s*(javascript|data|vbscript):/i.test(normalizedValue)) {
                     node.removeAttribute(attr.name);
                 }
             });
