@@ -5,6 +5,17 @@ All notable changes to this plugin are documented here. Format loosely follows
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
 beyond being a label).
 
+## [Unreleased]
+
+### Fixed
+
+- `tests/NativeSendDriverIntegrationTest.php` read a created Send back
+  through the anonymous Send-access route with a `GET` — that route is a
+  `POST` (confirmed against Vaultwarden's server source, which implements
+  the same contract as the real Bitwarden API), so a `GET` there 404s. Only
+  the optional integration test is affected; `NativeSendDriver` itself never
+  calls this route.
+
 ## [1.0.0] - 2026-09-08
 
 Initial release.
