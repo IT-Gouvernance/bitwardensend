@@ -44,7 +44,7 @@ use Session;
  */
 class Profile extends \Profile
 {
-    public static $rightname = 'profile';
+    public static string $rightname = 'profile';
 
     /**
      * Inherited from \Profile, so late static binding would otherwise resolve the
@@ -75,7 +75,7 @@ class Profile extends \Profile
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if ($item instanceof \Profile && !$item->isNewItem() && Session::haveRight('profile', READ)
+        if ($item instanceof \Profile && !$item->isNewItem() && Session::haveRight(self::$rightname, READ)
             && self::isCentralInterface($item)) {
             return self::createTabEntry(Send::getTypeName(0), 0, self::class, Send::getIcon());
         }
@@ -92,7 +92,7 @@ class Profile extends \Profile
         // safe on its own, matching Config::displayTabContentForItem() and
         // Send::showForItem().
         if (
-            $item instanceof \Profile && !$item->isNewItem() && Session::haveRight('profile', READ)
+            $item instanceof \Profile && !$item->isNewItem() && Session::haveRight(self::$rightname, READ)
             && self::isCentralInterface($item)
         ) {
             self::showForProfile((int) $item->getID());
@@ -175,7 +175,7 @@ class Profile extends \Profile
                 'The rights below require this one: every action in the tab checks it first.',
                 'bitwardensend',
             ),
-            'can_update'   => Session::haveRight('profile', UPDATE),
+            'can_update'   => Session::haveRight(self::$rightname, UPDATE),
         ]);
     }
 

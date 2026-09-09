@@ -43,7 +43,7 @@ use Session;
  */
 class Config extends CommonDBTM
 {
-    public static $rightname = 'config';
+    public static string $rightname = 'config';
 
     // Masked by CommonDBTM::unsetUndisclosedFields() wherever core relies on
     // it (the REST API's item/search/list output, Dropdown/Link rendering) -
@@ -466,7 +466,7 @@ class Config extends CommonDBTM
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof \Config && Session::haveRight('config', UPDATE)) {
+        if ($item instanceof \Config && Session::haveRight(self::$rightname, UPDATE)) {
             self::showConfigForm();
         }
 
@@ -480,7 +480,7 @@ class Config extends CommonDBTM
         // directly with a deterministic tab key, without going through
         // that label check. Re-checked here too so this method is safe on
         // its own, regardless of caller.
-        if (!Session::haveRight('config', UPDATE)) {
+        if (!Session::haveRight(self::$rightname, UPDATE)) {
             return;
         }
 
@@ -499,7 +499,7 @@ class Config extends CommonDBTM
             'has_native_master_password'    => self::getNativeMasterPassword() !== '',
             'cleanup_cron_url'              => Send::getCleanupCronUrl(),
             'cleanup_cron_name'             => Send::getTypeName(1) . ' — cleanup',
-            'can_update'                    => Session::haveRight('config', UPDATE),
+            'can_update'                    => Session::haveRight(self::$rightname, UPDATE),
         ]);
     }
 

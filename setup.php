@@ -72,7 +72,7 @@ function plugin_init_bitwardensend(): void
         return;
     }
 
-    if (Session::haveRight('config', UPDATE)) {
+    if (Session::haveRight(Config::$rightname, UPDATE)) {
         $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['bitwardensend'] = 'front/config.form.php';
     }
 

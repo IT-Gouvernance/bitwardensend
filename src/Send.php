@@ -50,7 +50,7 @@ use Toolbox;
  */
 class Send extends CommonDBTM
 {
-    public static $rightname = 'plugin_bitwardensend_send';
+    public static string $rightname = 'plugin_bitwardensend_send';
 
     // Masked by CommonDBTM::unsetUndisclosedFields() wherever core relies on
     // it (the REST API's item/search/list output, Dropdown/Link rendering) -
@@ -597,7 +597,7 @@ class Send extends CommonDBTM
             // marked private: requesting it is not enough without the
             // right to see private followups in the first place.
             $isPrivate = !empty($input['followup_is_private'])
-                && Session::haveRight('followup', ITILFollowup::SEEPRIVATE);
+                && Session::haveRight(ITILFollowup::$rightname, ITILFollowup::SEEPRIVATE);
             self::addFollowup(
                 $item,
                 is_string($rawFollowupContent) ? $rawFollowupContent : '',
