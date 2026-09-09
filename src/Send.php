@@ -236,7 +236,7 @@ class Send extends CommonDBTM
             return [];
         }
 
-        if (!in_array($item->getType(), self::getSupportedItemtypes(), true)) {
+        if (!in_array($item::class, self::getSupportedItemtypes(), true)) {
             return [];
         }
 
@@ -279,7 +279,7 @@ class Send extends CommonDBTM
     {
         if (
             !($item instanceof CommonITILObject)
-            || !in_array($item->getType(), self::getSupportedItemtypes(), true)
+            || !in_array($item::class, self::getSupportedItemtypes(), true)
             || !self::canView()
         ) {
             return '';
@@ -288,7 +288,7 @@ class Send extends CommonDBTM
         $count = 0;
         if (!empty($_SESSION['glpishow_count_on_tabs'])) {
             $count = countElementsInTable(self::getTable(), [
-                'itemtype' => $item->getType(),
+                'itemtype' => $item::class,
                 'items_id' => $item->getID(),
             ]);
         }
@@ -327,7 +327,7 @@ class Send extends CommonDBTM
         $iterator = $DB->request([
             'FROM'  => self::getTable(),
             'WHERE' => [
-                'itemtype' => $item->getType(),
+                'itemtype' => $item::class,
                 'items_id' => $item->getID(),
             ],
             'ORDER' => 'date_creation DESC',
@@ -437,7 +437,7 @@ class Send extends CommonDBTM
         ];
 
         return [
-            'itemtype'           => $item->getType(),
+            'itemtype'           => $item::class,
             'items_id'           => $item->getID(),
             'default_name'       => sprintf('%s #%d', $item->getTypeName(1), $item->getID()),
             'conf'               => $formConf,
@@ -675,7 +675,7 @@ class Send extends CommonDBTM
 
         $followup = new ITILFollowup();
         $created  = $followup->add([
-            'itemtype'   => $item->getType(),
+            'itemtype'   => $item::class,
             'items_id'   => $item->getID(),
             'content'    => $content,
             'is_private' => $is_private ? 1 : 0,
