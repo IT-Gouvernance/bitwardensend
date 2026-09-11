@@ -31,7 +31,7 @@
 
 use GlpiPlugin\Bitwardensend\Profile;
 
-Session::checkRight('profile', UPDATE);
+Session::checkRight(Profile::$rightname, UPDATE);
 
 // The CSRF token (see {{ csrf_token() }} in this form's template) is
 // validated automatically by GLPI's own request kernel before this script

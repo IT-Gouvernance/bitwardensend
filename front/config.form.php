@@ -32,7 +32,7 @@
 use GlpiPlugin\Bitwardensend\Config;
 use GlpiPlugin\Bitwardensend\SendDriverFactory;
 
-Session::checkRight('config', UPDATE);
+Session::checkRight(Config::$rightname, UPDATE);
 
 // The CSRF token (see {{ csrf_token() }} in this form's template) is
 // validated automatically by GLPI's own request kernel before this script

@@ -4,7 +4,7 @@ Adds a **Bitwarden Send** button to the ITIL timeline, alongside Answer/Task/Sol
 Document/Validation. A technician types a secret, the plugin creates a Bitwarden Send
 link and posts that link as a followup on the ticket.
 
-Built for GLPI 11.
+Built for GLPI 12.
 
 *(Français : voir [README_TECHNIQUE.md](README_TECHNIQUE.md).)*
 

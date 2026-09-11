@@ -50,7 +50,7 @@ use Toolbox;
  */
 class Send extends CommonDBTM
 {
-    public static $rightname = 'plugin_bitwardensend_send';
+    public static string $rightname = 'plugin_bitwardensend_send';
 
     // Masked by CommonDBTM::unsetUndisclosedFields() wherever core relies on
     // it (the REST API's item/search/list output, Dropdown/Link rendering) -
@@ -58,9 +58,9 @@ class Send extends CommonDBTM
     // ciphertext, not plaintext, and only ever decrypted in showForItem()
     // behind its own right/entity checks, but there is no reason to expose
     // even the ciphertext to a session that only has plugin READ.
-    public static $undisclosedFields = ['access_url'];
+    public static array $undisclosedFields = ['access_url'];
 
-    public $dohistory = false;
+    public bool $dohistory = false;
 
     public static function getTable($classname = null): string
     {
@@ -236,7 +236,7 @@ class Send extends CommonDBTM
             return [];
         }
 
-        if (!in_array($item->getType(), self::getSupportedItemtypes(), true)) {
+        if (!in_array($item::class, self::getSupportedItemtypes(), true)) {
             return [];
         }
 
@@ -279,7 +279,7 @@ class Send extends CommonDBTM
     {
         if (
             !($item instanceof CommonITILObject)
-            || !in_array($item->getType(), self::getSupportedItemtypes(), true)
+            || !in_array($item::class, self::getSupportedItemtypes(), true)
             || !self::canView()
         ) {
             return '';
@@ -288,7 +288,7 @@ class Send extends CommonDBTM
         $count = 0;
         if (!empty($_SESSION['glpishow_count_on_tabs'])) {
             $count = countElementsInTable(self::getTable(), [
-                'itemtype' => $item->getType(),
+                'itemtype' => $item::class,
                 'items_id' => $item->getID(),
             ]);
         }
@@ -327,7 +327,7 @@ class Send extends CommonDBTM
         $iterator = $DB->request([
             'FROM'  => self::getTable(),
             'WHERE' => [
-                'itemtype' => $item->getType(),
+                'itemtype' => $item::class,
                 'items_id' => $item->getID(),
             ],
             'ORDER' => 'date_creation DESC',
@@ -437,7 +437,7 @@ class Send extends CommonDBTM
         ];
 
         return [
-            'itemtype'           => $item->getType(),
+            'itemtype'           => $item::class,
             'items_id'           => $item->getID(),
             'default_name'       => sprintf('%s #%d', $item->getTypeName(1), $item->getID()),
             'conf'               => $formConf,
@@ -597,7 +597,7 @@ class Send extends CommonDBTM
             // marked private: requesting it is not enough without the
             // right to see private followups in the first place.
             $isPrivate = !empty($input['followup_is_private'])
-                && Session::haveRight('followup', ITILFollowup::SEEPRIVATE);
+                && Session::haveRight(ITILFollowup::$rightname, ITILFollowup::SEEPRIVATE);
             self::addFollowup(
                 $item,
                 is_string($rawFollowupContent) ? $rawFollowupContent : '',
@@ -675,7 +675,7 @@ class Send extends CommonDBTM
 
         $followup = new ITILFollowup();
         $created  = $followup->add([
-            'itemtype'   => $item->getType(),
+            'itemtype'   => $item::class,
             'items_id'   => $item->getID(),
             'content'    => $content,
             'is_private' => $is_private ? 1 : 0,

@@ -7,6 +7,19 @@ beyond being a label).
 
 ## [Unreleased]
 
+### Added
+
+- GLPI 12 compatibility (`2.0.0`, GLPI 11 no longer supported). Also fixes
+  static analysis/Rector errors GLPI 12's CI catches that GLPI 11's did not:
+  `$rightname` now typed `string` on `Config`/`Profile`/`Send`, every
+  `Session::checkRight()`/`haveRight()` call uses a `$rightname` reference
+  instead of a hardcoded right-name string, `Send`/`Config`'s
+  `$undisclosedFields` and `Send::$dohistory` now carry the same native
+  `array`/`bool` types `CommonDBTM` declares them with in GLPI 12,
+  `EncString`'s `TYPE` class constant is now typed `int` (PHP 8.3), and
+  `Send::$item->getType()` calls are now `$item::class` (GLPI 12's own
+  Rector rule for this).
+
 ### Fixed
 
 - `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
