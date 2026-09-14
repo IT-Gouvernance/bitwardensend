@@ -9,6 +9,17 @@ beyond being a label).
 
 ### Fixed
 
+- The "Bitwarden Sends" tab exposed a Send's stored access link (when "Keep
+  the link in the GLPI database" is on) to anyone with the plugin's own
+  `READ` right and view access to the ticket, regardless of whether that
+  Send's link was posted as a **private** followup specifically to keep it
+  from users without `ITILFollowup::SEEPRIVATE` (e.g. the requester, or
+  support staff without that right). The tab has no record of which
+  followup a Send was posted with, so `Send::showForItem()` now only
+  decrypts and shows the link to viewers who either hold `SEEPRIVATE` or
+  are the Send's own creator — treating every stored link as at least that
+  sensitive, since it is a bearer URL granting direct access to the shared
+  secret.
 - `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
   back the way a real recipient would, to independently verify its
   encrypted content — the premise turned out to be wrong once actually run

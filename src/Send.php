@@ -323,6 +323,20 @@ class Send extends CommonDBTM
         // at display time instead of being stored.
         $now = $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s');
 
+        // The stored link is a bearer URL: whoever holds it can open the
+        // shared secret directly, no further right check involved. A Send
+        // can be posted as a *private* followup specifically to keep it
+        // from users without ITILFollowup::SEEPRIVATE (e.g. the requester,
+        // or support staff without that right) - but this tab has no
+        // record of which followup a Send was posted with, so it cannot
+        // tell a Send behind a private followup apart from one that isn't.
+        // Treating every stored link as being at least that sensitive
+        // (unless the viewer is the Send's own creator) is the only way to
+        // not silently defeat that private-followup intent for users who
+        // can otherwise see this tab.
+        $loginUserId      = Session::getLoginUserID();
+        $canRevealAnyLink = Session::haveRight('followup', ITILFollowup::SEEPRIVATE);
+
         $sends = [];
         $iterator = $DB->request([
             'FROM'  => self::getTable(),
@@ -350,8 +364,10 @@ class Send extends CommonDBTM
             $deletionDate    = is_string($rawDeletionDate) ? $rawDeletionDate : null;
             $row['deletion_date_display'] = $deletionDate ? Html::convDateTime($deletionDate) : '';
 
+            $canRevealLink = $canRevealAnyLink || ($loginUserId !== false && $loginUserId === $usersId);
+
             $rawAccessUrl = $row['access_url'] ?? null;
-            $row['access_url'] = is_string($rawAccessUrl) && $rawAccessUrl !== ''
+            $row['access_url'] = ($canRevealLink && is_string($rawAccessUrl) && $rawAccessUrl !== '')
                 ? Config::decrypt($rawAccessUrl)
                 : null;
 
