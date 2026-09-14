@@ -20,6 +20,18 @@ beyond being a label).
   are the Send's own creator — treating every stored link as at least that
   sensitive, since it is a bearer URL granting direct access to the shared
   secret.
+- The followup preview's rich-text sanitizer stripped tab/newline/CR from
+  inside a URL before checking its scheme, but only leading whitespace
+  (`\s`) before it — missing the rest of the C0 control range (e.g.
+  `U+0001`–`U+0008`, `U+000E`–`U+001F`) a browser also trims from the
+  front of a URL before parsing it. A payload with one of those leading
+  `javascript:`/`data:`/`vbscript:` slipped past the check but still ran
+  on click. Now strips the whole `\x00`–`\x20` range before testing.
+- `Config::isLoopbackHost()` compared the host against the bare string
+  `::1`, but `parse_url()` keeps the brackets on an IPv6 host (`[::1]` for
+  `http://[::1]:8087`), so a literal IPv6 loopback URL never matched and
+  was rejected as "not loopback" — despite docs/README_TECHNICAL.md
+  documenting `::1` as supported. Strips the brackets before comparing.
 - `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
   back the way a real recipient would, to independently verify its
   encrypted content — the premise turned out to be wrong once actually run

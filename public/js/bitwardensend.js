@@ -476,15 +476,18 @@
                     return;
                 }
                 const localName = name.replace(/^[^:]+:/, '');
-                // Browsers strip every ASCII tab/newline/CR from a URL
-                // before parsing it for navigation (WHATWG URL Standard's
-                // own first parsing step) - do the same before testing the
-                // scheme, or e.g. "jav\tascript:" (a tab hidden inside the
-                // word) slips past this check untouched here but still
-                // resolves to a working javascript: URI on click.
-                const normalizedValue = attr.value.replace(/[\t\n\r]/g, '');
+                // Browsers strip every ASCII tab/newline/CR from anywhere
+                // in a URL, plus any leading C0 control character or
+                // space, before parsing it for navigation (WHATWG URL
+                // Standard's own basic URL parser) - do the same before
+                // testing the scheme. Covers both a hidden tab inside the
+                // word (e.g. "jav" + tab + "ascript:") and a leading
+                // control character before the word - both slip past a
+                // narrower check untouched here but still resolve to a
+                // working javascript: URI on click.
+                const normalizedValue = attr.value.replace(/[\x00-\x20]/g, '');
                 if (navigatingAttributes.indexOf(localName) !== -1
-                    && /^\s*(javascript|data|vbscript):/i.test(normalizedValue)) {
+                    && /^(javascript|data|vbscript):/i.test(normalizedValue)) {
                     node.removeAttribute(attr.name);
                 }
             });
