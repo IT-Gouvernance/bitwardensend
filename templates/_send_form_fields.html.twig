@@ -225,13 +225,19 @@
                   <i class="ti ti-stack-2 text-secondary"
                      title="{{ __('Use a GLPI followup template', 'bitwardensend') }}"></i>
                   <select id="bws_followup_template" class="form-select form-select-sm"
-                          data-bws-confirm-replace="{{ __('Replace the current text? Your changes will be lost.', 'bitwardensend') }}">
+                          data-bws-itemtype="{{ subitem.itemtype }}" data-bws-items-id="{{ subitem.items_id }}"
+                          data-bws-confirm-replace="{{ __('Replace the current text? Your changes will be lost.', 'bitwardensend') }}"
+                          data-bws-load-error="{{ __('Could not load that template.', 'bitwardensend') }}">
                      <option value="" data-bws-content="{{ subitem.conf.followup_template }}">
                         {{ __('Plugin default template', 'bitwardensend') }}
                      </option>
+                     {# GLPI followup template <option>s carry no content: picking one
+                        fetches and renders it on demand (ajax/followup_template.php),
+                        instead of every visible template being rendered up front - see
+                        Send::getFollowupTemplatesForItem()'s docblock for why. #}
                      <optgroup label="{{ __('GLPI followup templates', 'bitwardensend') }}">
                         {% for tpl in subitem.followup_templates %}
-                           <option value="{{ tpl.id }}" data-bws-content="{{ tpl.content }}">
+                           <option value="{{ tpl.id }}">
                               {{ tpl.name }}
                            </option>
                         {% endfor %}

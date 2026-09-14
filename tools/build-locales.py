@@ -218,6 +218,7 @@ FR = {
     'Could not create the Send: %s': 'Échec de la création du Send : %s',
     'Could not decrypt the account user key: wrong master password?':
         'Impossible de déchiffrer la clé utilisateur du compte : mot de passe maître incorrect ?',
+    'Could not load that template.': "Impossible de charger ce gabarit.",
     'Could not revoke the link: %s': 'Échec de la révocation du lien : %s',
     'Could not save the configuration.': "Échec de l'enregistrement de la configuration.",
     'Create link': 'Créer le lien',
@@ -469,6 +470,7 @@ ES = {
     'Could not create the Send: %s': 'No se pudo crear el Send: %s',
     'Could not decrypt the account user key: wrong master password?':
         'No se pudo descifrar la clave de usuario de la cuenta: ¿contraseña maestra incorrecta?',
+    'Could not load that template.': 'No se pudo cargar esa plantilla.',
     'Could not revoke the link: %s': 'No se pudo revocar el enlace: %s',
     'Could not save the configuration.': 'No se pudo guardar la configuración.',
     'Create link': 'Crear enlace',

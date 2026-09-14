@@ -32,6 +32,19 @@ beyond being a label).
   `http://[::1]:8087`), so a literal IPv6 loopback URL never matched and
   was rejected as "not loopback" — despite docs/README_TECHNICAL.md
   documenting `::1` as supported. Strips the brackets before comparing.
+- The Send creation form's GLPI followup template selector rendered every
+  visible template through Twig (`TemplateManager::renderContentForCommonITIL()`)
+  on every form load, before any of them was ever picked — not just the one
+  the technician selected. Since GLPI's own sandboxed Twig policy allows
+  unbounded loops (`{% for %}`/`range()`), a user with `itilfollowuptemplate`
+  `UPDATE` could author a template that pins a PHP-FPM worker for the
+  duration every time the Send form opens in that entity, or one that
+  errors on render and shows an error message on every form open. Template
+  content is now rendered on demand instead, via a new
+  `ajax/followup_template.php` endpoint, only for the one template actually
+  selected — the same right/entity/`is_active` scoping as the list it was
+  picked from, matching how GLPI core's own `ajax/itilfollowup.php` renders
+  exactly one template on demand for a plain followup.
 - `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
   back the way a real recipient would, to independently verify its
   encrypted content — the premise turned out to be wrong once actually run

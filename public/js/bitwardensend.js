@@ -584,6 +584,26 @@
     }
 
     /**
+     * Puts content into the followup field (editor or plain <textarea>
+     * fallback) and refreshes the {url}/{expiration}/{max_access} preview -
+     * the part shared between the plugin-default and GLPI-template branches
+     * of pluginBitwardensendApplyFollowupTemplate below.
+     */
+    function pluginBitwardensendSetFollowupContent(select, content) {
+        const editor = (window.tinymce && window.tinymce.get) ? window.tinymce.get('bws_followup') : null;
+        const textarea = document.getElementById('bws_followup');
+
+        if (editor) {
+            editor.setContent(content);
+            select._bwsBaseline = editor.getContent();
+        } else if (textarea) {
+            textarea.value = content;
+        }
+
+        window.pluginBitwardensendUpdateFollowupPreview();
+    }
+
+    /**
      * Load the selected followup template — this plugin's own default, or one
      * of GLPI's followup templates ("gabarits de suivi") — into the followup
      * editor, replacing its current content.
@@ -594,6 +614,14 @@
      * where that check cannot be done reliably (see
      * pluginBitwardensendGetFollowupEditorContent): no worse than before this
      * selector existed.
+     *
+     * The plugin's own default template's content is already known
+     * client-side (it is just this configuration's own template string), so
+     * that option's content comes straight from its data-bws-content
+     * attribute. A GLPI followup template is fetched and rendered on demand
+     * instead (ajax/followup_template.php) — its content is never sent to
+     * the browser until actually picked, unlike the plugin default. See
+     * Send::getFollowupTemplatesForItem()'s docblock for why.
      *
      * The {url}/{expiration}/{max_access} substitution happens server-side at
      * submission time, on whatever text ends up in the field: a GLPI template
@@ -612,21 +640,52 @@
             }
         }
 
-        const option = select.options[select.selectedIndex];
-        const content = option ? (option.getAttribute('data-bws-content') || '') : '';
-        const editor = (window.tinymce && window.tinymce.get) ? window.tinymce.get('bws_followup') : null;
-        const textarea = document.getElementById('bws_followup');
+        const templateId = select.value;
+        select._bwsLastValue = templateId;
 
-        if (editor) {
-            editor.setContent(content);
-            select._bwsBaseline = editor.getContent();
-        } else if (textarea) {
-            textarea.value = content;
+        if (templateId === '') {
+            const option = select.options[select.selectedIndex];
+            const content = option ? (option.getAttribute('data-bws-content') || '') : '';
+            pluginBitwardensendSetFollowupContent(select, content);
+            return;
         }
 
-        select._bwsLastValue = select.value;
+        const itemtype = select.dataset.bwsItemtype || '';
+        const items_id = select.dataset.bwsItemsId || '';
+        const url = `${CFG_GLPI.root_doc}/plugins/bitwardensend/ajax/followup_template.php`
+            + `?itemtype=${encodeURIComponent(itemtype)}`
+            + `&items_id=${encodeURIComponent(items_id)}`
+            + `&template_id=${encodeURIComponent(templateId)}`;
 
-        window.pluginBitwardensendUpdateFollowupPreview();
+        select.disabled = true;
+
+        fetch(url, { credentials: 'same-origin' })
+            .then((response) => response.json().then((body) => ({ ok: response.ok, body: body })))
+            .then((result) => {
+                select.disabled = false;
+
+                // select.value may have already moved on to a different
+                // option (or back to the plugin default) while this request
+                // was in flight - applying a now-stale response would
+                // silently overwrite whatever the technician picked instead.
+                if (select.value !== templateId) {
+                    return;
+                }
+
+                if (!result.ok || typeof result.body.content !== 'string') {
+                    throw new Error('bitwardensend: followup template fetch failed');
+                }
+
+                pluginBitwardensendSetFollowupContent(select, result.body.content);
+            })
+            .catch(() => {
+                select.disabled = false;
+                // Left selected rather than snapped back to the plugin
+                // default: the editor was never touched by this failed
+                // attempt either, so reverting just the dropdown would make
+                // the two disagree about what is actually loaded.
+                window.alert(select.dataset.bwsLoadError || 'Could not load that template.');
+            });
     };
 
     /**
