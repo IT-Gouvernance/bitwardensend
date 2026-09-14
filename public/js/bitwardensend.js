@@ -485,6 +485,10 @@
                 // control character before the word - both slip past a
                 // narrower check untouched here but still resolve to a
                 // working javascript: URI on click.
+                // no-control-regex disabled below: intentional, this range
+                // is exactly the set of bytes a browser itself strips from
+                // a URL before parsing it, per the comment above.
+                // eslint-disable-next-line no-control-regex
                 const normalizedValue = attr.value.replace(/[\x00-\x20]/g, '');
                 if (navigatingAttributes.indexOf(localName) !== -1
                     && /^(javascript|data|vbscript):/i.test(normalizedValue)) {

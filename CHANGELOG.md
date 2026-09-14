@@ -26,7 +26,10 @@ beyond being a label).
   `U+0001`–`U+0008`, `U+000E`–`U+001F`) a browser also trims from the
   front of a URL before parsing it. A payload with one of those leading
   `javascript:`/`data:`/`vbscript:` slipped past the check but still ran
-  on click. Now strips the whole `\x00`–`\x20` range before testing.
+  on click. Now strips the whole `\x00`–`\x20` range before testing. ESLint's
+  `no-control-regex` rule flagged that range as suspicious (it normally
+  catches accidental control characters in a regex) — annotated as
+  intentional instead of narrowing it.
 - `Config::isLoopbackHost()` compared the host against the bare string
   `::1`, but `parse_url()` keeps the brackets on an IPv6 host (`[::1]` for
   `http://[::1]:8087`), so a literal IPv6 loopback URL never matched and
