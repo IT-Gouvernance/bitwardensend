@@ -237,7 +237,11 @@ class Config extends CommonDBTM
      */
     private static function isLoopbackHost(string $host): bool
     {
-        $host = strtolower($host);
+        // parse_url() keeps the brackets on an IPv6 host (e.g. the host of
+        // http://[::1]:8087 is "[::1]", not "::1") - strip them, or a
+        // literal IPv6 loopback URL never matches below despite being
+        // exactly what this allowlist means to accept.
+        $host = trim(strtolower($host), '[]');
 
         return $host === 'localhost'
             || $host === '::1'
