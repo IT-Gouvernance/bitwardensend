@@ -110,20 +110,19 @@ class Send extends CommonDBTM
      * it came from, so a GLPI template using those same placeholders works
      * exactly like the plugin's own default.
      *
-     * A GLPI followup template's own content can carry its own Twig-based
-     * placeholders (`{% for user in ticket.requesters.users %}...{% endfor %}`,
-     * etc. — see Glpi\ContentTemplates\TemplateManager, since GLPI 10.0):
-     * rendered here against $item exactly like GLPI's own
-     * ajax/itilfollowup.php does when a technician picks one for a plain
-     * followup, so this offers the same rendered content rather than the raw,
-     * unrendered tags. Falls back to the raw content on a Twig error, matching
-     * AbstractITILChildTemplate::getRenderedContent()'s own fallback.
+     * Names and ids only - the selected template's content is fetched and
+     * rendered on demand through renderFollowupTemplateForItem() below (see
+     * ajax/followup_template.php), not eagerly here for every template.
+     * Rendering is real Twig execution (see that method's docblock); doing
+     * it for every visible template on every form load, before any of them
+     * is ever picked, made template content itself a CPU/memory primitive
+     * for anyone able to author one.
      *
      * Returns [] when the class does not exist (older GLPI without followup
      * templates), the current user lacks read rights on it, or none are visible
      * from the item's entity — the selector is then simply omitted.
      *
-     * @return list<array{id:int,name:string,content:string}>
+     * @return list<array{id:int,name:string}>
      */
     public static function getFollowupTemplatesForItem(CommonITILObject $item): array
     {
@@ -134,50 +133,15 @@ class Send extends CommonDBTM
         // must degrade to "no GLPI templates offered", not break the Send
         // creation dialog itself.
         try {
-            if (!class_exists(ITILFollowupTemplate::class)) {
+            $scope = self::followupTemplateScopeForItem($item);
+            if ($scope === null) {
                 return [];
-            }
-
-            // Matches GLPI's usual convention for these dropdown classes
-            // (same as TaskTemplate/SolutionTemplate); falls back to the same
-            // string if the property itself is not declared on this version.
-            $rightname = property_exists(ITILFollowupTemplate::class, 'rightname')
-                ? ITILFollowupTemplate::$rightname
-                : 'itilfollowuptemplate';
-            if (!Session::haveRight($rightname, READ)) {
-                return [];
-            }
-
-            $table = ITILFollowupTemplate::getTable();
-            if (!$DB->tableExists($table)) {
-                return [];
-            }
-
-            $where = [];
-            if ($DB->fieldExists($table, 'is_active')) {
-                $where['is_active'] = 1;
-            }
-
-            if ($DB->fieldExists($table, 'entities_id')) {
-                // 'auto': includes is_recursive=1 templates from ancestor
-                // entities when the table has that column, same rule GLPI's
-                // own entity-scoped pickers use — plain entities_id match
-                // otherwise. Without this, a template set recursive on a
-                // parent entity simply never showed up here.
-                $rawEntitiesId = $item->fields['entities_id'] ?? 0;
-                $entitiesId    = is_numeric($rawEntitiesId) ? (int) $rawEntitiesId : 0;
-                $where[] = (new DbUtils())->getEntitiesRestrictCriteria(
-                    $table,
-                    'entities_id',
-                    $entitiesId,
-                    'auto',
-                );
             }
 
             $templates = [];
             $iterator = $DB->request([
-                'FROM'  => $table,
-                'WHERE' => $where,
+                'FROM'  => $scope['table'],
+                'WHERE' => $scope['where'],
                 'ORDER' => 'name ASC',
             ]);
 
@@ -186,22 +150,12 @@ class Send extends CommonDBTM
                     continue;
                 }
 
-                $rawId      = $row['id'] ?? 0;
-                $rawName    = $row['name'] ?? '';
-                $rawContent = $row['content'] ?? '';
-                $content    = is_string($rawContent) ? $rawContent : '';
-
-                if ($content !== '' && class_exists(TemplateManager::class)) {
-                    $rendered = TemplateManager::renderContentForCommonITIL($item, $content);
-                    if ($rendered !== null) {
-                        $content = $rendered;
-                    }
-                }
+                $rawId   = $row['id'] ?? 0;
+                $rawName = $row['name'] ?? '';
 
                 $templates[] = [
-                    'id'      => is_numeric($rawId) ? (int) $rawId : 0,
-                    'name'    => is_string($rawName) ? $rawName : '',
-                    'content' => $content,
+                    'id'   => is_numeric($rawId) ? (int) $rawId : 0,
+                    'name' => is_string($rawName) ? $rawName : '',
                 ];
             }
 
@@ -210,6 +164,133 @@ class Send extends CommonDBTM
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Renders one GLPI followup template's content against $item - the
+     * on-demand counterpart to the list above, called from
+     * ajax/followup_template.php once a technician actually picks a
+     * template, instead of every visible one being rendered up front.
+     *
+     * A GLPI followup template's own content can carry its own Twig-based
+     * placeholders (`{% for user in ticket.requesters.users %}...{% endfor %}`,
+     * etc. — see Glpi\ContentTemplates\TemplateManager, since GLPI 10.0):
+     * rendered here against $item exactly like GLPI's own
+     * ajax/itilfollowup.php does when a technician picks one for a plain
+     * followup, so this returns the same rendered content rather than the
+     * raw, unrendered tags. Falls back to the raw content on a Twig error,
+     * matching AbstractITILChildTemplate::getRenderedContent()'s own
+     * fallback.
+     *
+     * Uses the exact same right/entity/is_active scoping as the list above
+     * (followupTemplateScopeForItem()) plus the requested id, so this can
+     * never render (or confirm the existence of) a template the caller
+     * could not already see listed there.
+     *
+     * Returns null when the template does not exist or is not visible to
+     * the current user/item under that same scoping - never the "class
+     * missing"/"no right" cases silently degrading to empty content, since
+     * the caller (the AJAX endpoint) needs to tell those apart from a
+     * legitimately empty template to respond with the right HTTP status.
+     */
+    public static function renderFollowupTemplateForItem(CommonITILObject $item, int $templateId): ?string
+    {
+        global $DB;
+
+        try {
+            $scope = self::followupTemplateScopeForItem($item);
+            if ($scope === null || $templateId <= 0) {
+                return null;
+            }
+
+            $where       = $scope['where'];
+            $where['id'] = $templateId;
+
+            $row = null;
+            $iterator = $DB->request([
+                'FROM'  => $scope['table'],
+                'WHERE' => $where,
+                'LIMIT' => 1,
+            ]);
+            foreach ($iterator as $data) {
+                if (is_array($data)) {
+                    $row = $data;
+                }
+            }
+
+            if ($row === null) {
+                return null;
+            }
+
+            $rawContent = $row['content'] ?? '';
+            $content    = is_string($rawContent) ? $rawContent : '';
+
+            if ($content !== '' && class_exists(TemplateManager::class)) {
+                $rendered = TemplateManager::renderContentForCommonITIL($item, $content);
+                if ($rendered !== null) {
+                    $content = $rendered;
+                }
+            }
+
+            return $content;
+        } catch (Throwable $throwable) {
+            Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Shared right/table/entity scoping for the two methods above - kept as
+     * one implementation so the set of templates offered in the list can
+     * never drift from the set renderFollowupTemplateForItem() will
+     * actually render.
+     *
+     * @return array{table:string,where:array<int|string,mixed>}|null
+     */
+    private static function followupTemplateScopeForItem(CommonITILObject $item): ?array
+    {
+        if (!class_exists(ITILFollowupTemplate::class)) {
+            return null;
+        }
+
+        // Matches GLPI's usual convention for these dropdown classes (same
+        // as TaskTemplate/SolutionTemplate); falls back to the same string
+        // if the property itself is not declared on this version.
+        $rightname = property_exists(ITILFollowupTemplate::class, 'rightname')
+            ? ITILFollowupTemplate::$rightname
+            : 'itilfollowuptemplate';
+        if (!Session::haveRight($rightname, READ)) {
+            return null;
+        }
+
+        global $DB;
+        $table = ITILFollowupTemplate::getTable();
+        if (!$DB->tableExists($table)) {
+            return null;
+        }
+
+        $where = [];
+        if ($DB->fieldExists($table, 'is_active')) {
+            $where['is_active'] = 1;
+        }
+
+        if ($DB->fieldExists($table, 'entities_id')) {
+            // 'auto': includes is_recursive=1 templates from ancestor
+            // entities when the table has that column, same rule GLPI's
+            // own entity-scoped pickers use — plain entities_id match
+            // otherwise. Without this, a template set recursive on a
+            // parent entity simply never showed up here.
+            $rawEntitiesId = $item->fields['entities_id'] ?? 0;
+            $entitiesId    = is_numeric($rawEntitiesId) ? (int) $rawEntitiesId : 0;
+            $where[] = (new DbUtils())->getEntitiesRestrictCriteria(
+                $table,
+                'entities_id',
+                $entitiesId,
+                'auto',
+            );
+        }
+
+        return ['table' => $table, 'where' => $where];
     }
 
     // ------------------------------------------------------------------
@@ -418,7 +499,7 @@ class Send extends CommonDBTM
      *         followup_is_private: mixed,
      *         followup_template: string
      *     },
-     *     followup_templates: list<array{id:int,name:string,content:string}>,
+     *     followup_templates: list<array{id:int,name:string}>,
      *     force_followup: bool
      * }
      */
