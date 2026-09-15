@@ -9,6 +9,45 @@ beyond being a label).
 
 ### Fixed
 
+- The "Bitwarden Sends" tab exposed a Send's stored access link (when "Keep
+  the link in the GLPI database" is on) to anyone with the plugin's own
+  `READ` right and view access to the ticket, regardless of whether that
+  Send's link was posted as a **private** followup specifically to keep it
+  from users without `ITILFollowup::SEEPRIVATE` (e.g. the requester, or
+  support staff without that right). The tab has no record of which
+  followup a Send was posted with, so `Send::showForItem()` now only
+  decrypts and shows the link to viewers who either hold `SEEPRIVATE` or
+  are the Send's own creator — treating every stored link as at least that
+  sensitive, since it is a bearer URL granting direct access to the shared
+  secret.
+- The followup preview's rich-text sanitizer stripped tab/newline/CR from
+  inside a URL before checking its scheme, but only leading whitespace
+  (`\s`) before it — missing the rest of the C0 control range (e.g.
+  `U+0001`–`U+0008`, `U+000E`–`U+001F`) a browser also trims from the
+  front of a URL before parsing it. A payload with one of those leading
+  `javascript:`/`data:`/`vbscript:` slipped past the check but still ran
+  on click. Now strips the whole `\x00`–`\x20` range before testing. ESLint's
+  `no-control-regex` rule flagged that range as suspicious (it normally
+  catches accidental control characters in a regex) — annotated as
+  intentional instead of narrowing it.
+- `Config::isLoopbackHost()` compared the host against the bare string
+  `::1`, but `parse_url()` keeps the brackets on an IPv6 host (`[::1]` for
+  `http://[::1]:8087`), so a literal IPv6 loopback URL never matched and
+  was rejected as "not loopback" — despite docs/README_TECHNICAL.md
+  documenting `::1` as supported. Strips the brackets before comparing.
+- The Send creation form's GLPI followup template selector rendered every
+  visible template through Twig (`TemplateManager::renderContentForCommonITIL()`)
+  on every form load, before any of them was ever picked — not just the one
+  the technician selected. Since GLPI's own sandboxed Twig policy allows
+  unbounded loops (`{% for %}`/`range()`), a user with `itilfollowuptemplate`
+  `UPDATE` could author a template that pins a PHP-FPM worker for the
+  duration every time the Send form opens in that entity, or one that
+  errors on render and shows an error message on every form open. Template
+  content is now rendered on demand instead, via a new
+  `ajax/followup_template.php` endpoint, only for the one template actually
+  selected — the same right/entity/`is_active` scoping as the list it was
+  picked from, matching how GLPI core's own `ajax/itilfollowup.php` renders
+  exactly one template on demand for a plain followup.
 - `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
   back the way a real recipient would, to independently verify its
   encrypted content — the premise turned out to be wrong once actually run
