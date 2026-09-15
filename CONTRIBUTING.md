@@ -19,7 +19,7 @@ By participating in this project, you agree to abide by its
 
 ## Development setup
 
-This is a GLPI plugin: it needs a GLPI 11 checkout to run against. Clone this
+This is a GLPI plugin: it needs a GLPI 12 checkout to run against. Clone this
 repository into that checkout's `plugins/` directory as `bitwardensend`:
 
 ```bash

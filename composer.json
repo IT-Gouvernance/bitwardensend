@@ -4,7 +4,7 @@
     "license": "GPL-3.0-or-later",
     "type": "glpi-plugin",
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.0"

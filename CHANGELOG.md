@@ -7,6 +7,21 @@ beyond being a label).
 
 ## [Unreleased]
 
+### Added
+
+- GLPI 12 compatibility (`2.0.0`, GLPI 11 no longer supported). Also fixes
+  static analysis/Rector errors GLPI 12's CI catches that GLPI 11's did not:
+  `$rightname` now typed `string` on `Config`/`Profile`/`Send`, every
+  `Session::checkRight()`/`haveRight()` call uses a `$rightname` reference
+  instead of a hardcoded right-name string, `Send`/`Config`'s
+  `$undisclosedFields` and `Send::$dohistory` now carry the same native
+  `array`/`bool` types `CommonDBTM` declares them with in GLPI 12,
+  `EncString`'s `TYPE` class constant is now typed `int` (PHP 8.3), and
+  `Send::$item->getType()` calls are now `$item::class` (GLPI 12's own
+  Rector rule for this). One more hardcoded `'followup'` right-name string
+  (`Send::showForItem()`, added by a later merge from the 1.0.x line) fixed
+  the same way, for the same reason.
+
 ### Fixed
 
 - The "Bitwarden Sends" tab exposed a Send's stored access link (when "Keep

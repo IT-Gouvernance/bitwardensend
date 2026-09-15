@@ -51,7 +51,7 @@ use RuntimeException;
  */
 final readonly class EncString implements Stringable
 {
-    private const TYPE = 2;
+    private const int TYPE = 2;
 
     private function __construct(
         public string $iv,
