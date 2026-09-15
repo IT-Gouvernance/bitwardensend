@@ -25,19 +25,19 @@ msgstr ""
 msgid "0 means unlimited until expiration."
 msgstr ""
 
-#: src/Config.php:285, templates/config.html.twig:161
+#: src/Config.php:289, templates/config.html.twig:161
 msgid "API URL"
 msgstr ""
 
-#: src/Config.php:297, templates/config.html.twig:188
+#: src/Config.php:301, templates/config.html.twig:188
 msgid "API client ID"
 msgstr ""
 
-#: src/Config.php:312, templates/config.html.twig:199
+#: src/Config.php:316, templates/config.html.twig:199
 msgid "API client secret"
 msgstr ""
 
-#: src/Config.php:298, templates/config.html.twig:219
+#: src/Config.php:302, templates/config.html.twig:219
 msgid "Account email"
 msgstr ""
 
@@ -75,7 +75,7 @@ msgstr ""
 msgid "Bitwarden API error: %s"
 msgstr ""
 
-#: src/Send.php:586
+#: src/Send.php:710
 msgid "Bitwarden Send link created: %s"
 msgstr ""
 
@@ -140,11 +140,11 @@ msgstr ""
 msgid "Copy link"
 msgstr ""
 
-#: src/Send.php:501
+#: src/Send.php:625
 msgid "Could not compute the expiration date."
 msgstr ""
 
-#: src/Send.php:535
+#: src/Send.php:659
 msgid "Could not create the Send: %s"
 msgstr ""
 
@@ -152,7 +152,11 @@ msgstr ""
 msgid "Could not decrypt the account user key: wrong master password?"
 msgstr ""
 
-#: src/Send.php:716
+#: templates/_send_form_fields.html.twig:230
+msgid "Could not load that template."
+msgstr ""
+
+#: src/Send.php:840
 msgid "Could not revoke the link: %s"
 msgstr ""
 
@@ -168,11 +172,11 @@ msgstr ""
 msgid "Create Send links"
 msgstr ""
 
-#: templates/answer_form.html.twig:57, templates/form.html.twig:60
+#: templates/answer_form.html.twig:57, templates/form.html.twig:62
 msgid "Create link"
 msgstr ""
 
-#: src/Send.php:873, templates/list.html.twig:50
+#: src/Send.php:997, templates/list.html.twig:50
 msgid "Created by"
 msgstr ""
 
@@ -188,7 +192,7 @@ msgstr ""
 msgid "Default maximum views"
 msgstr ""
 
-#: hook.php:145, src/Send.php:747
+#: hook.php:145, src/Send.php:871
 msgid ""
 "Delete revoked or expired Bitwarden Send entries past the configured retention"
 msgstr ""
@@ -226,7 +230,7 @@ msgid ""
 "Encrypted with the GLPI key. Used to unlock the vault automatically. Leave empty if you unlock the service yourself."
 msgstr ""
 
-#: src/Send.php:885, templates/list.html.twig:52
+#: src/Send.php:1009, templates/list.html.twig:52
 msgid "Expiration"
 msgstr ""
 
@@ -254,7 +258,7 @@ msgstr ""
 msgid "For example http://127.0.0.1:8087 — never expose this port publicly."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:232
+#: templates/_send_form_fields.html.twig:238
 msgid "GLPI followup templates"
 msgstr ""
 
@@ -271,7 +275,7 @@ msgstr ""
 msgid "Generate a random password"
 msgstr ""
 
-#: src/Send.php:85
+#: src/Send.php:94
 msgid ""
 "Hello,\n"
 "\n"
@@ -296,11 +300,15 @@ msgstr ""
 msgid "Hide the text by default when opened"
 msgstr ""
 
-#: src/Config.php:284, templates/config.html.twig:150
+#: src/Config.php:288, templates/config.html.twig:150
 msgid "Identity URL"
 msgstr ""
 
-#: ajax/form.php:54, src/Send.php:452
+#: ajax/followup_template.php:63
+msgid "Invalid request."
+msgstr ""
+
+#: ajax/followup_template.php:68, ajax/form.php:54, src/Send.php:576
 msgid "Item not found or access denied."
 msgstr ""
 
@@ -328,7 +336,7 @@ msgstr ""
 msgid "Link password (optional)"
 msgstr ""
 
-#: src/Send.php:731
+#: src/Send.php:855
 msgid "Link revoked."
 msgstr ""
 
@@ -336,7 +344,7 @@ msgstr ""
 msgid "Local API (bw serve) — recommended"
 msgstr ""
 
-#: src/Config.php:265, templates/config.html.twig:70
+#: src/Config.php:269, templates/config.html.twig:70
 msgid "Local API URL"
 msgstr ""
 
@@ -344,7 +352,7 @@ msgstr ""
 msgid "Lowercase"
 msgstr ""
 
-#: src/Config.php:319, templates/config.html.twig:90, templates/config.html.twig:230
+#: src/Config.php:323, templates/config.html.twig:90, templates/config.html.twig:230
 msgid "Master password"
 msgstr ""
 
@@ -411,7 +419,7 @@ msgstr ""
 msgid "Password protected"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:230
+#: templates/_send_form_fields.html.twig:232
 msgid "Plugin default template"
 msgstr ""
 
@@ -423,7 +431,7 @@ msgstr ""
 msgid "Post the link as a followup by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:244
+#: templates/_send_form_fields.html.twig:250
 msgid "Private followup (hidden from the requester)"
 msgstr ""
 
@@ -431,11 +439,11 @@ msgstr ""
 msgid "Private followup by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:228
+#: templates/_send_form_fields.html.twig:229
 msgid "Replace the current text? Your changes will be lost."
 msgstr ""
 
-#: src/Send.php:751
+#: src/Send.php:875
 msgid "Retention (days)"
 msgstr ""
 
@@ -451,7 +459,7 @@ msgstr ""
 msgid "Revoke this link?"
 msgstr ""
 
-#: src/Send.php:891, templates/list.html.twig:80
+#: src/Send.php:1015, templates/list.html.twig:80
 msgid "Revoked"
 msgstr ""
 
@@ -479,7 +487,7 @@ msgstr ""
 msgid "Send it over another channel, by phone or text message for instance."
 msgstr ""
 
-#: src/Config.php:277, templates/config.html.twig:112
+#: src/Config.php:281, templates/config.html.twig:112
 msgid "Send link base URL"
 msgstr ""
 
@@ -507,6 +515,10 @@ msgstr ""
 msgid "Symbols"
 msgstr ""
 
+#: ajax/followup_template.php:76
+msgid "Template not found."
+msgstr ""
+
 #: templates/config.html.twig:374
 msgid "Test connection"
 msgstr ""
@@ -527,11 +539,11 @@ msgstr ""
 msgid "The Send was created but no access link was returned."
 msgstr ""
 
-#: src/Send.php:660
+#: src/Send.php:784
 msgid "The Send was created but the followup could not be added."
 msgstr ""
 
-#: src/Send.php:480
+#: src/Send.php:604
 msgid "The content to share is empty."
 msgstr ""
 
@@ -604,7 +616,7 @@ msgstr ""
 msgid "Unlimited"
 msgstr ""
 
-#: ajax/form.php:46, src/Send.php:442
+#: ajax/form.php:46, src/Send.php:566
 msgid "Unsupported item type."
 msgstr ""
 
@@ -621,7 +633,7 @@ msgid ""
 "Variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}"
 msgstr ""
 
-#: src/Config.php:286, templates/config.html.twig:172
+#: src/Config.php:290, templates/config.html.twig:172
 msgid "Web vault URL"
 msgstr ""
 
@@ -630,11 +642,11 @@ msgid ""
 "When disabled, GLPI only keeps metadata: the link then exists in the followup only."
 msgstr ""
 
-#: src/Send.php:469
+#: src/Send.php:593
 msgid "You are not allowed to add a followup on this item."
 msgstr ""
 
-#: src/Send.php:641, templates/_send_form_fields.html.twig:199
+#: src/Send.php:765, templates/_send_form_fields.html.twig:199
 msgid "an unlimited number of"
 msgstr ""
 
@@ -650,7 +662,7 @@ msgstr ""
 msgid "the link (created once you submit)"
 msgstr ""
 
-#: src/Send.php:63
+#: src/Send.php:72
 msgid "Bitwarden Send"
 msgid_plural "Bitwarden Sends"
 msgstr[0] ""
