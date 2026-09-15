@@ -8,9 +8,10 @@ name: Rebuild translation
 #
 # Manual only (workflow_dispatch): run it by hand — e.g. `gh workflow run
 # locales.yml --ref <branch>` or "Run workflow" in the Actions UI — whenever
-# a change touches translated strings. It only PUSHES the regenerated
-# catalog when run on the default branch; on any other branch it still
-# builds and fails the same way, but never commits back.
+# a change touches translated strings. Pushes the regenerated catalog back
+# to whichever branch it was run on (main and 1.0/bugfixes are independent
+# here - each only gets updated when run against it), not just the
+# repository's default branch.
 #
 # release.yml (the version-bump release workflow) is also manual only, so
 # there is no automatic ordering between the two: run this one first when a
@@ -48,7 +49,6 @@ jobs:
         run: python3 tools/build-locales.py
 
       - name: Commit updated catalogs
-        if: github.ref_name == github.event.repository.default_branch
         env:
           TARGET_BRANCH: ${{ github.ref_name }}
         run: |
