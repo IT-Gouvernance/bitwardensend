@@ -33,6 +33,7 @@ namespace GlpiPlugin\Bitwardensend;
 
 use DbUtils;
 use ITILFollowupTemplate;
+use RuntimeException;
 use Throwable;
 use CommonDBTM;
 use CommonGLPI;
@@ -42,6 +43,7 @@ use Glpi\Application\View\TemplateRenderer;
 use Glpi\ContentTemplates\TemplateManager;
 use Html;
 use ITILFollowup;
+use Notification;
 use Session;
 use Toolbox;
 
@@ -876,6 +878,16 @@ class Send extends CommonDBTM
             ];
         }
 
+        if ($name === 'testconnection') {
+            return [
+                'description' => __(
+                    'Test the Bitwarden connection and report failures the same way GLPI reports any '
+                    . 'other automatic action that keeps failing',
+                    'bitwardensend',
+                ),
+            ];
+        }
+
         return [];
     }
 
@@ -893,6 +905,115 @@ class Send extends CommonDBTM
         }
 
         return null;
+    }
+
+    /**
+     * @see getCleanupCronUrl()
+     */
+    public static function getTestConnectionCronUrl(): ?string
+    {
+        $task = new CronTask();
+        if ($task->getFromDBbyName(self::class, 'testconnection')) {
+            $rawTaskId = $task->fields['id'] ?? 0;
+            return CronTask::getFormURLWithID(is_numeric($rawTaskId) ? (int) $rawTaskId : 0);
+        }
+
+        return null;
+    }
+
+    /**
+     * Name and edit URL of the core notification that actually reports a
+     * repeatedly-failing automatic action (Setup > Notifications - the
+     * `CronTask`/`alert` event, "Monitoring of automatic actions" by
+     * default). Looked up by itemtype/event rather than by that default
+     * name: an admin can rename it, and this must still find it either way.
+     *
+     * Null when it does not exist - deleted, or a GLPI version without it -
+     * the config page hint then falls back to naming Setup > Notifications
+     * generically instead of linking to a specific entry.
+     *
+     * @return array{url:string,name:string}|null
+     */
+    public static function getCronMonitoringNotificationUrl(): ?array
+    {
+        if (!class_exists(Notification::class)) {
+            return null;
+        }
+
+        global $DB;
+        $table = Notification::getTable();
+        if (!$DB->tableExists($table)) {
+            return null;
+        }
+
+        $iterator = $DB->request([
+            'FROM'  => $table,
+            'WHERE' => ['itemtype' => 'CronTask', 'event' => 'alert'],
+            'LIMIT' => 1,
+        ]);
+
+        foreach ($iterator as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $rawId = $row['id'] ?? 0;
+            $id    = is_numeric($rawId) ? (int) $rawId : 0;
+            if ($id <= 0) {
+                continue;
+            }
+
+            $rawName = $row['name'] ?? '';
+
+            return [
+                'url'  => Notification::getFormURLWithID($id),
+                'name' => is_string($rawName) && $rawName !== ''
+                    ? $rawName
+                    : __('Monitoring of automatic actions'),
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * Verifies the currently configured Send driver can actually reach
+     * Bitwarden, on whatever schedule this automatic action is set to
+     * (Setup > Automatic actions > Bitwarden Send — test connection, same
+     * place as its frequency).
+     *
+     * Deliberately throws rather than returning a failure code: GLPI's own
+     * CronTask runner only counts a run as an *error* (as opposed to
+     * "nothing to do") when the callback throws, and only errored runs
+     * count toward its own existing "5 failures in the last 10 runs"
+     * notification threshold (Setup > Notifications > "Monitoring of
+     * automatic actions" — a core notification, already there for every
+     * automatic action, not something this plugin adds). So this
+     * deliberately does *not* build any notification machinery of its
+     * own: a bad status here becomes a thrown exception, GLPI's own
+     * automatic-action monitoring does the rest, exactly like it already
+     * does for `cleanup` above or any other automatic action that starts
+     * failing.
+     *
+     * Same status vocabulary as front/config.form.php's own "Test
+     * connection" button ('unlocked'/'ok' healthy, everything else - a
+     * different keyword, or testConnection() itself throwing on an
+     * unreachable endpoint - not) so an admin sees the same failure
+     * reasons here as when testing by hand from the configuration page.
+     */
+    public static function cronTestConnection(?CronTask $task = null): int
+    {
+        $status = SendDriverFactory::create()->testConnection();
+
+        if (!in_array($status, ['unlocked', 'ok'], true)) {
+            throw new RuntimeException(
+                sprintf(__('Unexpected vault status: %s', 'bitwardensend'), $status),
+            );
+        }
+
+        $task?->addVolume(1);
+
+        return 1;
     }
 
     /**

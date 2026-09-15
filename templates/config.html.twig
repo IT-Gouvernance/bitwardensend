@@ -366,6 +366,25 @@
          </div>
       </div>
 
+      <div class="alert alert-info d-flex align-items-center mb-0">
+         <i class="ti ti-info-circle me-2"></i>
+         <div>
+            {{ __('The connection above is also tested periodically by the automatic action', 'bitwardensend') }}
+            {% if test_connection_cron_url %}
+               <a href="{{ test_connection_cron_url }}">{{ test_connection_cron_name }}</a>
+            {% else %}
+               <strong>{{ test_connection_cron_name }}</strong>
+            {% endif %}
+            {{ __('(Setup > Automatic actions); a failure is reported the same way GLPI reports any other automatic action that keeps failing, via the notification', 'bitwardensend') }}
+            {% if cron_monitoring_notification %}
+               <a href="{{ cron_monitoring_notification.url }}">{{ cron_monitoring_notification.name }}</a>
+            {% else %}
+               <strong>{{ __('Monitoring of automatic actions', 'bitwardensend') }}</strong>
+            {% endif %}
+            {{ __('(Setup > Notifications).', 'bitwardensend') }}
+         </div>
+      </div>
+
    </div>
 
    {% if can_update %}

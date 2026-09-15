@@ -503,6 +503,9 @@ class Config extends CommonDBTM
             'has_native_master_password'    => self::getNativeMasterPassword() !== '',
             'cleanup_cron_url'              => Send::getCleanupCronUrl(),
             'cleanup_cron_name'             => Send::getTypeName(1) . ' — cleanup',
+            'test_connection_cron_url'      => Send::getTestConnectionCronUrl(),
+            'test_connection_cron_name'     => Send::getTypeName(1) . ' — test connection',
+            'cron_monitoring_notification'  => Send::getCronMonitoringNotificationUrl(),
             'can_update'                    => Session::haveRight(self::$rightname, UPDATE),
         ]);
     }
