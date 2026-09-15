@@ -21,6 +21,28 @@ beyond being a label).
   Rector rule for this). One more hardcoded `'followup'` right-name string
   (`Send::showForItem()`, added by a later merge from the 1.0.x line) fixed
   the same way, for the same reason.
+- New automatic action, "Bitwarden Send — test connection": periodically
+  re-runs the same connection check as the configuration page's own "Test
+  connection" button. On an unhealthy status it throws, so a run counts as
+  an error the same way any other automatic action failure does — GLPI's
+  own existing "Monitoring of automatic actions" notification (Setup >
+  Notifications) picks it up after enough failures, with no plugin-specific
+  notification machinery added for this. Defaults to every 5 minutes
+  (`cleanup` stays daily) — that notification only fires after 5 errored
+  runs in the last 10, so the frequency is what actually bounds how long a
+  real outage goes unnoticed before the first alert; both the frequency
+  and that 5-in-10 threshold are GLPI's own automatic-action settings, not
+  plugin-specific ones, and remain admin-adjustable. A hint on the
+  configuration page links to it, next to the
+  existing one for `cleanup`, and to the actual GLPI notification that
+  reports the failure (looked up by itemtype/event so it still finds it
+  even if an admin has renamed it, or falls back to naming Setup >
+  Notifications generically if it can't be found at all). Registered as
+  `testconnection`, not `test_connection`: `CronTask::launch()` builds the
+  callback method name as `itemtype::('cron' . name)` — case-insensitive
+  like any PHP method call, but not underscore-insensitive, so the
+  original underscored name would have made GLPI look for a method that
+  does not exist and this task would never actually have run.
 
 ### Fixed
 

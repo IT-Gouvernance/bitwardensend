@@ -150,6 +150,29 @@ function plugin_bitwardensend_install(): bool
         'param'   => 30,
     ]);
 
+    // No 'param': failures are reported through GLPI's own existing
+    // automatic-action monitoring (Setup > Notifications), not a plugin-
+    // specific setting - see Send::cronTestConnection()'s own docblock.
+    // Default frequency 5 minutes, not hourly: that notification only
+    // fires after 5 errored runs in the last 10, so the frequency is what
+    // actually controls how long a real outage goes unnoticed - 5 minutes
+    // keeps that worst case under an hour instead of most of a day.
+    //
+    // No underscore in the registered name ('testconnection', not
+    // 'test_connection'): CronTask::launch() builds the callback method
+    // name as itemtype::('cron' . name) with no transformation of its own
+    // - case-insensitively fine (PHP method names always are), but an
+    // underscore in $name that isn't in the actual method name would make
+    // that lookup fail outright, so this task would silently never run.
+    CronTask::register(Send::class, 'testconnection', 5 * MINUTE_TIMESTAMP, [
+        'comment' => __(
+            'Test the Bitwarden connection and report failures the same way GLPI reports any '
+            . 'other automatic action that keeps failing',
+            'bitwardensend',
+        ),
+        'mode'    => CronTask::MODE_INTERNAL,
+    ]);
+
     return true;
 }
 

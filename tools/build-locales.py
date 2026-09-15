@@ -169,8 +169,15 @@ TPL_ES = ("Hola,\n\n"
           "Saludos cordiales,")
 
 FR = {
+    '(Setup > Automatic actions); a failure is reported the same way GLPI reports any '
+    'other automatic action that keeps failing, via the notification':
+        "(Configuration > Actions automatiques) ; un échec est signalé de la même façon que "
+        "GLPI signale toute autre action automatique qui échoue de façon répétée, via la "
+        "notification",
     '(Setup > Automatic actions).':
         '(Configuration > Actions automatiques).',
+    '(Setup > Notifications).':
+        '(Configuration > Notifications).',
     '0 means unlimited until expiration.':
         "0 signifie illimité jusqu'à l'expiration.",
     'API URL': "URL de l'API",
@@ -276,6 +283,7 @@ FR = {
     'Master password': 'Mot de passe maître',
     'Max views': 'Ouvertures max.',
     'Maximum number of views': "Nombre maximal d'ouvertures",
+    'Monitoring of automatic actions': 'Surveillance des actions automatiques',
     'Native (PHP only)': 'Natif (PHP uniquement)',
     'Native works without shell access on the server (e.g. GLPI Cloud) but only '
     'supports service accounts using the PBKDF2 KDF — see the README.':
@@ -349,6 +357,12 @@ FR = {
         'Enregistré — saisissez-en un nouveau pour le remplacer',
     'Symbols': 'Symboles',
     'Test connection': 'Tester la connexion',
+    'Test the Bitwarden connection and report failures the same way GLPI reports any '
+    'other automatic action that keeps failing':
+        "Tester la connexion à Bitwarden et signaler les échecs de la même façon que GLPI "
+        "signale toute autre action automatique qui échoue de façon répétée",
+    'The connection above is also tested periodically by the automatic action':
+        "La connexion ci-dessus est aussi testée périodiquement par l'action automatique",
     'The rights below require this one: every action in the tab checks it first.':
         "Les droits ci-dessous nécessitent celui-ci : chaque action de l'onglet le vérifie en premier.",
     'The Bitwarden client is not logged in. Run "bw login" on the server.':
@@ -421,8 +435,15 @@ FR = {
 FR_PLURAL = {('Bitwarden Send', 'Bitwarden Sends'): ('Bitwarden Send', 'Bitwarden Sends')}
 
 ES = {
+    '(Setup > Automatic actions); a failure is reported the same way GLPI reports any '
+    'other automatic action that keeps failing, via the notification':
+        "(Configuración > Acciones automáticas); un fallo se notifica de la misma forma que "
+        "GLPI notifica cualquier otra acción automática que sigue fallando, mediante la "
+        "notificación",
     '(Setup > Automatic actions).':
         '(Configuración > Acciones automáticas).',
+    '(Setup > Notifications).':
+        '(Configuración > Notificaciones).',
     '0 means unlimited until expiration.':
         '0 significa ilimitado hasta la expiración.',
     'API URL': 'URL de la API',
@@ -528,6 +549,7 @@ ES = {
     'Master password': 'Contraseña maestra',
     'Max views': 'Vistas máx.',
     'Maximum number of views': 'Número máximo de vistas',
+    'Monitoring of automatic actions': 'Supervisión de las acciones automáticas',
     'Native (PHP only)': 'Nativo (solo PHP)',
     'Native works without shell access on the server (e.g. GLPI Cloud) but only '
     'supports service accounts using the PBKDF2 KDF — see the README.':
@@ -601,6 +623,12 @@ ES = {
         'Guardado — escriba uno nuevo para reemplazarlo',
     'Symbols': 'Símbolos',
     'Test connection': 'Probar conexión',
+    'Test the Bitwarden connection and report failures the same way GLPI reports any '
+    'other automatic action that keeps failing':
+        "Probar la conexión a Bitwarden y notificar los fallos de la misma forma que GLPI "
+        "notifica cualquier otra acción automática que sigue fallando",
+    'The connection above is also tested periodically by the automatic action':
+        'La conexión anterior también se prueba periódicamente mediante la acción automática',
     'The rights below require this one: every action in the tab checks it first.':
         'Los derechos siguientes requieren este: cada acción de la pestaña lo comprueba primero.',
     'The Bitwarden client is not logged in. Run "bw login" on the server.':
