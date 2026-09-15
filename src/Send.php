@@ -335,7 +335,7 @@ class Send extends CommonDBTM
         // not silently defeat that private-followup intent for users who
         // can otherwise see this tab.
         $loginUserId      = Session::getLoginUserID();
-        $canRevealAnyLink = Session::haveRight('followup', ITILFollowup::SEEPRIVATE);
+        $canRevealAnyLink = Session::haveRight(ITILFollowup::$rightname, ITILFollowup::SEEPRIVATE);
 
         $sends = [];
         $iterator = $DB->request([

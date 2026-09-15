@@ -18,7 +18,9 @@ beyond being a label).
   `array`/`bool` types `CommonDBTM` declares them with in GLPI 12,
   `EncString`'s `TYPE` class constant is now typed `int` (PHP 8.3), and
   `Send::$item->getType()` calls are now `$item::class` (GLPI 12's own
-  Rector rule for this).
+  Rector rule for this). One more hardcoded `'followup'` right-name string
+  (`Send::showForItem()`, added by a later merge from the 1.0.x line) fixed
+  the same way, for the same reason.
 
 ### Fixed
 
