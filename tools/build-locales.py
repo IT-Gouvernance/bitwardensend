@@ -262,6 +262,7 @@ FR = {
     'Hide the text by default when opened':
         "Masquer le texte par défaut à l'ouverture",
     'Identity URL': "URL d'identité",
+    'Invalid request.': 'Requête invalide.',
     'Item not found or access denied.': 'Élément introuvable ou accès refusé.',
     'Keep the link in the GLPI database': 'Conserver le lien dans la base GLPI',
     'Leave empty to require none': "Laissez vide pour n'en exiger aucun",
@@ -348,6 +349,7 @@ FR = {
     'Stored — type a new one to replace it':
         'Enregistré — saisissez-en un nouveau pour le remplacer',
     'Symbols': 'Symboles',
+    'Template not found.': 'Gabarit introuvable.',
     'Test connection': 'Tester la connexion',
     'The rights below require this one: every action in the tab checks it first.':
         "Les droits ci-dessous nécessitent celui-ci : chaque action de l'onglet le vérifie en premier.",
@@ -514,6 +516,7 @@ ES = {
     'Hide the text by default when opened':
         'Ocultar el texto de forma predeterminada al abrirlo',
     'Identity URL': 'URL de identidad',
+    'Invalid request.': 'Solicitud no válida.',
     'Item not found or access denied.': 'Elemento no encontrado o acceso denegado.',
     'Keep the link in the GLPI database': 'Conservar el enlace en la base de datos de GLPI',
     'Leave empty to require none': 'Déjelo vacío para no exigir ninguno',
@@ -600,6 +603,7 @@ ES = {
     'Stored — type a new one to replace it':
         'Guardado — escriba uno nuevo para reemplazarlo',
     'Symbols': 'Símbolos',
+    'Template not found.': 'Plantilla no encontrada.',
     'Test connection': 'Probar conexión',
     'The rights below require this one: every action in the tab checks it first.':
         'Los derechos siguientes requieren este: cada acción de la pestaña lo comprueba primero.',
