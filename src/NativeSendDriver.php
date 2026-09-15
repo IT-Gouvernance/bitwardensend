@@ -86,6 +86,22 @@ class NativeSendDriver implements SendDriverInterface
 
     public function testConnection(): string
     {
+        // The full authenticate(), not just requestAccessToken(): a
+        // previous version of this method called only the token request,
+        // reasoning that the derived user key was never used - true for
+        // the return value, but it missed that authenticate() failing is
+        // itself the signal that matters here. It is the only thing that
+        // actually exercises the master password (throws "Could not
+        // decrypt the account user key: wrong master password?" if it is
+        // wrong) and the KDF check (this driver cannot handle Argon2id
+        // accounts at all). Skipping it made testConnection() report 'ok'
+        // for a wrong master password or an Argon2id account - both of
+        // which make every real createSend() fail - which affected the
+        // configuration page's own manual "Test connection" button too,
+        // not just the automatic health check. The CLI driver's own
+        // testConnection() still calls ensureUnlocked() and validates the
+        // master password the same way, so this also keeps the two
+        // drivers consistent with each other.
         $this->authenticate();
         return 'ok';
     }

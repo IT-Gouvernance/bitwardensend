@@ -45,8 +45,6 @@ use GlpiPlugin\Bitwardensend\Send;
 
 Session::checkRight(Send::$rightname, CREATE);
 
-header('Content-Type: application/json; charset=UTF-8');
-
 $rawItemtype = $_GET['itemtype'] ?? '';
 $itemtype    = is_string($rawItemtype) ? $rawItemtype : '';
 $rawItemsId  = $_GET['items_id'] ?? 0;
@@ -76,4 +74,14 @@ if ($content === null) {
     throw new NotFoundHttpException(__('Template not found.', 'bitwardensend'));
 }
 
-echo json_encode(['content' => $content]);
+// Set only once a JSON body is actually about to be sent: an exception
+// thrown above is rendered by GLPI's kernel with its own Content-Type, and
+// setting application/json before that would just mislabel that body.
+header('Content-Type: application/json; charset=UTF-8');
+
+$encoded = json_encode(['content' => $content], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+if ($encoded === false) {
+    throw new RuntimeException(__('Could not encode the rendered template.', 'bitwardensend'));
+}
+
+echo $encoded;
