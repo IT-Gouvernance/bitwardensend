@@ -43,7 +43,6 @@
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
-use Rector\Configuration\RectorConfigBuilder;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use RectorGlpi\Set\GlpiSetList;
 
@@ -91,8 +90,7 @@ $paths = [
 
 registerPluginAutoloading($paths);
 
-/** @var RectorConfigBuilder $config */
-$config = RectorConfig::configure()
+return RectorConfig::configure()
     ->withPaths($paths)
     ->withRootFiles()
     ->withSets([
@@ -119,5 +117,3 @@ $config = RectorConfig::configure()
         // runtime TypeErrors.
         SafeDeclareStrictTypesRector::class,
     ]);
-
-return $config;
