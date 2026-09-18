@@ -7,6 +7,7 @@
         "php": ">=8.3"
     },
     "require-dev": {
+        "glpi-project/rector-glpi": "^1.1",
         "phpunit/phpunit": "^11.0"
     },
     "autoload": {
