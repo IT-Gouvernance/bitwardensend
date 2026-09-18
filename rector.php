@@ -31,13 +31,14 @@
  * Same rule set and builder chain GLPI's own PluginsRector.php applies for
  * every plugin, reproduced directly instead of `require`-ing that file from
  * an adjacent GLPI checkout: GlpiSetList now comes from glpi-project/rector-glpi
- * (a normal Composer dependency - see composer.json's require-dev), so this
- * runs from a bare clone of this repository alone, no GLPI checkout needed
- * next to it. `src/Plugin.php` is still required directly below: that part
- * is a separate concern (making GLPI core's own Plugin class resolvable for
- * registerPluginAutoloading() further down), which rector-glpi does not
- * provide - GLPI core itself, not just its Rector ruleset, is still needed
- * for that one file.
+ * (a normal Composer dependency - see composer.json's require-dev), pinning
+ * the ruleset's own version instead of whatever GLPI checkout happens to be
+ * sitting next to this plugin when CI (or a developer) runs Rector. This
+ * still needs to run from inside a GLPI checkout, though, exactly like
+ * before: GLPI core's own autoloader and `src/Plugin.php` are both required
+ * directly below, for the actual GLPI classes (CommonDBTM and friends) this
+ * plugin's own classes extend/reference, and for registerPluginAutoloading()
+ * further down. rector-glpi provides the ruleset only, not GLPI core itself.
  */
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
@@ -46,6 +47,12 @@ use Rector\Configuration\RectorConfigBuilder;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use RectorGlpi\Set\GlpiSetList;
 
+// GLPI core's own autoloader - covers CommonDBTM and every other global-
+// namespace GLPI class this plugin's own classes extend/reference, none of
+// which this plugin's own Composer autoload (PSR-4, GlpiPlugin\Bitwardensend\
+// only) knows about. Same file phpstan.neon already loads as a bootstrapFile,
+// for the same reason.
+require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../../src/Plugin.php';
 
 /**
