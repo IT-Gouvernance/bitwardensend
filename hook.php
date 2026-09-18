@@ -158,6 +158,20 @@ function plugin_bitwardensend_install(): bool
     // actually controls how long a real outage goes unnoticed - 5 minutes
     // keeps that worst case under an hour instead of most of a day.
     //
+    // MODE_INTERNAL, like `cleanup` above: works out of the box on every
+    // install, no system cron required - MODE_EXTERNAL would silently
+    // never run at all on the (common) installs that never configure one,
+    // which defeats the point of a health check more than the alternative
+    // downside does. That alternative downside is real, not free: this
+    // task makes a blocking outbound HTTP call to reach Bitwarden/bw
+    // serve, and MODE_INTERNAL runs piggybacked on a random user's own
+    // page request - so a slow/down Bitwarden could make that unlucky
+    // user's page hang, for no reason connected to what they were doing.
+    // Send::cronTestConnection() caps the timeout at 5 seconds for this
+    // call specifically (the configured value can be much longer, meant
+    // for a technician deliberately waiting on a real Send), bounding
+    // that downside without giving up the zero-config default.
+    //
     // No underscore in the registered name ('testconnection', not
     // 'test_connection'): CronTask::launch() builds the callback method
     // name as itemtype::('cron' . name) with no transformation of its own

@@ -156,6 +156,22 @@ Bitwarden Send**, like any other GLPI scheduled action:
   disable automatic cleanup.
 - The frequency and execution mode are also set on that same screen.
 
+## Connection health check
+
+A second automatic action, "Bitwarden Send — test connection", re-runs the same check
+as the configuration page's own "Test connection" button every 5 minutes by default. On
+a failure it reports through GLPI's own automatic-action monitoring (Setup >
+Notifications > "Monitoring of automatic actions"), the same way any other automatic
+action failure is reported — nothing specific to this plugin to configure there.
+
+It runs in GLPI's internal mode, like `cleanup` above (piggybacked on page requests, no
+system cron needed) — works out of the box on every install. The trade-off: it makes an
+outbound network call, so a slow or down Bitwarden can make a random user's page hang
+for the connection's timeout duration right when that failure is exactly what this check
+exists to catch. If that turns out to matter in practice, switch it to external mode
+from Setup > Automatic actions (needs a real system cron configured to then actually
+run).
+
 ## Security notes
 
 - A Send link is self-contained: the decryption key sits in the URL fragment. Posted

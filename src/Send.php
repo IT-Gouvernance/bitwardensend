@@ -1000,10 +1000,24 @@ class Send extends CommonDBTM
      * different keyword, or testConnection() itself throwing on an
      * unreachable endpoint - not) so an admin sees the same failure
      * reasons here as when testing by hand from the configuration page.
+     *
+     * Caps the driver's own timeout at 5 seconds for this call specifically
+     * (the configured value can be much longer - up to 120s - since that
+     * one is meant for a technician deliberately waiting on a real Send).
+     * This task runs in CronTask::MODE_INTERNAL, piggybacked on a random
+     * user's own page request, precisely so it works with no system cron
+     * configured; a hard cap keeps that unlucky user's worst-case wait
+     * bounded to a few seconds instead of the full configured timeout, for
+     * a check that legitimately does not need to wait as long as a real
+     * Send creation would.
      */
     public static function cronTestConnection(?CronTask $task = null): int
     {
-        $status = SendDriverFactory::create()->testConnection();
+        $conf = Config::getConfig();
+        $rawTimeout = $conf['timeout'] ?? 15;
+        $conf['timeout'] = min(is_numeric($rawTimeout) ? (int) $rawTimeout : 15, 5);
+
+        $status = SendDriverFactory::create($conf)->testConnection();
 
         if (!in_array($status, ['unlocked', 'ok'], true)) {
             throw new RuntimeException(

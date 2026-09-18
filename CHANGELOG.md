@@ -46,6 +46,30 @@ beyond being a label).
 
 ### Fixed
 
+- `Send::cronTestConnection()` could block the page of whichever user
+  happened to trigger it (it runs in `CronTask::MODE_INTERNAL`, piggybacked
+  on a random page request — deliberately, so it works with no system cron
+  configured) for up to the driver's full configured timeout (up to 120s)
+  reaching an unresponsive Bitwarden — exactly when that slowness is what
+  the check exists to catch. Caps the timeout at 5 seconds for this call
+  specifically, leaving the configured value untouched for a technician
+  deliberately waiting on a real Send. (An earlier version of this fix
+  instead had the native driver's `testConnection()` skip the PBKDF2
+  master-key derivation, reasoning its result went unused — true for the
+  return value, but that derivation failing is itself the signal that a
+  wrong master password, or an Argon2id account this driver cannot handle
+  at all, is configured. Skipping it made both the health check and the
+  configuration page's own manual "Test connection" button report healthy
+  in exactly those two broken states. Reverted; the timeout cap addresses
+  the actual page-blocking concern without that regression.)
+- `ajax/followup_template.php` set `Content-Type: application/json` before
+  validating the request, so an error response (thrown as one of GLPI's
+  own HTTP exceptions) was rendered by GLPI's kernel under an already-sent
+  JSON header — harmless (the client already tolerates a non-JSON error
+  body), but mislabelled. Moved after validation. Also added a
+  `json_encode()` failure check: invalid UTF-8 in a rendered template
+  would have silently produced an empty `200` body instead of a clear
+  error.
 - The "Bitwarden Sends" tab exposed a Send's stored access link (when "Keep
   the link in the GLPI database" is on) to anyone with the plugin's own
   `READ` right and view access to the ticket, regardless of whether that

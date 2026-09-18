@@ -162,6 +162,23 @@ autre action planifiée GLPI :
   désactiver le nettoyage automatique.
 - La fréquence et le mode d'exécution se règlent aussi sur cet écran.
 
+## Vérification périodique de la connexion
+
+Une seconde action automatique, « Bitwarden Send — test connection », relance le même
+test que le bouton « Tester la connexion » de la page de configuration, toutes les 5
+minutes par défaut. En cas d'échec, il est signalé via la surveillance native des
+actions automatiques de GLPI (Configuration > Notifications > « Surveillance des
+actions automatiques ») — rien de spécifique au plugin à configurer à cet endroit.
+
+Elle s'exécute en mode interne, comme l'action de nettoyage ci-dessus (exécutée lors des
+requêtes de page, aucune tâche cron système nécessaire) — fonctionne d'emblée sur
+n'importe quelle installation. Le compromis : elle fait un appel réseau sortant, donc un
+Bitwarden lent ou indisponible peut faire attendre la page d'un utilisateur au hasard le
+temps du délai de connexion — précisément au moment où cette panne est ce que ce contrôle
+est censé détecter. Si ça pose problème en pratique, passez-la en mode externe depuis
+Configuration > Actions automatiques (nécessite alors une vraie tâche cron système pour
+réellement se déclencher).
+
 ## Notes de sécurité
 
 - Un lien Send est autonome : la clé de déchiffrement se trouve dans le fragment de
