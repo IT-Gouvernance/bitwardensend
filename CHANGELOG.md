@@ -44,6 +44,21 @@ beyond being a label).
   original underscored name would have made GLPI look for a method that
   does not exist and this task would never actually have run.
 
+### Changed
+
+- `rector.php`'s `GlpiSetList` ruleset now comes from `glpi-project/rector-glpi`
+  (added to `composer.json`'s `require-dev`), GLPI's own ruleset published
+  as a standalone Composer package with its own pinned version, instead of
+  `require`-ing GLPI core's own `PluginsRector.php` from whatever GLPI
+  checkout happens to be sitting next to this plugin. Same builder chain
+  (paths, root files, cache, parallel execution, prepared sets, PHP version
+  sets, the `SafeDeclareStrictTypesRector` skip) reproduced directly in
+  `rector.php` instead of delegated to that file. Still needs to run from
+  inside a GLPI checkout, exactly as before: GLPI core's own autoloader and
+  `src/Plugin.php` are both still `require`d directly, for the actual GLPI
+  classes (`CommonDBTM` and friends) this plugin's own classes extend, and
+  for `registerPluginAutoloading()`'s `Plugin::class` reflection.
+
 ### Fixed
 
 - `Send::cronTestConnection()` could block the page of whichever user
