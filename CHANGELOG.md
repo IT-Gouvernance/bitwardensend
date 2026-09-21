@@ -58,6 +58,23 @@ beyond being a label).
   `src/Plugin.php` are both still `require`d directly, for the actual GLPI
   classes (`CommonDBTM` and friends) this plugin's own classes extend, and
   for `registerPluginAutoloading()`'s `Plugin::class` reflection.
+- `phpstan.neon`'s two rule-extension `includes` (`glpi-project/phpstan-glpi`,
+  `phpstan/phpstan-deprecation-rules`) now come from this plugin's own
+  `vendor/` (added to `composer.json`'s `require-dev`, alongside
+  `phpstan/phpstan` itself so `vendor/bin/phpstan` exists) instead of GLPI
+  core's `../../vendor/`. GLPI's own CI runs PHPStan from a prebuilt Docker
+  image with GLPI core's `vendor/` baked in at build time, not reinstalled
+  per run - when that image's `phpstan/phpstan-deprecation-rules` build
+  drifts out of sync with the `phpstan/phpstan` version baked in alongside
+  it, every plugin using it hits the same "Class ... DeprecatedScopeHelper
+  not found" container error, with no fix available from a plugin's own
+  repository. The CI script itself already prefers a plugin's own
+  `vendor/bin/phpstan` over GLPI core's when present, so pinning these
+  three packages here sidesteps the image's staleness entirely. GLPI
+  core's own autoloader and `src/` stay the `bootstrapFiles`/
+  `scanDirectories` source, unchanged - only the static analysis tool
+  itself and its rule packages moved, not the GLPI classes being analyzed
+  against.
 
 ### Fixed
 
