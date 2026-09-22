@@ -5,7 +5,7 @@ All notable changes to this plugin are documented here. Format loosely follows
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
 beyond being a label).
 
-## [Unreleased]
+## [2.0.0-rc1] - 2026-09-22
 
 ### Added
 
@@ -102,6 +102,88 @@ beyond being a label).
   `json_encode()` failure check: invalid UTF-8 in a rendered template
   would have silently produced an empty `200` body instead of a clear
   error.
+- The "Bitwarden Sends" tab exposed a Send's stored access link (when "Keep
+  the link in the GLPI database" is on) to anyone with the plugin's own
+  `READ` right and view access to the ticket, regardless of whether that
+  Send's link was posted as a **private** followup specifically to keep it
+  from users without `ITILFollowup::SEEPRIVATE` (e.g. the requester, or
+  support staff without that right). The tab has no record of which
+  followup a Send was posted with, so `Send::showForItem()` now only
+  decrypts and shows the link to viewers who either hold `SEEPRIVATE` or
+  are the Send's own creator — treating every stored link as at least that
+  sensitive, since it is a bearer URL granting direct access to the shared
+  secret.
+- The followup preview's rich-text sanitizer stripped tab/newline/CR from
+  inside a URL before checking its scheme, but only leading whitespace
+  (`\s`) before it — missing the rest of the C0 control range (e.g.
+  `U+0001`–`U+0008`, `U+000E`–`U+001F`) a browser also trims from the
+  front of a URL before parsing it. A payload with one of those leading
+  `javascript:`/`data:`/`vbscript:` slipped past the check but still ran
+  on click. Now strips the whole `\x00`–`\x20` range before testing. ESLint's
+  `no-control-regex` rule flagged that range as suspicious (it normally
+  catches accidental control characters in a regex) — annotated as
+  intentional instead of narrowing it.
+- `Config::isLoopbackHost()` compared the host against the bare string
+  `::1`, but `parse_url()` keeps the brackets on an IPv6 host (`[::1]` for
+  `http://[::1]:8087`), so a literal IPv6 loopback URL never matched and
+  was rejected as "not loopback" — despite docs/README_TECHNICAL.md
+  documenting `::1` as supported. Strips the brackets before comparing.
+- The Send creation form's GLPI followup template selector rendered every
+  visible template through Twig (`TemplateManager::renderContentForCommonITIL()`)
+  on every form load, before any of them was ever picked — not just the one
+  the technician selected. Since GLPI's own sandboxed Twig policy allows
+  unbounded loops (`{% for %}`/`range()`), a user with `itilfollowuptemplate`
+  `UPDATE` could author a template that pins a PHP-FPM worker for the
+  duration every time the Send form opens in that entity, or one that
+  errors on render and shows an error message on every form open. Template
+  content is now rendered on demand instead, via a new
+  `ajax/followup_template.php` endpoint, only for the one template actually
+  selected — the same right/entity/`is_active` scoping as the list it was
+  picked from, matching how GLPI core's own `ajax/itilfollowup.php` renders
+  exactly one template on demand for a plain followup.
+- `tests/NativeSendDriverIntegrationTest.php` tried to read a created Send
+  back the way a real recipient would, to independently verify its
+  encrypted content — the premise turned out to be wrong once actually run
+  against a real account: that route is not anonymous on current Bitwarden.
+  The real backend (`bitwarden/server`'s `SendsController`) requires a
+  Bearer token carrying the Send's id as a claim, obtained through a
+  separate token exchange this test never implemented (two earlier attempts
+  assumed a plain unauthenticated `GET`/`POST` and both 404'd against a real
+  account). Simplified the test to what it can actually prove without that
+  token exchange: that creating and revoking a Send round-trips against a
+  live account. `NativeSendDriver` itself never reads a Send back this way,
+  so the plugin's own behavior is unaffected either way.
+- The followup preview's rich-text sanitizer stripped `javascript:`/`data:`/
+  `vbscript:` from `href`/`src`/etc. but only checked the scheme after
+  leading whitespace, not after removing embedded tab/newline/CR characters
+  the way a browser itself does before resolving a URL — a scheme like
+  `jav` + tab + `ascript:` slipped past the check unmodified but still ran
+  as a working `javascript:` URI once clicked. Now strips those characters
+  before testing, matching the WHATWG URL Standard's own first parsing
+  step.
+- A GLPI followup template picked on the creation form (as an alternative to
+  the plugin's own configured template) was inserted as raw, unrendered
+  text. A template using GLPI's own Twig-based content placeholders (e.g.
+  `{% for user in ticket.requesters.users %}{{ user.firstname }}{% endfor %}`)
+  showed those tags literally instead of the data they resolve to.
+  `Send::getFollowupTemplatesForItem()` now renders each template's content
+  against the item through `Glpi\ContentTemplates\TemplateManager` — the same
+  call GLPI's own `ajax/itilfollowup.php` makes when picking a template for a
+  plain followup — falling back to the raw content if rendering fails.
+- `Send` did not declare `$undisclosedFields` for `access_url`, unlike
+  `Config`'s own three encrypted fields — added it, so the stored (still
+  GLPIKey-encrypted) value is masked the same way wherever core relies on
+  that property (REST API item output, search/list, Dropdown/Link
+  rendering).
+- `Config::showConfigForm()` passed the entire configuration row, including
+  the three encrypted secret fields, into the config page's Twig context —
+  the template only ever reads the pre-computed `has_*` booleans for those.
+  Removed the three raw values from the context before rendering.
+
+## [1.0.1] - 2026-09-21
+
+### Fixed
+
 - The "Bitwarden Sends" tab exposed a Send's stored access link (when "Keep
   the link in the GLPI database" is on) to anyone with the plugin's own
   `READ` right and view access to the ticket, regardless of whether that
