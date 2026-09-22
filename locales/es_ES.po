@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: bitwardensend 2.0.0-dev\n"
+"Project-Id-Version: bitwardensend 2.0.0-rc1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-31 00:00+0000\n"
 "PO-Revision-Date: 2026-07-31 00:00+0000\n"
@@ -75,15 +75,15 @@ msgid ""
 msgstr ""
 "Variables disponibles: {url} (enlace listo para usar), {url_raw} (solo la dirección, para su propio enlace), {expiration}, {max_access}"
 
-#: src/CliSendDriver.php:246, src/NativeSendDriver.php:141, src/NativeSendDriver.php:191
+#: src/CliSendDriver.php:246, src/NativeSendDriver.php:157, src/NativeSendDriver.php:207
 msgid "Bitwarden API URL is not configured"
 msgstr "La URL de la API de Bitwarden no está configurada"
 
-#: src/NativeSendDriver.php:298
+#: src/NativeSendDriver.php:314
 msgid "Bitwarden API client credentials are not configured."
 msgstr "Las credenciales de cliente de la API de Bitwarden no están configuradas."
 
-#: src/NativeSendDriver.php:445
+#: src/NativeSendDriver.php:461
 msgid "Bitwarden API error: %s"
 msgstr "Error de la API de Bitwarden: %s"
 
@@ -95,23 +95,23 @@ msgstr "Enlace de Bitwarden Send creado: %s"
 msgid "Bitwarden connection"
 msgstr "Conexión con Bitwarden"
 
-#: src/NativeSendDriver.php:346
+#: src/NativeSendDriver.php:362
 msgid "Bitwarden did not return KDF parameters."
 msgstr "Bitwarden no devolvió los parámetros KDF."
 
-#: src/NativeSendDriver.php:161
+#: src/NativeSendDriver.php:177
 msgid "Bitwarden did not return a Send id/accessId"
 msgstr "Bitwarden no devolvió un id/accessId de Send"
 
-#: src/NativeSendDriver.php:342
+#: src/NativeSendDriver.php:358
 msgid "Bitwarden did not return an access token."
 msgstr "Bitwarden no devolvió un token de acceso."
 
-#: src/NativeSendDriver.php:350
+#: src/NativeSendDriver.php:366
 msgid "Bitwarden did not return the account user key."
 msgstr "Bitwarden no devolvió la clave de usuario de la cuenta."
 
-#: src/NativeSendDriver.php:291
+#: src/NativeSendDriver.php:307
 msgid "Bitwarden identity URL is not configured."
 msgstr "La URL de identidad de Bitwarden no está configurada."
 
@@ -125,7 +125,7 @@ msgstr ""
 msgid "CLI / bw serve — recommended"
 msgstr "CLI / bw serve — recomendado"
 
-#: src/CliSendDriver.php:303, src/NativeSendDriver.php:433
+#: src/CliSendDriver.php:303, src/NativeSendDriver.php:449
 msgid "Cannot reach the Bitwarden API (%s)"
 msgstr "No se puede acceder a la API de Bitwarden (%s)"
 
@@ -161,10 +161,14 @@ msgstr "No se pudo calcular la fecha de expiración."
 msgid "Could not create the Send: %s"
 msgstr "No se pudo crear el Send: %s"
 
-#: src/NativeSendDriver.php:262
+#: src/NativeSendDriver.php:278
 msgid "Could not decrypt the account user key: wrong master password?"
 msgstr ""
 "No se pudo descifrar la clave de usuario de la cuenta: ¿contraseña maestra incorrecta?"
+
+#: ajax/followup_template.php:84
+msgid "Could not encode the rendered template."
+msgstr "No se pudo codificar la plantilla generada."
 
 #: templates/_send_form_fields.html.twig:230
 msgid "Could not load that template."
@@ -190,11 +194,11 @@ msgstr "Crear enlaces Send"
 msgid "Create link"
 msgstr "Crear enlace"
 
-#: src/Send.php:1118, templates/list.html.twig:50
+#: src/Send.php:1132, templates/list.html.twig:50
 msgid "Created by"
 msgstr "Creado por"
 
-#: src/NativeSendDriver.php:273
+#: src/NativeSendDriver.php:289
 msgid "Decrypted user key has an unexpected length."
 msgstr "La clave de usuario descifrada tiene una longitud inesperada."
 
@@ -246,7 +250,7 @@ msgid ""
 msgstr ""
 "Cifrado con la clave de GLPI. Se usa para desbloquear la bóveda automáticamente. Déjelo vacío si desbloquea el servicio usted mismo."
 
-#: src/Send.php:1130, templates/list.html.twig:52
+#: src/Send.php:1144, templates/list.html.twig:52
 msgid "Expiration"
 msgstr "Expiración"
 
@@ -331,11 +335,11 @@ msgstr "Ocultar el texto de forma predeterminada al abrirlo"
 msgid "Identity URL"
 msgstr "URL de identidad"
 
-#: ajax/followup_template.php:63
+#: ajax/followup_template.php:61
 msgid "Invalid request."
 msgstr "Solicitud no válida."
 
-#: ajax/followup_template.php:68, ajax/form.php:54, src/Send.php:578
+#: ajax/followup_template.php:66, ajax/form.php:54, src/Send.php:578
 msgid "Item not found or access denied."
 msgstr "Elemento no encontrado o acceso denegado."
 
@@ -414,7 +418,7 @@ msgid "No Bitwarden Send link has been created for this item yet."
 msgstr ""
 "Todavía no se ha creado ningún enlace de Bitwarden Send para este elemento."
 
-#: src/NativeSendDriver.php:223
+#: src/NativeSendDriver.php:239
 msgid "No master password is configured for the native driver."
 msgstr "No hay ninguna contraseña maestra configurada para el driver nativo."
 
@@ -494,7 +498,7 @@ msgstr "Revocar enlaces Send"
 msgid "Revoke this link?"
 msgstr "¿Revocar este enlace?"
 
-#: src/Send.php:1136, templates/list.html.twig:80
+#: src/Send.php:1150, templates/list.html.twig:80
 msgid "Revoked"
 msgstr "Revocado"
 
@@ -552,7 +556,7 @@ msgstr "Guardado — escriba uno nuevo para reemplazarlo"
 msgid "Symbols"
 msgstr "Símbolos"
 
-#: ajax/followup_template.php:76
+#: ajax/followup_template.php:74
 msgid "Template not found."
 msgstr "Plantilla no encontrada."
 
@@ -560,7 +564,7 @@ msgstr "Plantilla no encontrada."
 msgid "Test connection"
 msgstr "Probar conexión"
 
-#: hook.php:168, src/Send.php:883
+#: hook.php:182, src/Send.php:883
 msgid ""
 "Test the Bitwarden connection and report failures the same way GLPI reports any other automatic action that keeps failing"
 msgstr ""
@@ -619,7 +623,7 @@ msgid ""
 msgstr ""
 "El servicio responde, pero la bóveda está bloqueada. Indique la contraseña maestra a continuación para que el plugin pueda desbloquearla, o desbloquee el servicio manualmente en el servidor."
 
-#: src/NativeSendDriver.php:237
+#: src/NativeSendDriver.php:253
 msgid ""
 "This account uses the Argon2id KDF, which the native driver cannot reproduce in PHP. Use a service account configured with PBKDF2, or switch this Send driver to \"cli\"."
 msgstr ""
@@ -643,19 +647,19 @@ msgstr "Tiempo de espera (segundos)"
 msgid "US — bitwarden.com"
 msgstr "US — bitwarden.com"
 
-#: src/CliSendDriver.php:263, src/NativeSendDriver.php:146
+#: src/CliSendDriver.php:263, src/NativeSendDriver.php:162
 msgid "Unable to encode the request body"
 msgstr "No se pudo codificar el cuerpo de la solicitud"
 
-#: src/CliSendDriver.php:251, src/NativeSendDriver.php:383
+#: src/CliSendDriver.php:251, src/NativeSendDriver.php:399
 msgid "Unable to initialize cURL"
 msgstr "No se pudo inicializar cURL"
 
-#: src/CliSendDriver.php:311, src/NativeSendDriver.php:455
+#: src/CliSendDriver.php:311, src/NativeSendDriver.php:471
 msgid "Unexpected response from the Bitwarden API (HTTP %d)"
 msgstr "Respuesta inesperada de la API de Bitwarden (HTTP %d)"
 
-#: front/config.form.php:95, src/Send.php:1010
+#: front/config.form.php:95, src/Send.php:1024
 msgid "Unexpected vault status: %s"
 msgstr "Estado de la bóveda inesperado: %s"
 
@@ -663,7 +667,7 @@ msgstr "Estado de la bóveda inesperado: %s"
 msgid "Unknown Bitwarden API error"
 msgstr "Error desconocido de la API de Bitwarden"
 
-#: src/CliSendDriver.php:123, src/NativeSendDriver.php:181
+#: src/CliSendDriver.php:123, src/NativeSendDriver.php:197
 msgid "Unknown Send identifier"
 msgstr "Identificador de Send desconocido"
 
