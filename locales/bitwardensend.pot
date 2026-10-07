@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: bitwardensend 2.0.0-rc1\n"
+"Project-Id-Version: bitwardensend 1.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-31 00:00+0000\n"
 "PO-Revision-Date: 2026-07-31 00:00+0000\n"
@@ -205,7 +205,7 @@ msgstr ""
 msgid "Default maximum views"
 msgstr ""
 
-#: hook.php:145, src/Send.php:873
+#: hook.php:144, src/Send.php:873
 msgid ""
 "Delete revoked or expired Bitwarden Send entries past the configured retention"
 msgstr ""
@@ -540,7 +540,7 @@ msgstr ""
 msgid "Test connection"
 msgstr ""
 
-#: hook.php:182, src/Send.php:883
+#: hook.php:181, src/Send.php:883
 msgid ""
 "Test the Bitwarden connection and report failures the same way GLPI reports any other automatic action that keeps failing"
 msgstr ""
