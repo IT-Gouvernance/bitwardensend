@@ -5,21 +5,13 @@ All notable changes to this plugin are documented here. Format loosely follows
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
 beyond being a label).
 
-## [Unreleased]
-
-### Changed
-
-- `glpi-project/phpstan-glpi` bumped from `^1.3` to `^1.4`, for its new
-  `ForbidNonLiteralSqlExpressionRule` (forbids building a `QueryExpression`
-  from anything but a literal string). No-op for this plugin: it doesn't
-  use `QueryExpression` anywhere, and the rule only activates once analyzed
-  against GLPI 13+ anyway (this plugin targets GLPI 12).
-
-## [2.0.0-rc1] - 2026-09-22
+## [1.1.0] - 2026-10-07
 
 ### Added
 
-- GLPI 12 compatibility (`2.0.0`, GLPI 11 no longer supported). Also fixes
+- GLPI 12 compatibility (`1.1.0`). GLPI 11 is not supported by this version -
+  it stays on the 1.0.x line, which keeps receiving its own fixes
+  independently. Also fixes
   static analysis/Rector errors GLPI 12's CI catches that GLPI 11's did not:
   `$rightname` now typed `string` on `Config`/`Profile`/`Send`, every
   `Session::checkRight()`/`haveRight()` call uses a `$rightname` reference
@@ -56,6 +48,11 @@ beyond being a label).
 
 ### Changed
 
+- `glpi-project/phpstan-glpi` bumped from `^1.3` to `^1.4`, for its new
+  `ForbidNonLiteralSqlExpressionRule` (forbids building a `QueryExpression`
+  from anything but a literal string). No-op for this plugin: it doesn't
+  use `QueryExpression` anywhere, and the rule only activates once analyzed
+  against GLPI 13+ anyway (this plugin targets GLPI 12).
 - `rector.php`'s `GlpiSetList` ruleset now comes from `glpi-project/rector-glpi`
   (added to `composer.json`'s `require-dev`), GLPI's own ruleset published
   as a standalone Composer package with its own pinned version, instead of

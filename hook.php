@@ -38,9 +38,8 @@ use GlpiPlugin\Bitwardensend\Send;
  * No Migration step yet: none of the 1.0.0-betaN/1.0.0-rcN pre-releases were
  * ever used in production, so there is no schema drift to migrate away from
  * - the CREATE TABLE statements below only ever run once and already carry
- * every column a fresh 1.0.0 install needs. The first schema change that
- * actually needs one, in a release after 1.0.0, gets a proper Migration
- * step at that point.
+ * every column a fresh 1.1.0 install needs. The first schema change that
+ * actually needs one gets a proper Migration step at that point.
  */
 function plugin_bitwardensend_install(): bool
 {
