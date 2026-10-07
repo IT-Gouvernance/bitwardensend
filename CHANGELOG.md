@@ -5,6 +5,16 @@ All notable changes to this plugin are documented here. Format loosely follows
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
 beyond being a label).
 
+## [Unreleased]
+
+### Changed
+
+- `glpi-project/phpstan-glpi` bumped from `^1.3` to `^1.4`, for its new
+  `ForbidNonLiteralSqlExpressionRule` (forbids building a `QueryExpression`
+  from anything but a literal string). No-op for this plugin: it doesn't
+  use `QueryExpression` anywhere, and the rule only activates once analyzed
+  against GLPI 13+ anyway (this plugin targets GLPI 12).
+
 ## [2.0.0-rc1] - 2026-09-22
 
 ### Added
