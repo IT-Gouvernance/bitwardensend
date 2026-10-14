@@ -159,21 +159,14 @@
                <i class="ti ti-diamond text-secondary ms-1"
                   title="{{ __('Requires a Bitwarden Premium or Family plan. Bitwarden rejects the Send otherwise.', 'bitwardensend') }}"></i>
             </label>
-            {% if subitem.ticket_actors is not empty %}
-               <div class="mb-2">
-                  {% for actor in subitem.ticket_actors %}
-                     <label class="form-check">
-                        <input type="checkbox" class="form-check-input"
-                               name="recipient_email_actors[]" value="{{ actor.email }}">
-                        <span class="form-check-label">{{ actor.label }}</span>
-                     </label>
-                  {% endfor %}
-               </div>
-            {% endif %}
-            <input type="text" id="bws_emails" name="recipient_emails" class="form-control"
-                   autocomplete="off" placeholder="{{ __('e.g. alice@example.com, bob@example.com', 'bitwardensend') }}">
+            <select id="bws_emails" name="recipient_emails[]" class="form-control" multiple
+                    data-bws-placeholder="{{ __('e.g. alice@example.com, bob@example.com', 'bitwardensend') }}">
+               {% for actor in subitem.ticket_actors %}
+                  <option value="{{ actor.email }}">{{ actor.label }}</option>
+               {% endfor %}
+            </select>
             <div class="form-hint">
-               {{ __('Leave empty to not restrict access. Cannot be combined with a link password above.', 'bitwardensend') }}
+               {{ __('Pick from the item\'s own requesters/observers/assignees, or type any other address. Leave empty to not restrict access. Cannot be combined with a link password above.', 'bitwardensend') }}
             </div>
          </div>
       {% endif %}

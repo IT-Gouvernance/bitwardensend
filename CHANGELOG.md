@@ -23,12 +23,12 @@ beyond being a label).
   install's `glpi_plugin_bitwardensend_sends` and
   `glpi_plugin_bitwardensend_configs` tables each get a new column
   (`is_email_protected`, `email_mode_enabled`) through a proper GLPI
-  `Migration` step (`hook.php`), not another raw `ALTER TABLE`. The creation
-  form also offers the item's own requesters/observers/assignees as
-  one-click checkboxes next to the free-text field, for whichever of them
-  already have a resolvable email address — avoids retyping an address
-  already on the ticket; both sources are merged and validated the same
-  way.
+  `Migration` step (`hook.php`), not another raw `ALTER TABLE`. The field
+  is a single Select2 multi-select (tags enabled): the item's own
+  requesters/observers/assignees who have a resolvable email address are
+  offered as pickable suggestions, and any other address can still be
+  typed directly — both end up validated the same way server-side,
+  regardless of which one a given address came from.
 
 ## [1.1.0] - 2026-10-07
 

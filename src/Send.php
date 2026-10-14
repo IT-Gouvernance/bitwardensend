@@ -719,21 +719,20 @@ class Send extends CommonDBTM
         // way a form field that was never rendered would have none.
         $emails = null;
         if (!empty($conf['email_mode_enabled'])) {
-            // Two sources, merged: the free-text field, and whichever of
-            // the item's own actors (see getTicketActorEmails()) were
-            // checked on the form. Both go through the same validation
-            // below regardless of source - an actor's checkbox value is
-            // still attacker-controllable POST data, not implicitly trusted
-            // just because the email itself came from GLPI's own DB.
-            $rawEmails = $input['recipient_emails'] ?? '';
-            $emailsInput = is_string($rawEmails) ? $rawEmails : '';
-            $emailCandidates = explode(',', $emailsInput);
-
-            $rawActorEmails = $input['recipient_email_actors'] ?? [];
-            if (is_array($rawActorEmails)) {
-                foreach ($rawActorEmails as $actorEmail) {
-                    if (is_string($actorEmail)) {
-                        $emailCandidates[] = $actorEmail;
+            // One multi-select (Select2, tags:true - see
+            // _send_form_fields.html.twig/bitwardensend.js), posting an
+            // array either way: a picked option (one of the item's own
+            // actors, see getTicketActorEmails()) or a freely typed tag.
+            // Both go through the exact same validation below regardless
+            // of source - a "picked" value is still attacker-controllable
+            // POST data, not implicitly trusted just because the email
+            // itself came from GLPI's own DB.
+            $rawEmails = $input['recipient_emails'] ?? [];
+            $emailCandidates = [];
+            if (is_array($rawEmails)) {
+                foreach ($rawEmails as $rawEmail) {
+                    if (is_string($rawEmail)) {
+                        $emailCandidates[] = $rawEmail;
                     }
                 }
             }

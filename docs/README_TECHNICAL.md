@@ -187,10 +187,11 @@ to the creation form, next to the link password field. The two are mutually
 exclusive: a Send can require a password, specific recipient emails, or neither, never
 both.
 
-The form also lists the item's own requesters, observers and assignees as
-checkboxes (whichever of them have a resolvable email address) next to the
-free-text field — a one-click way to restrict access to people already on the
-item, without retyping their address. Both sources are combined.
+The field itself offers the item's own requesters, observers and assignees
+as pickable suggestions (whichever of them have a resolvable email
+address), so restricting access to people already on the item does not
+mean retyping their address — any other address can still be typed
+directly in the same field.
 
 ## Security notes
 

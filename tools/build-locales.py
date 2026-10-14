@@ -281,8 +281,6 @@ FR = {
     'Invalid request.': 'Requête invalide.',
     'Item not found or access denied.': 'Élément introuvable ou accès refusé.',
     'Keep the link in the GLPI database': 'Conserver le lien dans la base GLPI',
-    'Leave empty to not restrict access. Cannot be combined with a link password above.':
-        "Laissez vide pour ne pas restreindre l'accès. Ne peut pas être combiné avec un mot de passe de lien ci-dessus.",
     'Leave empty to require none': "Laissez vide pour n'en exiger aucun",
     'Length': 'Longueur',
     'Link defaults': 'Valeurs par défaut des liens',
@@ -322,6 +320,13 @@ FR = {
         'Visible uniquement dans votre coffre Bitwarden.',
     'Password generator options': 'Options du générateur de mot de passe',
     'Password protected': 'Protégé par mot de passe',
+    'Pick from the item\'s own requesters/observers/assignees, or type any '
+    'other address. Leave empty to not restrict access. Cannot be combined '
+    'with a link password above.':
+        "Choisissez parmi les demandeurs/observateurs/techniciens affectés "
+        "de l'élément, ou saisissez une autre adresse. Laissez vide pour ne "
+        "pas restreindre l'accès. Ne peut pas être combiné avec un mot de "
+        "passe de lien ci-dessus.",
     'Plugin default template': 'Modèle par défaut du plugin',
     'Post the link as a followup': 'Publier le lien dans un suivi',
     'Post the link as a followup by default':
@@ -571,9 +576,6 @@ ES = {
     'Invalid request.': 'Solicitud no válida.',
     'Item not found or access denied.': 'Elemento no encontrado o acceso denegado.',
     'Keep the link in the GLPI database': 'Conservar el enlace en la base de datos de GLPI',
-    'Leave empty to not restrict access. Cannot be combined with a link password above.':
-        'Déjelo vacío para no restringir el acceso. No se puede combinar con una '
-        'contraseña de enlace indicada arriba.',
     'Leave empty to require none': 'Déjelo vacío para no exigir ninguno',
     'Length': 'Longitud',
     'Link defaults': 'Valores predeterminados del enlace',
@@ -613,6 +615,13 @@ ES = {
         'Visible únicamente en su bóveda de Bitwarden.',
     'Password generator options': 'Opciones del generador de contraseñas',
     'Password protected': 'Protegido con contraseña',
+    'Pick from the item\'s own requesters/observers/assignees, or type any '
+    'other address. Leave empty to not restrict access. Cannot be combined '
+    'with a link password above.':
+        'Elija entre los solicitantes/observadores/técnicos asignados del '
+        'elemento, o escriba otra dirección. Déjelo vacío para no '
+        'restringir el acceso. No se puede combinar con una contraseña de '
+        'enlace indicada arriba.',
     'Plugin default template': 'Plantilla predeterminada del plugin',
     'Post the link as a followup': 'Publicar el enlace como seguimiento',
     'Post the link as a followup by default':

@@ -194,10 +194,11 @@ des destinataires » au formulaire de création, à côté du mot de passe du li
 deux sont mutuellement exclusifs : un Send peut exiger un mot de passe, des e-mails de
 destinataires spécifiques, ou ni l'un ni l'autre, jamais les deux.
 
-Le formulaire propose aussi les demandeurs, observateurs et techniciens affectés de
-l'élément sous forme de cases à cocher (ceux qui ont une adresse e-mail résolvable), à
-côté du champ libre — un moyen rapide de restreindre l'accès aux personnes déjà
-impliquées, sans retaper leur adresse. Les deux sources sont combinées.
+Le champ propose directement les demandeurs, observateurs et techniciens affectés de
+l'élément comme suggestions (ceux qui ont une adresse e-mail résolvable), donc
+restreindre l'accès aux personnes déjà impliquées ne demande pas de retaper leur
+adresse — n'importe quelle autre adresse peut toujours être saisie directement dans
+le même champ.
 
 ## Notes de sécurité
 
