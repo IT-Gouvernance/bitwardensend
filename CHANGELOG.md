@@ -32,14 +32,16 @@ beyond being a label).
 
 ### Fixed
 
-- A revoked or expired Send's row on the "Bitwarden Sends" tab used
-  Bootstrap's `text-muted` utility to fade it out, but that color did not
-  contrast well against GLPI's actual background in practice. Replaced
-  with a plain `opacity` rule on the row's plain-text columns only (name,
-  creator, dates, max views) - the status badge and the action buttons
-  keep their own full-contrast styling, which a first attempt at this fix
-  had also faded, to the point of becoming hard to read (confirmed with a
-  screenshot).
+- The "Revoked" status badge on the "Bitwarden Sends" tab used Tabler's own
+  `bg-secondary` (a gray background with text color inherited from a theme
+  variable), which rendered as near-illegible gray-on-gray in practice -
+  confirmed by screenshot, unlike "Expired"/"Active"'s own badge colors,
+  which were fine. Fixed background/text colors instead, not tied to a
+  theme variable. (An earlier attempt at this also faded the row's plain
+  text via `opacity`, on the theory the whole row was hard to read - it
+  was not; only this badge was, and fading the row made the badge and
+  the action buttons harder to read still. Reverted; the row's text is
+  untouched.)
 
 ## [1.1.0] - 2026-10-07
 

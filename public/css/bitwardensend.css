@@ -36,15 +36,16 @@
 }
 
 /*
- * De-emphasizes a revoked/expired row. Opacity rather than Bootstrap's own
- * text-muted utility (a fixed gray computed from --tblr-secondary-color):
- * that variable's exact shade against GLPI's current background wasn't
- * legible in practice. Opacity always dims relative to whatever the real
- * background actually is, light or dark theme alike, instead of aiming for
- * an absolute color that may or may not contrast well with it.
+ * The "Revoked" status badge - Tabler's own bg-secondary (gray background,
+ * color inherited from whatever --tblr-secondary-color/-fg resolve to in
+ * the current GLPI theme) rendered as near-illegible gray-on-gray in
+ * practice, confirmed by screenshot. Fixed background/text colors instead,
+ * not tied to a theme variable that may or may not contrast with
+ * whatever else that variable also controls.
  */
-.bws-row-faded {
-   opacity: .65;
+.bws-badge-revoked {
+   background-color: #6c757d;
+   color: #fff;
 }
 
 /*
