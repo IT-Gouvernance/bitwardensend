@@ -37,6 +37,7 @@ use RuntimeException;
 use Throwable;
 use CommonDBTM;
 use CommonGLPI;
+use CommonITILActor;
 use CommonITILObject;
 use CronTask;
 use Glpi\Application\View\TemplateRenderer;
@@ -46,6 +47,7 @@ use ITILFollowup;
 use Notification;
 use Session;
 use Toolbox;
+use User;
 
 /**
  * A Bitwarden Send link attached to an ITIL object.
@@ -162,6 +164,73 @@ class Send extends CommonDBTM
             }
 
             return $templates;
+        } catch (Throwable $throwable) {
+            Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * The item's requesters/observers/assignees who have a resolvable email
+     * address — offered as one-click additions to the email-verified-
+     * recipients field (see createFromInput()), instead of retyping an
+     * address already on the item. Only ever called when that mode is
+     * actually enabled.
+     *
+     * Deduplicated by email: the same person can hold more than one actor
+     * role (e.g. requester and observer), and should only ever appear once.
+     *
+     * @return list<array{label: string, email: string}>
+     */
+    public static function getTicketActorEmails(CommonITILObject $item): array
+    {
+        try {
+            $types = [
+                CommonITILActor::REQUESTER => _n('Requester', 'Requesters', 1),
+                CommonITILActor::OBSERVER  => _n('Observer', 'Observers', 1),
+                CommonITILActor::ASSIGN    => __('Assigned to'),
+            ];
+
+            $actors     = [];
+            $seenEmails = [];
+
+            foreach ($types as $type => $typeLabel) {
+                foreach ($item->getUsers($type) as $actor) {
+                    if (!is_array($actor)) {
+                        continue;
+                    }
+
+                    $rawUsersId = $actor['users_id'] ?? 0;
+                    $usersId    = is_numeric($rawUsersId) ? (int) $rawUsersId : 0;
+
+                    if ($usersId > 0) {
+                        $user = new User();
+                        if (!$user->getFromDB($usersId)) {
+                            continue;
+                        }
+
+                        $email = $user->getDefaultEmail();
+                        $name  = $user->getFriendlyName();
+                    } else {
+                        $rawAlternativeEmail = $actor['alternative_email'] ?? '';
+                        $email = is_string($rawAlternativeEmail) ? $rawAlternativeEmail : '';
+                        $name  = $email;
+                    }
+
+                    if ($email === '' || isset($seenEmails[$email])) {
+                        continue;
+                    }
+
+                    $seenEmails[$email] = true;
+
+                    $actors[] = [
+                        'label' => sprintf('%s: %s <%s>', $typeLabel, $name, $email),
+                        'email' => $email,
+                    ];
+                }
+            }
+
+            return $actors;
         } catch (Throwable $throwable) {
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
             return [];
@@ -494,6 +563,7 @@ class Send extends CommonDBTM
      *     default_name: string,
      *     conf: array{
      *         password_generator_enabled: mixed,
+     *         email_mode_enabled: mixed,
      *         default_deletion_days: mixed,
      *         default_max_access_count: mixed,
      *         default_hide_email: mixed,
@@ -502,6 +572,7 @@ class Send extends CommonDBTM
      *         followup_template: string
      *     },
      *     followup_templates: list<array{id:int,name:string}>,
+     *     ticket_actors: list<array{label: string, email: string}>,
      *     force_followup: bool
      * }
      */
@@ -527,6 +598,7 @@ class Send extends CommonDBTM
         // has no use for either.
         $formConf = [
             'password_generator_enabled' => $conf['password_generator_enabled'] ?? 1,
+            'email_mode_enabled'         => $conf['email_mode_enabled'] ?? 0,
             'default_deletion_days'      => $conf['default_deletion_days'] ?? 7,
             'default_max_access_count'   => $conf['default_max_access_count'] ?? 1,
             'default_hide_email'         => $conf['default_hide_email'] ?? 0,
@@ -544,6 +616,9 @@ class Send extends CommonDBTM
             'followup_templates' => empty($conf['allow_glpi_followup_templates'])
                 ? []
                 : self::getFollowupTemplatesForItem($item),
+            'ticket_actors'      => empty($conf['email_mode_enabled'])
+                ? []
+                : self::getTicketActorEmails($item),
         ];
     }
 
@@ -637,6 +712,63 @@ class Send extends CommonDBTM
         $rawPassword   = $input['password'] ?? '';
         $password      = is_string($rawPassword) ? $rawPassword : '';
 
+        // Re-checked server-side, not just trusted from the form's own
+        // conditional rendering: a direct POST could set this regardless of
+        // whether the admin actually turned the toggle on. Silently ignored
+        // rather than rejected - the field simply has no effect, the same
+        // way a form field that was never rendered would have none.
+        $emails = null;
+        if (!empty($conf['email_mode_enabled'])) {
+            // One multi-select (Select2, tags:true - see
+            // _send_form_fields.html.twig/bitwardensend.js), posting an
+            // array either way: a picked option (one of the item's own
+            // actors, see getTicketActorEmails()) or a freely typed tag.
+            // Both go through the exact same validation below regardless
+            // of source - a "picked" value is still attacker-controllable
+            // POST data, not implicitly trusted just because the email
+            // itself came from GLPI's own DB.
+            $rawEmails = $input['recipient_emails'] ?? [];
+            $emailCandidates = [];
+            if (is_array($rawEmails)) {
+                foreach ($rawEmails as $rawEmail) {
+                    if (is_string($rawEmail)) {
+                        $emailCandidates[] = $rawEmail;
+                    }
+                }
+            }
+
+            $emailList = array_values(array_unique(array_filter(
+                array_map(trim(...), $emailCandidates),
+                static fn(string $email): bool => $email !== '',
+            )));
+            if ($emailList !== []) {
+                foreach ($emailList as $email) {
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                        Session::addMessageAfterRedirect(
+                            sprintf(
+                                __('"%s" is not a valid email address.', 'bitwardensend'),
+                                htmlspecialchars($email, ENT_QUOTES),
+                            ),
+                            false,
+                            ERROR,
+                        );
+                        return false;
+                    }
+                }
+
+                $emails = implode(',', $emailList);
+            }
+        }
+
+        if ($emails !== null && $password !== '') {
+            Session::addMessageAfterRedirect(
+                __('Choose either a link password or recipient emails, not both.', 'bitwardensend'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+
         $rawName = $input['name'] ?? '';
         $name    = trim(is_string($rawName) ? $rawName : '');
         if ($name === '') {
@@ -652,6 +784,7 @@ class Send extends CommonDBTM
                 maxAccessCount: $max_access,
                 deletionDate: $deletion_date,
                 password: $password,
+                emails: $emails,
                 hideEmail: !empty($input['hide_email']),
             ));
         } catch (Throwable $throwable) {
@@ -687,6 +820,7 @@ class Send extends CommonDBTM
             'deletion_date'         => date('Y-m-d H:i:s', $expiration_ts),
             'max_access_count'      => $max_access > 0 ? $max_access : null,
             'is_password_protected' => $password !== '' ? 1 : 0,
+            'is_email_protected'    => $emails !== null ? 1 : 0,
             'date_creation'         => $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s'),
         ]);
 

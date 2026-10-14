@@ -152,6 +152,25 @@
          </div>
       </div>
 
+      {% if subitem.conf.email_mode_enabled %}
+         <div class="mb-3">
+            <label class="form-label" for="bws_emails">
+               {{ __('Restrict access to recipient emails (optional)', 'bitwardensend') }}
+               <i class="ti ti-diamond text-secondary ms-1"
+                  title="{{ __('Requires a Bitwarden Premium or Family plan. Bitwarden rejects the Send otherwise.', 'bitwardensend') }}"></i>
+            </label>
+            <select id="bws_emails" name="recipient_emails[]" class="form-control" multiple
+                    data-bws-placeholder="{{ __('e.g. alice@example.com, bob@example.com', 'bitwardensend') }}">
+               {% for actor in subitem.ticket_actors %}
+                  <option value="{{ actor.email }}">{{ actor.label }}</option>
+               {% endfor %}
+            </select>
+            <div class="form-hint">
+               {{ __('Pick from the item\'s own requesters/observers/assignees, or type any other address. Leave empty to not restrict access. Cannot be combined with a link password above.', 'bitwardensend') }}
+            </div>
+         </div>
+      {% endif %}
+
       <div class="list-group list-group-flush border rounded">
          <label class="list-group-item d-flex align-items-center justify-content-between">
             <span class="form-check-label me-3">{{ __('Hide the text by default when opened', 'bitwardensend') }}</span>

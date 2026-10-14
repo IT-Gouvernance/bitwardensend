@@ -120,6 +120,7 @@ class NativeSendDriver implements SendDriverInterface
         SendCrypto::zero($sendKey);
 
         $hasPassword = $payload->password !== null && $payload->password !== '';
+        $hasEmails   = $payload->emails !== null && $payload->emails !== '';
 
         $body = [
             'type' => 0, // text
@@ -142,6 +143,10 @@ class NativeSendDriver implements SendDriverInterface
             // the request reaches Bitwarden; here we are the client, so we
             // have to do that step ourselves.
             'password'  => $hasPassword ? SendCrypto::hashSendPassword($payload->password, $keyMaterial) : null,
+            // Sent as plain text, unlike password - this is a Bitwarden
+            // Premium/Family-only feature (the API itself rejects it with a
+            // 400 otherwise, so no local plan check is attempted here).
+            'emails'    => $hasEmails ? $payload->emails : null,
             'disabled'  => $payload->disabled,
             'hideEmail' => $payload->hideEmail,
             'key'       => (string) EncString::encrypt($keyMaterial, $userEncKey, $userMacKey),

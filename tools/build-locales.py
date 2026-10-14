@@ -169,6 +169,8 @@ TPL_ES = ("Hola,\n\n"
           "Saludos cordiales,")
 
 FR = {
+    '"%s" is not a valid email address.':
+        "« %s » n'est pas une adresse e-mail valide.",
     '(Setup > Automatic actions); a failure is reported the same way GLPI reports any '
     'other automatic action that keeps failing, via the notification':
         "(Configuration > Actions automatiques) ; un échec est signalé de la même façon que "
@@ -188,6 +190,8 @@ FR = {
     'Advanced options': 'Options avancées',
     'Allow choosing a GLPI followup template when creating a Send':
         "Autoriser le choix d'un gabarit de suivi GLPI lors de la création d'un Send",
+    'Allow restricting a Send to specific recipient emails':
+        "Autoriser la restriction d'un Send à des e-mails de destinataires spécifiques",
     'Automatic deletion of revoked or expired entries is configured on the automatic action':
         "La suppression automatique des entrées révoquées ou expirées se configure sur l'action automatique",
     'Available variables: {url} (ready-to-click link), {url_raw} (just the address, '
@@ -212,6 +216,8 @@ FR = {
     'Bitwarden identity URL is not configured.':
         "L'URL d'identité Bitwarden n'est pas configurée.",
     'Cannot reach the Bitwarden API (%s)': "Impossible de joindre l'API Bitwarden (%s)",
+    'Choose either a link password or recipient emails, not both.':
+        "Choisissez soit un mot de passe de lien, soit des e-mails de destinataires, pas les deux.",
     'CLI / bw serve — recommended': 'CLI / bw serve — recommandé',
     'Configuration not saved: check these fields: %s':
         "Configuration non enregistrée : vérifiez ces champs : %s",
@@ -240,6 +246,8 @@ FR = {
     'Delete the stored password': 'Supprimer le mot de passe enregistré',
     'Delete the stored secret': 'Supprimer le secret enregistré',
     'Delete this entry?': 'Supprimer cette entrée ?',
+    'e.g. alice@example.com, bob@example.com':
+        'ex. alice@example.com, bob@example.com',
     'Encrypted with the GLPI key. Used to unlock the vault automatically. '
     'Leave empty if you unlock the service yourself.':
         'Chiffré avec la clé GLPI. Sert à déverrouiller automatiquement le coffre. '
@@ -312,6 +320,13 @@ FR = {
         'Visible uniquement dans votre coffre Bitwarden.',
     'Password generator options': 'Options du générateur de mot de passe',
     'Password protected': 'Protégé par mot de passe',
+    'Pick from the item\'s own requesters/observers/assignees, or type any '
+    'other address. Leave empty to not restrict access. Cannot be combined '
+    'with a link password above.':
+        "Choisissez parmi les demandeurs/observateurs/techniciens affectés "
+        "de l'élément, ou saisissez une autre adresse. Laissez vide pour ne "
+        "pas restreindre l'accès. Ne peut pas être combiné avec un mot de "
+        "passe de lien ci-dessus.",
     'Plugin default template': 'Modèle par défaut du plugin',
     'Post the link as a followup': 'Publier le lien dans un suivi',
     'Post the link as a followup by default':
@@ -321,6 +336,17 @@ FR = {
     'Private followup by default': 'Suivi privé par défaut',
     'Replace the current text? Your changes will be lost.':
         'Remplacer le texte actuel ? Vos modifications seront perdues.',
+    'Requires a Bitwarden Premium or Family plan on the account used to create the Send. '
+    'Bitwarden rejects the Send otherwise.':
+        "Nécessite un abonnement Bitwarden Premium ou Famille sur le compte utilisé pour "
+        "créer le Send. Bitwarden refuse le Send dans le cas contraire.",
+    'Requires a Bitwarden Premium or Family plan. Bitwarden rejects the Send otherwise.':
+        "Nécessite un abonnement Bitwarden Premium ou Famille. Bitwarden refuse le Send "
+        "dans le cas contraire.",
+    'Restrict access to recipient emails (optional)':
+        "Restreindre l'accès à des e-mails de destinataires (facultatif)",
+    'Restricted to specific recipient emails':
+        'Restreint à des e-mails de destinataires spécifiques',
     'Retention (days)': 'Rétention (jours)',
     'Revoke': 'Révoquer',
     'Rights updated.': 'Droits mis à jour.',
@@ -438,6 +464,8 @@ FR = {
 FR_PLURAL = {('Bitwarden Send', 'Bitwarden Sends'): ('Bitwarden Send', 'Bitwarden Sends')}
 
 ES = {
+    '"%s" is not a valid email address.':
+        '"%s" no es una dirección de correo electrónico válida.',
     '(Setup > Automatic actions); a failure is reported the same way GLPI reports any '
     'other automatic action that keeps failing, via the notification':
         "(Configuración > Acciones automáticas); un fallo se notifica de la misma forma que "
@@ -457,6 +485,8 @@ ES = {
     'Advanced options': 'Opciones avanzadas',
     'Allow choosing a GLPI followup template when creating a Send':
         'Permitir elegir una plantilla de seguimiento de GLPI al crear un Send',
+    'Allow restricting a Send to specific recipient emails':
+        'Permitir restringir un Send a direcciones de correo de destinatarios específicos',
     'Automatic deletion of revoked or expired entries is configured on the automatic action':
         'La eliminación automática de las entradas revocadas o caducadas se configura en la acción automática',
     'Available variables: {url} (ready-to-click link), {url_raw} (just the address, '
@@ -481,6 +511,8 @@ ES = {
     'Bitwarden identity URL is not configured.':
         'La URL de identidad de Bitwarden no está configurada.',
     'Cannot reach the Bitwarden API (%s)': 'No se puede acceder a la API de Bitwarden (%s)',
+    'Choose either a link password or recipient emails, not both.':
+        'Elija una contraseña de enlace o correos de destinatarios, no ambos.',
     'CLI / bw serve — recommended': 'CLI / bw serve — recomendado',
     'Configuration not saved: check these fields: %s':
         'Configuración no guardada: revise estos campos: %s',
@@ -509,6 +541,8 @@ ES = {
     'Delete the stored password': 'Eliminar la contraseña guardada',
     'Delete the stored secret': 'Eliminar el secreto guardado',
     'Delete this entry?': '¿Eliminar esta entrada?',
+    'e.g. alice@example.com, bob@example.com':
+        'p. ej. alice@example.com, bob@example.com',
     'Encrypted with the GLPI key. Used to unlock the vault automatically. '
     'Leave empty if you unlock the service yourself.':
         'Cifrado con la clave de GLPI. Se usa para desbloquear la bóveda '
@@ -581,6 +615,13 @@ ES = {
         'Visible únicamente en su bóveda de Bitwarden.',
     'Password generator options': 'Opciones del generador de contraseñas',
     'Password protected': 'Protegido con contraseña',
+    'Pick from the item\'s own requesters/observers/assignees, or type any '
+    'other address. Leave empty to not restrict access. Cannot be combined '
+    'with a link password above.':
+        'Elija entre los solicitantes/observadores/técnicos asignados del '
+        'elemento, o escriba otra dirección. Déjelo vacío para no '
+        'restringir el acceso. No se puede combinar con una contraseña de '
+        'enlace indicada arriba.',
     'Plugin default template': 'Plantilla predeterminada del plugin',
     'Post the link as a followup': 'Publicar el enlace como seguimiento',
     'Post the link as a followup by default':
@@ -590,6 +631,17 @@ ES = {
     'Private followup by default': 'Seguimiento privado de forma predeterminada',
     'Replace the current text? Your changes will be lost.':
         '¿Reemplazar el texto actual? Se perderán sus cambios.',
+    'Requires a Bitwarden Premium or Family plan on the account used to create the Send. '
+    'Bitwarden rejects the Send otherwise.':
+        'Requiere un plan Bitwarden Premium o Familiar en la cuenta usada para crear el '
+        'Send. De lo contrario, Bitwarden rechaza el Send.',
+    'Requires a Bitwarden Premium or Family plan. Bitwarden rejects the Send otherwise.':
+        'Requiere un plan Bitwarden Premium o Familiar. De lo contrario, Bitwarden '
+        'rechaza el Send.',
+    'Restrict access to recipient emails (optional)':
+        'Restringir el acceso a correos de destinatarios (opcional)',
+    'Restricted to specific recipient emails':
+        'Restringido a correos de destinatarios específicos',
     'Retention (days)': 'Retención (días)',
     'Revoke': 'Revocar',
     'Rights updated.': 'Derechos actualizados.',

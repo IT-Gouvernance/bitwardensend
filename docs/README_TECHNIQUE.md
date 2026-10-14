@@ -141,6 +141,7 @@ Configuration > Général > onglet **Bitwarden Send** :
 | ID/secret client de l'API, e-mail, mot de passe maître | Compte de service du driver natif — voir « Driver natif » ci-dessus |
 | Valeurs par défaut des liens | expiration, vues max, comportement du suivi, modèle |
 | Autoriser les gabarits de suivi GLPI | permet aux techniciens de choisir un gabarit de suivi GLPI à la place du modèle ci-dessus |
+| Autoriser les destinataires vérifiés par e-mail | ajoute un champ « e-mails des destinataires » facultatif au formulaire de création, en alternative au mot de passe du lien — voir « Destinataires vérifiés par e-mail » ci-dessous |
 
 **Tester la connexion** : pour le driver CLI, indique le statut du coffre (`unlocked`,
 `locked`, `unauthenticated`) et tente un déverrouillage si un mot de passe maître est
@@ -178,6 +179,26 @@ temps du délai de connexion — précisément au moment où cette panne est ce 
 est censé détecter. Si ça pose problème en pratique, passez-la en mode externe depuis
 Configuration > Actions automatiques (nécessite alors une vraie tâche cron système pour
 réellement se déclencher).
+
+## Destinataires vérifiés par e-mail
+
+Une alternative au mot de passe du lien : restreindre un Send à une liste d'adresses
+e-mail de destinataires, chacun devant prouver son adresse via un code à usage unique
+envoyé par Bitwarden avant de pouvoir consulter le contenu. **Nécessite un abonnement
+Bitwarden Premium ou Famille** sur le compte utilisé pour créer le Send — l'API de
+Bitwarden refuse sinon la requête, sans contournement possible.
+
+Désactivé par défaut. Activez-le depuis **Configuration > Général > Bitwarden Send**
+(« Autoriser les destinataires vérifiés par e-mail ») pour ajouter un champ « e-mails
+des destinataires » au formulaire de création, à côté du mot de passe du lien. Les
+deux sont mutuellement exclusifs : un Send peut exiger un mot de passe, des e-mails de
+destinataires spécifiques, ou ni l'un ni l'autre, jamais les deux.
+
+Le champ propose directement les demandeurs, observateurs et techniciens affectés de
+l'élément comme suggestions (ceux qui ont une adresse e-mail résolvable), donc
+restreindre l'accès aux personnes déjà impliquées ne demande pas de retaper leur
+adresse — n'importe quelle autre adresse peut toujours être saisie directement dans
+le même champ.
 
 ## Notes de sécurité
 

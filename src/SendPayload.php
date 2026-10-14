@@ -47,6 +47,7 @@ final readonly class SendPayload
         public ?string $deletionDate = null,
         public ?string $expirationDate = null,
         public ?string $password = null,
+        public ?string $emails = null,
         public bool $hideEmail = false,
         public bool $disabled = false,
     ) {}

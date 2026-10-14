@@ -51,6 +51,7 @@
                 title: title
             });
             window.pluginBitwardensendStartFollowupPreviewPolling();
+            window.pluginBitwardensendInitEmailsSelect();
             return;
         }
 
@@ -90,6 +91,7 @@
                 // bootstrap script for the followup field won't run here either —
                 // it stays a plain textarea in this fallback, still functional).
                 window.pluginBitwardensendStartFollowupPreviewPolling();
+                window.pluginBitwardensendInitEmailsSelect();
             })
             .catch(() => {
                 modalEl.querySelector('.modal-body').innerHTML =
@@ -327,6 +329,43 @@
         Array.prototype.forEach.call(fields, (field) => {
             const wanted = field.getAttribute('data-bws-required') === '1';
             field.required = wanted && field.offsetParent !== null;
+        });
+    };
+
+    /**
+     * Enables Select2 on the "recipient emails" multi-select (email-
+     * verified-recipients mode): the item's own requesters/observers/
+     * assignees as selectable options, rendered server-side as real
+     * <option> elements (see _send_form_fields.html.twig — nothing built
+     * from JSON here, deliberately: that would mean escaping GLPI user
+     * names/addresses for safe inline-<script> embedding by hand instead
+     * of letting Twig's own auto-escaping handle it). tags:true also lets
+     * a technician type any other address, same as the plain text field
+     * this replaced.
+     *
+     * jQuery and Select2 are assumed already loaded globally — GLPI core
+     * pulls them in on every page that renders one of its own Dropdowns,
+     * which this form's surrounding page already does elsewhere.
+     *
+     * Safe to call more than once (the dialog can be reopened): destroys
+     * an existing instance first rather than erroring on a double-init.
+     */
+    window.pluginBitwardensendInitEmailsSelect = function () {
+        const field = document.getElementById('bws_emails');
+        if (!field || typeof window.jQuery !== 'function' || !window.jQuery.fn.select2) {
+            return;
+        }
+
+        const $field = window.jQuery(field);
+        if ($field.data('select2')) {
+            $field.select2('destroy');
+        }
+
+        $field.select2({
+            tags: true,
+            tokenSeparators: [',', ' '],
+            width: '100%',
+            placeholder: field.dataset.bwsPlaceholder || '',
         });
     };
 
