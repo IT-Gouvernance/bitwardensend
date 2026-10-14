@@ -37,6 +37,7 @@ use RuntimeException;
 use Throwable;
 use CommonDBTM;
 use CommonGLPI;
+use CommonITILActor;
 use CommonITILObject;
 use CronTask;
 use Glpi\Application\View\TemplateRenderer;
@@ -46,6 +47,7 @@ use ITILFollowup;
 use Notification;
 use Session;
 use Toolbox;
+use User;
 
 /**
  * A Bitwarden Send link attached to an ITIL object.
@@ -162,6 +164,71 @@ class Send extends CommonDBTM
             }
 
             return $templates;
+        } catch (Throwable $throwable) {
+            Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * The item's requesters/observers/assignees who have a resolvable email
+     * address — offered as one-click additions to the email-verified-
+     * recipients field (see createFromInput()), instead of retyping an
+     * address already on the item. Only ever called when that mode is
+     * actually enabled.
+     *
+     * Deduplicated by email: the same person can hold more than one actor
+     * role (e.g. requester and observer), and should only ever appear once.
+     *
+     * @return list<array{label: string, email: string}>
+     */
+    public static function getTicketActorEmails(CommonITILObject $item): array
+    {
+        try {
+            $types = [
+                CommonITILActor::REQUESTER => _n('Requester', 'Requesters', 1),
+                CommonITILActor::OBSERVER  => _n('Observer', 'Observers', 1),
+                CommonITILActor::ASSIGN    => __('Assigned to'),
+            ];
+
+            $actors     = [];
+            $seenEmails = [];
+
+            foreach ($types as $type => $typeLabel) {
+                foreach ($item->getUsers($type) as $actor) {
+                    if (!is_array($actor)) {
+                        continue;
+                    }
+
+                    $rawUsersId = $actor['users_id'] ?? 0;
+                    $usersId    = is_numeric($rawUsersId) ? (int) $rawUsersId : 0;
+
+                    if ($usersId > 0) {
+                        $user = new User();
+                        if (!$user->getFromDB($usersId)) {
+                            continue;
+                        }
+                        $email = $user->getDefaultEmail();
+                        $name  = $user->getFriendlyName();
+                    } else {
+                        $rawAlternativeEmail = $actor['alternative_email'] ?? '';
+                        $email = is_string($rawAlternativeEmail) ? $rawAlternativeEmail : '';
+                        $name  = $email;
+                    }
+
+                    if ($email === '' || isset($seenEmails[$email])) {
+                        continue;
+                    }
+                    $seenEmails[$email] = true;
+
+                    $actors[] = [
+                        'label' => sprintf('%s: %s <%s>', $typeLabel, $name, $email),
+                        'email' => $email,
+                    ];
+                }
+            }
+
+            return $actors;
         } catch (Throwable $throwable) {
             Toolbox::logDebug('[bitwardensend] ' . $throwable->getMessage());
             return [];
@@ -503,6 +570,7 @@ class Send extends CommonDBTM
      *         followup_template: string
      *     },
      *     followup_templates: list<array{id:int,name:string}>,
+     *     ticket_actors: list<array{label: string, email: string}>,
      *     force_followup: bool
      * }
      */
@@ -546,6 +614,9 @@ class Send extends CommonDBTM
             'followup_templates' => empty($conf['allow_glpi_followup_templates'])
                 ? []
                 : self::getFollowupTemplatesForItem($item),
+            'ticket_actors'      => empty($conf['email_mode_enabled'])
+                ? []
+                : self::getTicketActorEmails($item),
         ];
     }
 
@@ -646,13 +717,30 @@ class Send extends CommonDBTM
         // way a form field that was never rendered would have none.
         $emails = null;
         if (!empty($conf['email_mode_enabled'])) {
+            // Two sources, merged: the free-text field, and whichever of
+            // the item's own actors (see getTicketActorEmails()) were
+            // checked on the form. Both go through the same validation
+            // below regardless of source - an actor's checkbox value is
+            // still attacker-controllable POST data, not implicitly trusted
+            // just because the email itself came from GLPI's own DB.
             $rawEmails = $input['recipient_emails'] ?? '';
             $emailsInput = is_string($rawEmails) ? $rawEmails : '';
-            if (trim($emailsInput) !== '') {
-                $emailList = array_values(array_filter(
-                    array_map('trim', explode(',', $emailsInput)),
-                    static fn (string $email): bool => $email !== '',
-                ));
+            $emailCandidates = explode(',', $emailsInput);
+
+            $rawActorEmails = $input['recipient_email_actors'] ?? [];
+            if (is_array($rawActorEmails)) {
+                foreach ($rawActorEmails as $actorEmail) {
+                    if (is_string($actorEmail)) {
+                        $emailCandidates[] = $actorEmail;
+                    }
+                }
+            }
+
+            $emailList = array_values(array_unique(array_filter(
+                array_map('trim', $emailCandidates),
+                static fn (string $email): bool => $email !== '',
+            )));
+            if ($emailList !== []) {
                 foreach ($emailList as $email) {
                     if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
                         Session::addMessageAfterRedirect(
@@ -666,9 +754,7 @@ class Send extends CommonDBTM
                         return false;
                     }
                 }
-                if ($emailList !== []) {
-                    $emails = implode(',', $emailList);
-                }
+                $emails = implode(',', $emailList);
             }
         }
 
