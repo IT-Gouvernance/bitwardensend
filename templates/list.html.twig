@@ -57,7 +57,7 @@
             </thead>
             <tbody>
             {% for send in sends %}
-               <tr class="{{ (send.is_revoked or send.is_expired) ? 'text-muted' : '' }}">
+               <tr class="{{ (send.is_revoked or send.is_expired) ? 'bws-row-faded' : '' }}">
                   <td>
                      {{ send.name }}
                      {% if send.is_password_protected %}

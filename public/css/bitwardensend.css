@@ -36,6 +36,18 @@
 }
 
 /*
+ * De-emphasizes a revoked/expired row. Opacity rather than Bootstrap's own
+ * text-muted utility (a fixed gray computed from --tblr-secondary-color):
+ * that variable's exact shade against GLPI's current background wasn't
+ * legible in practice. Opacity always dims relative to whatever the real
+ * background actually is, light or dark theme alike, instead of aiming for
+ * an absolute color that may or may not contrast well with it.
+ */
+.bws-row-faded {
+   opacity: .65;
+}
+
+/*
  * The <summary> of a native <details> disclosure ("Advanced options" in the
  * Send creation form) isn't a link or button, so it needs an explicit
  * pointer cursor to read as clickable.

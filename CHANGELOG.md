@@ -30,6 +30,14 @@ beyond being a label).
   typed directly — both end up validated the same way server-side,
   regardless of which one a given address came from.
 
+### Fixed
+
+- A revoked or expired Send's row on the "Bitwarden Sends" tab used
+  Bootstrap's `text-muted` utility to fade it out, but that color did not
+  contrast well against GLPI's actual background in practice. Replaced
+  with a plain `opacity` rule, which dims relative to whatever the real
+  background is instead of aiming for a fixed gray.
+
 ## [1.1.0] - 2026-10-07
 
 ### Added
