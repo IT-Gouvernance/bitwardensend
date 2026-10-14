@@ -208,6 +208,7 @@ class Send extends CommonDBTM
                         if (!$user->getFromDB($usersId)) {
                             continue;
                         }
+
                         $email = $user->getDefaultEmail();
                         $name  = $user->getFriendlyName();
                     } else {
@@ -219,6 +220,7 @@ class Send extends CommonDBTM
                     if ($email === '' || isset($seenEmails[$email])) {
                         continue;
                     }
+
                     $seenEmails[$email] = true;
 
                     $actors[] = [
@@ -737,7 +739,7 @@ class Send extends CommonDBTM
             }
 
             $emailList = array_values(array_unique(array_filter(
-                array_map('trim', $emailCandidates),
+                array_map(trim(...), $emailCandidates),
                 static fn (string $email): bool => $email !== '',
             )));
             if ($emailList !== []) {
@@ -754,6 +756,7 @@ class Send extends CommonDBTM
                         return false;
                     }
                 }
+
                 $emails = implode(',', $emailList);
             }
         }
