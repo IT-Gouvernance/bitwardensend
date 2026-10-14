@@ -740,7 +740,7 @@ class Send extends CommonDBTM
 
             $emailList = array_values(array_unique(array_filter(
                 array_map(trim(...), $emailCandidates),
-                static fn (string $email): bool => $email !== '',
+                static fn(string $email): bool => $email !== '',
             )));
             if ($emailList !== []) {
                 foreach ($emailList as $email) {
