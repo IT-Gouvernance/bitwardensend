@@ -57,8 +57,9 @@
             </thead>
             <tbody>
             {% for send in sends %}
-               <tr class="{{ (send.is_revoked or send.is_expired) ? 'bws-row-faded' : '' }}">
-                  <td>
+               {% set faded = (send.is_revoked or send.is_expired) ? 'bws-row-faded' : '' %}
+               <tr>
+                  <td class="{{ faded }}">
                      {{ send.name }}
                      {% if send.is_password_protected %}
                         <i class="ti ti-key ms-1" title="{{ __('Password protected', 'bitwardensend') }}"></i>
@@ -74,10 +75,10 @@
                         </button>
                      {% endif %}
                   </td>
-                  <td>{{ send.user_name }}</td>
-                  <td>{{ send.date_creation_display }}</td>
-                  <td>{{ send.deletion_date_display }}</td>
-                  <td>{{ send.max_access_count ?: __('Unlimited', 'bitwardensend') }}</td>
+                  <td class="{{ faded }}">{{ send.user_name }}</td>
+                  <td class="{{ faded }}">{{ send.date_creation_display }}</td>
+                  <td class="{{ faded }}">{{ send.deletion_date_display }}</td>
+                  <td class="{{ faded }}">{{ send.max_access_count ?: __('Unlimited', 'bitwardensend') }}</td>
                   <td>
                      {% if send.is_revoked %}
                         <span class="badge bg-secondary">{{ __('Revoked', 'bitwardensend') }}</span>

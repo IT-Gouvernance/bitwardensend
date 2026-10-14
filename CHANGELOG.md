@@ -35,8 +35,11 @@ beyond being a label).
 - A revoked or expired Send's row on the "Bitwarden Sends" tab used
   Bootstrap's `text-muted` utility to fade it out, but that color did not
   contrast well against GLPI's actual background in practice. Replaced
-  with a plain `opacity` rule, which dims relative to whatever the real
-  background is instead of aiming for a fixed gray.
+  with a plain `opacity` rule on the row's plain-text columns only (name,
+  creator, dates, max views) - the status badge and the action buttons
+  keep their own full-contrast styling, which a first attempt at this fix
+  had also faded, to the point of becoming hard to read (confirmed with a
+  screenshot).
 
 ## [1.1.0] - 2026-10-07
 
