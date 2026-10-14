@@ -5,7 +5,7 @@ All notable changes to this plugin are documented here. Format loosely follows
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
 beyond being a label).
 
-## [Unreleased]
+## [1.1.1] - 2026-10-14
 
 ### Added
 
