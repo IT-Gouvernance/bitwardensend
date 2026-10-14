@@ -30,6 +30,19 @@ beyond being a label).
   typed directly — both end up validated the same way server-side,
   regardless of which one a given address came from.
 
+### Fixed
+
+- The three "Bitwarden Sends" status badges ("Revoked", "Active",
+  "Expired") used Tabler's own `bg-*` utilities, each resolving their text
+  color from a theme variable - "Revoked" rendered as near-illegible
+  gray-on-gray in practice, and "Active" likewise unreadable (confirmed by
+  screenshot both times). Fixed background/text colors for all three
+  instead, not tied to a theme variable. (An earlier attempt at the
+  "Revoked" one also faded the row's plain text via `opacity`, on the
+  theory the whole row was hard to read - it was not; only the badges
+  were, and fading the row made the badges and the action buttons harder
+  to read still. Reverted; the row's text is untouched.)
+
 ## [1.1.0] - 2026-10-07
 
 ### Added
