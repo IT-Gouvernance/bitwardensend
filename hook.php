@@ -65,6 +65,7 @@ function plugin_bitwardensend_install(): bool
             `followup_template` text,
             `allow_glpi_followup_templates` tinyint NOT NULL DEFAULT 1,
             `password_generator_enabled` tinyint NOT NULL DEFAULT 1,
+            `email_mode_enabled` tinyint NOT NULL DEFAULT 0,
             `send_driver` varchar(10) NOT NULL DEFAULT 'cli',
             `native_identity_url` varchar(255) NOT NULL DEFAULT 'https://identity.bitwarden.com',
             `native_api_url` varchar(255) NOT NULL DEFAULT 'https://api.bitwarden.com',
@@ -110,10 +111,11 @@ function plugin_bitwardensend_install(): bool
     // GLPI calls this same function again on update, so nothing below can be
     // a plain unguarded INSERT.
 
-    // The first real schema change since 1.0.0: an existing install's table
-    // predates the is_email_protected column added above, so a fresh CREATE
-    // TABLE never runs for it. GLPI's own Migration class, rather than more
-    // raw SQL, now that there is an actual upgrade path to carry.
+    // The first real schema change since 1.0.0: an existing install's tables
+    // predate the is_email_protected/email_mode_enabled columns added above,
+    // so a fresh CREATE TABLE never runs for them. GLPI's own Migration
+    // class, rather than more raw SQL, now that there is an actual upgrade
+    // path to carry.
     if ($DB->tableExists($sends_table) && !$DB->fieldExists($sends_table, 'is_email_protected')) {
         $migration = new Migration(PLUGIN_BITWARDENSEND_VERSION);
         $migration->addField(
@@ -121,6 +123,17 @@ function plugin_bitwardensend_install(): bool
             'is_email_protected',
             'bool',
             ['after' => 'is_password_protected', 'value' => 0],
+        );
+        $migration->executeMigration();
+    }
+
+    if ($DB->tableExists($config_table) && !$DB->fieldExists($config_table, 'email_mode_enabled')) {
+        $migration = new Migration(PLUGIN_BITWARDENSEND_VERSION);
+        $migration->addField(
+            $config_table,
+            'email_mode_enabled',
+            'bool',
+            ['after' => 'password_generator_enabled', 'value' => 0],
         );
         $migration->executeMigration();
     }

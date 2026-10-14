@@ -20,13 +20,15 @@ beyond being a label).
   recipient emails"), which then adds the field to the creation form.
   Mutually exclusive with a link password - the two cannot both be set on
   the same Send. First real schema change since 1.0.0: an existing
-  install's `glpi_plugin_bitwardensend_sends` table gets a new
-  `is_email_protected` column through a proper GLPI `Migration` step
-  (`hook.php`), not another raw `ALTER TABLE`. The creation form also offers
-  the item's own requesters/observers/assignees as one-click checkboxes
-  next to the free-text field, for whichever of them already have a
-  resolvable email address — avoids retyping an address already on the
-  ticket; both sources are merged and validated the same way.
+  install's `glpi_plugin_bitwardensend_sends` and
+  `glpi_plugin_bitwardensend_configs` tables each get a new column
+  (`is_email_protected`, `email_mode_enabled`) through a proper GLPI
+  `Migration` step (`hook.php`), not another raw `ALTER TABLE`. The creation
+  form also offers the item's own requesters/observers/assignees as
+  one-click checkboxes next to the free-text field, for whichever of them
+  already have a resolvable email address — avoids retyping an address
+  already on the ticket; both sources are merged and validated the same
+  way.
 
 ## [1.1.0] - 2026-10-07
 
