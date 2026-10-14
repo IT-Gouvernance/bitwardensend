@@ -36,15 +36,26 @@
 }
 
 /*
- * The "Revoked" status badge - Tabler's own bg-secondary (gray background,
- * color inherited from whatever --tblr-secondary-color/-fg resolve to in
- * the current GLPI theme) rendered as near-illegible gray-on-gray in
- * practice, confirmed by screenshot. Fixed background/text colors instead,
- * not tied to a theme variable that may or may not contrast with
+ * The three "Bitwarden Sends" status badges - Tabler's own bg-* utilities
+ * (bg-secondary, bg-green, bg-orange-lt) each resolve their text color from
+ * a theme variable, which rendered the "Revoked" one as near-illegible
+ * gray-on-gray in practice (confirmed by screenshot), and "Active"
+ * similarly unreadable. Fixed background/text colors for all three
+ * instead, not tied to a theme variable that may or may not contrast with
  * whatever else that variable also controls.
  */
 .bws-badge-revoked {
    background-color: #6c757d;
+   color: #fff;
+}
+
+.bws-badge-active {
+   background-color: #2fb344;
+   color: #fff;
+}
+
+.bws-badge-expired {
+   background-color: #f76707;
    color: #fff;
 }
 

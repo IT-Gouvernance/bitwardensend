@@ -32,16 +32,16 @@ beyond being a label).
 
 ### Fixed
 
-- The "Revoked" status badge on the "Bitwarden Sends" tab used Tabler's own
-  `bg-secondary` (a gray background with text color inherited from a theme
-  variable), which rendered as near-illegible gray-on-gray in practice -
-  confirmed by screenshot, unlike "Expired"/"Active"'s own badge colors,
-  which were fine. Fixed background/text colors instead, not tied to a
-  theme variable. (An earlier attempt at this also faded the row's plain
-  text via `opacity`, on the theory the whole row was hard to read - it
-  was not; only this badge was, and fading the row made the badge and
-  the action buttons harder to read still. Reverted; the row's text is
-  untouched.)
+- The three "Bitwarden Sends" status badges ("Revoked", "Active",
+  "Expired") used Tabler's own `bg-*` utilities, each resolving their text
+  color from a theme variable - "Revoked" rendered as near-illegible
+  gray-on-gray in practice, and "Active" likewise unreadable (confirmed by
+  screenshot both times). Fixed background/text colors for all three
+  instead, not tied to a theme variable. (An earlier attempt at the
+  "Revoked" one also faded the row's plain text via `opacity`, on the
+  theory the whole row was hard to read - it was not; only the badges
+  were, and fading the row made the badges and the action buttons harder
+  to read still. Reverted; the row's text is untouched.)
 
 ## [1.1.0] - 2026-10-07
 

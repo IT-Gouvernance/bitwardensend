@@ -82,9 +82,9 @@
                      {% if send.is_revoked %}
                         <span class="badge bws-badge-revoked">{{ __('Revoked', 'bitwardensend') }}</span>
                      {% elseif send.is_expired %}
-                        <span class="badge bg-orange-lt">{{ __('Expired', 'bitwardensend') }}</span>
+                        <span class="badge bws-badge-expired">{{ __('Expired', 'bitwardensend') }}</span>
                      {% else %}
-                        <span class="badge bg-green">{{ __('Active', 'bitwardensend') }}</span>
+                        <span class="badge bws-badge-active">{{ __('Active', 'bitwardensend') }}</span>
                      {% endif %}
                   </td>
                   <td class="text-end">
