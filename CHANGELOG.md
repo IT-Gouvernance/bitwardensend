@@ -5,6 +5,25 @@ All notable changes to this plugin are documented here. Format loosely follows
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
 beyond being a label).
 
+## [Unreleased]
+
+### Added
+
+- Optional "email verified recipients" mode for a Send, as an alternative to
+  a link password: restricts access to a list of email addresses instead of
+  requiring a password, each recipient proving their address with a
+  Bitwarden-sent one-time code before they can view the content. This is a
+  Bitwarden Premium/Family-plan feature - Bitwarden's own API rejects it
+  with a clear error otherwise, so this plugin does not attempt to detect
+  the account's plan itself. Off by default; turn it on from **Setup >
+  General > Bitwarden Send** ("Allow restricting a Send to specific
+  recipient emails"), which then adds the field to the creation form.
+  Mutually exclusive with a link password - the two cannot both be set on
+  the same Send. First real schema change since 1.0.0: an existing
+  install's `glpi_plugin_bitwardensend_sends` table gets a new
+  `is_email_protected` column through a proper GLPI `Migration` step
+  (`hook.php`), not another raw `ALTER TABLE`.
+
 ## [1.1.0] - 2026-10-07
 
 ### Added

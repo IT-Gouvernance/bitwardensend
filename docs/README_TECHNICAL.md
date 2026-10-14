@@ -136,6 +136,7 @@ Setup > General > **Bitwarden Send** tab:
 | API client ID/secret, account email, master password | Native driver's service account — see "Native driver" above |
 | Link defaults | expiration, max views, followup behaviour, template |
 | Allow GLPI followup templates | lets technicians pick one of GLPI's own followup templates instead of the template above |
+| Allow email verified recipients | adds an optional "recipient emails" field to the creation form, as an alternative to a link password — see "Email verified recipients" below |
 
 **Test connection**: for the CLI driver, reports the vault status (`unlocked`,
 `locked`, `unauthenticated`) and attempts an unlock when a master password is stored;
@@ -171,6 +172,20 @@ for the connection's timeout duration right when that failure is exactly what th
 exists to catch. If that turns out to matter in practice, switch it to external mode
 from Setup > Automatic actions (needs a real system cron configured to then actually
 run).
+
+## Email verified recipients
+
+An alternative to a link password: restrict a Send to a list of recipient email
+addresses instead, each one proving their address with a one-time code Bitwarden
+emails them before they can view the content. **Requires a Bitwarden Premium or
+Family plan** on the account used to create the Send — Bitwarden's own API rejects
+the request otherwise, with no workaround.
+
+Off by default. Turn it on from **Setup > General > Bitwarden Send** ("Allow
+restricting a Send to specific recipient emails") to add a "Recipient emails" field
+to the creation form, next to the link password field. The two are mutually
+exclusive: a Send can require a password, specific recipient emails, or neither, never
+both.
 
 ## Security notes
 

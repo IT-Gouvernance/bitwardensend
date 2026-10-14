@@ -35,11 +35,10 @@ use GlpiPlugin\Bitwardensend\Send;
 /**
  * Plugin installation.
  *
- * No Migration step yet: none of the 1.0.0-betaN/1.0.0-rcN pre-releases were
- * ever used in production, so there is no schema drift to migrate away from
- * - the CREATE TABLE statements below only ever run once and already carry
- * every column a fresh 1.1.0 install needs. The first schema change that
- * actually needs one gets a proper Migration step at that point.
+ * The CREATE TABLE statements below only ever run once, for a fresh install;
+ * an upgrade's own schema changes (is_email_protected, added for the email-
+ * verified-recipients mode) go through GLPI's Migration class instead,
+ * further down.
  */
 function plugin_bitwardensend_install(): bool
 {
@@ -95,6 +94,7 @@ function plugin_bitwardensend_install(): bool
             `deletion_date` timestamp NULL DEFAULT NULL,
             `max_access_count` int DEFAULT NULL,
             `is_password_protected` tinyint NOT NULL DEFAULT 0,
+            `is_email_protected` tinyint NOT NULL DEFAULT 0,
             `is_revoked` tinyint NOT NULL DEFAULT 0,
             `date_creation` timestamp NULL DEFAULT NULL,
             `date_mod` timestamp NULL DEFAULT NULL,
@@ -109,6 +109,21 @@ function plugin_bitwardensend_install(): bool
 
     // GLPI calls this same function again on update, so nothing below can be
     // a plain unguarded INSERT.
+
+    // The first real schema change since 1.0.0: an existing install's table
+    // predates the is_email_protected column added above, so a fresh CREATE
+    // TABLE never runs for it. GLPI's own Migration class, rather than more
+    // raw SQL, now that there is an actual upgrade path to carry.
+    if ($DB->tableExists($sends_table) && !$DB->fieldExists($sends_table, 'is_email_protected')) {
+        $migration = new Migration(PLUGIN_BITWARDENSEND_VERSION);
+        $migration->addField(
+            $sends_table,
+            'is_email_protected',
+            'bool',
+            ['after' => 'is_password_protected', 'value' => 0],
+        );
+        $migration->executeMigration();
+    }
 
     // The single config row, created once — never touched again so an admin's
     // edited followup template isn't reset by a later update.

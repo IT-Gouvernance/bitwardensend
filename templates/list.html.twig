@@ -63,6 +63,9 @@
                      {% if send.is_password_protected %}
                         <i class="ti ti-key ms-1" title="{{ __('Password protected', 'bitwardensend') }}"></i>
                      {% endif %}
+                     {% if send.is_email_protected %}
+                        <i class="ti ti-mail-check ms-1" title="{{ __('Restricted to specific recipient emails', 'bitwardensend') }}"></i>
+                     {% endif %}
                      {% if send.access_url %}
                         <button type="button" class="btn btn-sm btn-icon btn-ghost-secondary ms-1"
                                 onclick="pluginBitwardensendCopy(this, '{{ send.access_url|e('js') }}');"

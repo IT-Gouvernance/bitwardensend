@@ -62,6 +62,7 @@ class CliSendDriver implements SendDriverInterface
             'deletion_date'     => $payload->deletionDate,
             'expiration_date'   => $payload->expirationDate,
             'password'          => $payload->password,
+            'emails'            => $payload->emails,
             'hide_email'        => $payload->hideEmail,
         ]);
 
@@ -93,6 +94,8 @@ class CliSendDriver implements SendDriverInterface
         $max_access   = is_numeric($rawMaxAccess) ? (int) $rawMaxAccess : 0;
         $rawPassword  = $options['password'] ?? '';
         $password     = is_string($rawPassword) ? $rawPassword : '';
+        $rawEmails    = $options['emails'] ?? '';
+        $emails       = is_string($rawEmails) ? $rawEmails : '';
 
         $payload = [
             'type'           => 0,
@@ -107,6 +110,7 @@ class CliSendDriver implements SendDriverInterface
             'deletionDate'   => $options['deletion_date'] ?? null,
             'expirationDate' => $options['expiration_date'] ?? null,
             'password'       => $password !== '' ? $password : null,
+            'emails'         => $emails !== '' ? $emails : null,
             'disabled'       => false,
             'hideEmail'      => (bool) ($options['hide_email'] ?? false),
         ];

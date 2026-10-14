@@ -494,6 +494,7 @@ class Send extends CommonDBTM
      *     default_name: string,
      *     conf: array{
      *         password_generator_enabled: mixed,
+     *         email_mode_enabled: mixed,
      *         default_deletion_days: mixed,
      *         default_max_access_count: mixed,
      *         default_hide_email: mixed,
@@ -527,6 +528,7 @@ class Send extends CommonDBTM
         // has no use for either.
         $formConf = [
             'password_generator_enabled' => $conf['password_generator_enabled'] ?? 1,
+            'email_mode_enabled'         => $conf['email_mode_enabled'] ?? 0,
             'default_deletion_days'      => $conf['default_deletion_days'] ?? 7,
             'default_max_access_count'   => $conf['default_max_access_count'] ?? 1,
             'default_hide_email'         => $conf['default_hide_email'] ?? 0,
@@ -637,6 +639,48 @@ class Send extends CommonDBTM
         $rawPassword   = $input['password'] ?? '';
         $password      = is_string($rawPassword) ? $rawPassword : '';
 
+        // Re-checked server-side, not just trusted from the form's own
+        // conditional rendering: a direct POST could set this regardless of
+        // whether the admin actually turned the toggle on. Silently ignored
+        // rather than rejected - the field simply has no effect, the same
+        // way a form field that was never rendered would have none.
+        $emails = null;
+        if (!empty($conf['email_mode_enabled'])) {
+            $rawEmails = $input['recipient_emails'] ?? '';
+            $emailsInput = is_string($rawEmails) ? $rawEmails : '';
+            if (trim($emailsInput) !== '') {
+                $emailList = array_values(array_filter(
+                    array_map('trim', explode(',', $emailsInput)),
+                    static fn (string $email): bool => $email !== '',
+                ));
+                foreach ($emailList as $email) {
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                        Session::addMessageAfterRedirect(
+                            sprintf(
+                                __('"%s" is not a valid email address.', 'bitwardensend'),
+                                htmlspecialchars($email, ENT_QUOTES),
+                            ),
+                            false,
+                            ERROR,
+                        );
+                        return false;
+                    }
+                }
+                if ($emailList !== []) {
+                    $emails = implode(',', $emailList);
+                }
+            }
+        }
+
+        if ($emails !== null && $password !== '') {
+            Session::addMessageAfterRedirect(
+                __('Choose either a link password or recipient emails, not both.', 'bitwardensend'),
+                false,
+                ERROR,
+            );
+            return false;
+        }
+
         $rawName = $input['name'] ?? '';
         $name    = trim(is_string($rawName) ? $rawName : '');
         if ($name === '') {
@@ -652,6 +696,7 @@ class Send extends CommonDBTM
                 maxAccessCount: $max_access,
                 deletionDate: $deletion_date,
                 password: $password,
+                emails: $emails,
                 hideEmail: !empty($input['hide_email']),
             ));
         } catch (Throwable $throwable) {
@@ -687,6 +732,7 @@ class Send extends CommonDBTM
             'deletion_date'         => date('Y-m-d H:i:s', $expiration_ts),
             'max_access_count'      => $max_access > 0 ? $max_access : null,
             'is_password_protected' => $password !== '' ? 1 : 0,
+            'is_email_protected'    => $emails !== null ? 1 : 0,
             'date_creation'         => $_SESSION['glpi_currenttime'] ?? date('Y-m-d H:i:s'),
         ]);
 

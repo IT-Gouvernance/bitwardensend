@@ -291,6 +291,17 @@
                          name="password_generator_enabled" value="1" {{ conf.password_generator_enabled ? 'checked' : '' }}>
                </span>
             </label>
+            <label class="list-group-item d-flex align-items-center justify-content-between">
+               <span class="form-check-label me-3">
+                  <i class="ti ti-mail-check me-1 text-secondary"></i>{{ __('Allow restricting a Send to specific recipient emails', 'bitwardensend') }}
+                  <i class="ti ti-info-circle text-secondary ms-1"
+                     title="{{ __('Requires a Bitwarden Premium or Family plan on the account used to create the Send. Bitwarden rejects the Send otherwise.', 'bitwardensend') }}"></i>
+               </span>
+               <span class="form-check form-switch mb-0">
+                  <input type="checkbox" class="form-check-input" role="switch"
+                         name="email_mode_enabled" value="1" {{ conf.email_mode_enabled ? 'checked' : '' }}>
+               </span>
+            </label>
          </div>
       </div>
 
