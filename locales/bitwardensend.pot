@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: bitwardensend 1.1.0\n"
+"Project-Id-Version: bitwardensend 1.1.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-31 00:00+0000\n"
 "PO-Revision-Date: 2026-07-31 00:00+0000\n"
@@ -17,16 +17,20 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 
-#: templates/config.html.twig:365
+#: src/Send.php:749
+msgid "\"%s\" is not a valid email address."
+msgstr ""
+
+#: templates/config.html.twig:376
 msgid "(Setup > Automatic actions)."
 msgstr ""
 
-#: templates/config.html.twig:378
+#: templates/config.html.twig:389
 msgid ""
 "(Setup > Automatic actions); a failure is reported the same way GLPI reports any other automatic action that keeps failing, via the notification"
 msgstr ""
 
-#: templates/config.html.twig:384
+#: templates/config.html.twig:395
 msgid "(Setup > Notifications)."
 msgstr ""
 
@@ -34,23 +38,23 @@ msgstr ""
 msgid "0 means unlimited until expiration."
 msgstr ""
 
-#: src/Config.php:289, templates/config.html.twig:161
+#: src/Config.php:290, templates/config.html.twig:161
 msgid "API URL"
 msgstr ""
 
-#: src/Config.php:301, templates/config.html.twig:188
+#: src/Config.php:302, templates/config.html.twig:188
 msgid "API client ID"
 msgstr ""
 
-#: src/Config.php:316, templates/config.html.twig:199
+#: src/Config.php:317, templates/config.html.twig:199
 msgid "API client secret"
 msgstr ""
 
-#: src/Config.php:302, templates/config.html.twig:219
+#: src/Config.php:303, templates/config.html.twig:219
 msgid "Account email"
 msgstr ""
 
-#: templates/list.html.twig:84
+#: templates/list.html.twig:87
 msgid "Active"
 msgstr ""
 
@@ -58,33 +62,37 @@ msgstr ""
 msgid "Advanced options"
 msgstr ""
 
-#: templates/config.html.twig:336
+#: templates/config.html.twig:347
 msgid "Allow choosing a GLPI followup template when creating a Send"
 msgstr ""
 
-#: templates/config.html.twig:359
+#: templates/config.html.twig:296
+msgid "Allow restricting a Send to specific recipient emails"
+msgstr ""
+
+#: templates/config.html.twig:370
 msgid ""
 "Automatic deletion of revoked or expired entries is configured on the automatic action"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:204
+#: templates/_send_form_fields.html.twig:223
 msgid ""
 "Available variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}"
 msgstr ""
 
-#: src/CliSendDriver.php:246, src/NativeSendDriver.php:157, src/NativeSendDriver.php:207
+#: src/CliSendDriver.php:250, src/NativeSendDriver.php:162, src/NativeSendDriver.php:212
 msgid "Bitwarden API URL is not configured"
 msgstr ""
 
-#: src/NativeSendDriver.php:314
+#: src/NativeSendDriver.php:319
 msgid "Bitwarden API client credentials are not configured."
 msgstr ""
 
-#: src/NativeSendDriver.php:461
+#: src/NativeSendDriver.php:466
 msgid "Bitwarden API error: %s"
 msgstr ""
 
-#: src/Send.php:712
+#: src/Send.php:846
 msgid "Bitwarden Send link created: %s"
 msgstr ""
 
@@ -92,23 +100,23 @@ msgstr ""
 msgid "Bitwarden connection"
 msgstr ""
 
-#: src/NativeSendDriver.php:362
+#: src/NativeSendDriver.php:367
 msgid "Bitwarden did not return KDF parameters."
 msgstr ""
 
-#: src/NativeSendDriver.php:177
+#: src/NativeSendDriver.php:182
 msgid "Bitwarden did not return a Send id/accessId"
 msgstr ""
 
-#: src/NativeSendDriver.php:358
+#: src/NativeSendDriver.php:363
 msgid "Bitwarden did not return an access token."
 msgstr ""
 
-#: src/NativeSendDriver.php:366
+#: src/NativeSendDriver.php:371
 msgid "Bitwarden did not return the account user key."
 msgstr ""
 
-#: src/NativeSendDriver.php:307
+#: src/NativeSendDriver.php:312
 msgid "Bitwarden identity URL is not configured."
 msgstr ""
 
@@ -121,8 +129,12 @@ msgstr ""
 msgid "CLI / bw serve — recommended"
 msgstr ""
 
-#: src/CliSendDriver.php:303, src/NativeSendDriver.php:449
+#: src/CliSendDriver.php:307, src/NativeSendDriver.php:454
 msgid "Cannot reach the Bitwarden API (%s)"
+msgstr ""
+
+#: src/Send.php:765
+msgid "Choose either a link password or recipient emails, not both."
 msgstr ""
 
 #: front/config.form.php:51
@@ -145,19 +157,19 @@ msgstr ""
 msgid "Content to share"
 msgstr ""
 
-#: templates/list.html.twig:69
+#: templates/list.html.twig:72
 msgid "Copy link"
 msgstr ""
 
-#: src/Send.php:627
+#: src/Send.php:702
 msgid "Could not compute the expiration date."
 msgstr ""
 
-#: src/Send.php:661
+#: src/Send.php:794
 msgid "Could not create the Send: %s"
 msgstr ""
 
-#: src/NativeSendDriver.php:278
+#: src/NativeSendDriver.php:283
 msgid "Could not decrypt the account user key: wrong master password?"
 msgstr ""
 
@@ -165,11 +177,11 @@ msgstr ""
 msgid "Could not encode the rendered template."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:230
+#: templates/_send_form_fields.html.twig:249
 msgid "Could not load that template."
 msgstr ""
 
-#: src/Send.php:842
+#: src/Send.php:976
 msgid "Could not revoke the link: %s"
 msgstr ""
 
@@ -189,11 +201,11 @@ msgstr ""
 msgid "Create link"
 msgstr ""
 
-#: src/Send.php:1132, templates/list.html.twig:50
+#: src/Send.php:1266, templates/list.html.twig:50
 msgid "Created by"
 msgstr ""
 
-#: src/NativeSendDriver.php:289
+#: src/NativeSendDriver.php:294
 msgid "Decrypted user key has an unexpected length."
 msgstr ""
 
@@ -205,7 +217,7 @@ msgstr ""
 msgid "Default maximum views"
 msgstr ""
 
-#: hook.php:144, src/Send.php:873
+#: hook.php:172, src/Send.php:1007
 msgid ""
 "Delete revoked or expired Bitwarden Send entries past the configured retention"
 msgstr ""
@@ -222,7 +234,7 @@ msgstr ""
 msgid "Delete the stored secret"
 msgstr ""
 
-#: templates/list.html.twig:116
+#: templates/list.html.twig:119
 msgid "Delete this entry?"
 msgstr ""
 
@@ -243,11 +255,11 @@ msgid ""
 "Encrypted with the GLPI key. Used to unlock the vault automatically. Leave empty if you unlock the service yourself."
 msgstr ""
 
-#: src/Send.php:1144, templates/list.html.twig:52
+#: src/Send.php:1278, templates/list.html.twig:52
 msgid "Expiration"
 msgstr ""
 
-#: templates/list.html.twig:82
+#: templates/list.html.twig:85
 msgid "Expired"
 msgstr ""
 
@@ -255,15 +267,15 @@ msgstr ""
 msgid "Expires in"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:177, templates/config.html.twig:301
+#: templates/_send_form_fields.html.twig:196, templates/config.html.twig:312
 msgid "Followup configuration"
 msgstr ""
 
-#: templates/config.html.twig:347
+#: templates/config.html.twig:358
 msgid "Followup template"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:202
+#: templates/_send_form_fields.html.twig:221
 msgid "Followup text"
 msgstr ""
 
@@ -271,7 +283,7 @@ msgstr ""
 msgid "For example http://127.0.0.1:8087 — never expose this port publicly."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:238
+#: templates/_send_form_fields.html.twig:257
 msgid "GLPI followup templates"
 msgstr ""
 
@@ -288,7 +300,7 @@ msgstr ""
 msgid "Generate a random password"
 msgstr ""
 
-#: src/Send.php:96
+#: src/Send.php:98
 msgid ""
 "Hello,\n"
 "\n"
@@ -301,7 +313,7 @@ msgid ""
 "Kind regards,"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:163
+#: templates/_send_form_fields.html.twig:182
 msgid "Hide my email address from the recipient"
 msgstr ""
 
@@ -309,11 +321,11 @@ msgstr ""
 msgid "Hide the sender email address by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:157
+#: templates/_send_form_fields.html.twig:176
 msgid "Hide the text by default when opened"
 msgstr ""
 
-#: src/Config.php:288, templates/config.html.twig:150
+#: src/Config.php:289, templates/config.html.twig:150
 msgid "Identity URL"
 msgstr ""
 
@@ -321,11 +333,11 @@ msgstr ""
 msgid "Invalid request."
 msgstr ""
 
-#: ajax/followup_template.php:66, ajax/form.php:54, src/Send.php:578
+#: ajax/followup_template.php:66, ajax/form.php:54, src/Send.php:653
 msgid "Item not found or access denied."
 msgstr ""
 
-#: templates/config.html.twig:325
+#: templates/config.html.twig:336
 msgid "Keep the link in the GLPI database"
 msgstr ""
 
@@ -349,7 +361,7 @@ msgstr ""
 msgid "Link password (optional)"
 msgstr ""
 
-#: src/Send.php:857
+#: src/Send.php:991
 msgid "Link revoked."
 msgstr ""
 
@@ -357,7 +369,7 @@ msgstr ""
 msgid "Local API (bw serve) — recommended"
 msgstr ""
 
-#: src/Config.php:269, templates/config.html.twig:70
+#: src/Config.php:270, templates/config.html.twig:70
 msgid "Local API URL"
 msgstr ""
 
@@ -365,7 +377,7 @@ msgstr ""
 msgid "Lowercase"
 msgstr ""
 
-#: src/Config.php:323, templates/config.html.twig:90, templates/config.html.twig:230
+#: src/Config.php:324, templates/config.html.twig:90, templates/config.html.twig:230
 msgid "Master password"
 msgstr ""
 
@@ -377,7 +389,7 @@ msgstr ""
 msgid "Maximum number of views"
 msgstr ""
 
-#: templates/config.html.twig:382
+#: templates/config.html.twig:393
 msgid "Monitoring of automatic actions"
 msgstr ""
 
@@ -398,7 +410,7 @@ msgstr ""
 msgid "No Bitwarden Send link has been created for this item yet."
 msgstr ""
 
-#: src/NativeSendDriver.php:239
+#: src/NativeSendDriver.php:244
 msgid "No master password is configured for the native driver."
 msgstr ""
 
@@ -436,35 +448,58 @@ msgstr ""
 msgid "Password protected"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:232
+#: templates/_send_form_fields.html.twig:169
+msgid ""
+"Pick from the item's own requesters/observers/assignees, or type any other address. Leave empty to not restrict access. Cannot be combined with a link password above."
+msgstr ""
+
+#: templates/_send_form_fields.html.twig:251
 msgid "Plugin default template"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:188
+#: templates/_send_form_fields.html.twig:207
 msgid "Post the link as a followup"
 msgstr ""
 
-#: templates/config.html.twig:307
+#: templates/config.html.twig:318
 msgid "Post the link as a followup by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:250
+#: templates/_send_form_fields.html.twig:269
 msgid "Private followup (hidden from the requester)"
 msgstr ""
 
-#: templates/config.html.twig:316
+#: templates/config.html.twig:327
 msgid "Private followup by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:229
+#: templates/_send_form_fields.html.twig:248
 msgid "Replace the current text? Your changes will be lost."
 msgstr ""
 
-#: src/Send.php:877
+#: templates/config.html.twig:298
+msgid ""
+"Requires a Bitwarden Premium or Family plan on the account used to create the Send. Bitwarden rejects the Send otherwise."
+msgstr ""
+
+#: templates/_send_form_fields.html.twig:160
+msgid ""
+"Requires a Bitwarden Premium or Family plan. Bitwarden rejects the Send otherwise."
+msgstr ""
+
+#: templates/_send_form_fields.html.twig:158
+msgid "Restrict access to recipient emails (optional)"
+msgstr ""
+
+#: templates/list.html.twig:67
+msgid "Restricted to specific recipient emails"
+msgstr ""
+
+#: src/Send.php:1011
 msgid "Retention (days)"
 msgstr ""
 
-#: templates/list.html.twig:98, templates/list.html.twig:101
+#: templates/list.html.twig:101, templates/list.html.twig:104
 msgid "Revoke"
 msgstr ""
 
@@ -472,11 +507,11 @@ msgstr ""
 msgid "Revoke Send links"
 msgstr ""
 
-#: templates/list.html.twig:99
+#: templates/list.html.twig:102
 msgid "Revoke this link?"
 msgstr ""
 
-#: src/Send.php:1150, templates/list.html.twig:80
+#: src/Send.php:1284, templates/list.html.twig:83
 msgid "Revoked"
 msgstr ""
 
@@ -504,7 +539,7 @@ msgstr ""
 msgid "Send it over another channel, by phone or text message for instance."
 msgstr ""
 
-#: src/Config.php:281, templates/config.html.twig:112
+#: src/Config.php:282, templates/config.html.twig:112
 msgid "Send link base URL"
 msgstr ""
 
@@ -536,44 +571,44 @@ msgstr ""
 msgid "Template not found."
 msgstr ""
 
-#: templates/config.html.twig:393
+#: templates/config.html.twig:404
 msgid "Test connection"
 msgstr ""
 
-#: hook.php:181, src/Send.php:883
+#: hook.php:209, src/Send.php:1017
 msgid ""
 "Test the Bitwarden connection and report failures the same way GLPI reports any other automatic action that keeps failing"
 msgstr ""
 
-#: src/CliSendDriver.php:194
+#: src/CliSendDriver.php:198
 msgid "The Bitwarden client is not logged in. Run \"bw login\" on the server."
 msgstr ""
 
-#: src/CliSendDriver.php:201
+#: src/CliSendDriver.php:205
 msgid "The Bitwarden vault is locked and no master password is configured."
 msgstr ""
 
-#: src/CliSendDriver.php:387
+#: src/CliSendDriver.php:391
 msgid "The Send access link has an unexpected scheme."
 msgstr ""
 
-#: src/CliSendDriver.php:374
+#: src/CliSendDriver.php:378
 msgid "The Send was created but no access link was returned."
 msgstr ""
 
-#: src/Send.php:786
+#: src/Send.php:920
 msgid "The Send was created but the followup could not be added."
 msgstr ""
 
-#: templates/config.html.twig:372
+#: templates/config.html.twig:383
 msgid "The connection above is also tested periodically by the automatic action"
 msgstr ""
 
-#: src/Send.php:606
+#: src/Send.php:681
 msgid "The content to share is empty."
 msgstr ""
 
-#: templates/list.html.twig:100
+#: templates/list.html.twig:103
 msgid "The link will no longer be viewable. This cannot be undone."
 msgstr ""
 
@@ -592,17 +627,17 @@ msgid ""
 "The service answers but the vault is locked. Set the master password below so the plugin can unlock it, or unlock the service manually on the server."
 msgstr ""
 
-#: src/NativeSendDriver.php:253
+#: src/NativeSendDriver.php:258
 msgid ""
 "This account uses the Argon2id KDF, which the native driver cannot reproduce in PHP. Use a service account configured with PBKDF2, or switch this Send driver to \"cli\"."
 msgstr ""
 
-#: templates/config.html.twig:352
+#: templates/config.html.twig:363
 msgid ""
 "This is the default text proposed when creating a Send. If the option above is enabled, the technician can instead pick one of the GLPI followup templates (Setup > Templates > Followup templates) — the same variables also work in those."
 msgstr ""
 
-#: templates/list.html.twig:117
+#: templates/list.html.twig:120
 msgid "This only removes the record from GLPI. This cannot be undone."
 msgstr ""
 
@@ -614,35 +649,35 @@ msgstr ""
 msgid "US — bitwarden.com"
 msgstr ""
 
-#: src/CliSendDriver.php:263, src/NativeSendDriver.php:162
+#: src/CliSendDriver.php:267, src/NativeSendDriver.php:167
 msgid "Unable to encode the request body"
 msgstr ""
 
-#: src/CliSendDriver.php:251, src/NativeSendDriver.php:399
+#: src/CliSendDriver.php:255, src/NativeSendDriver.php:404
 msgid "Unable to initialize cURL"
 msgstr ""
 
-#: src/CliSendDriver.php:311, src/NativeSendDriver.php:471
+#: src/CliSendDriver.php:315, src/NativeSendDriver.php:476
 msgid "Unexpected response from the Bitwarden API (HTTP %d)"
 msgstr ""
 
-#: front/config.form.php:95, src/Send.php:1024
+#: front/config.form.php:95, src/Send.php:1158
 msgid "Unexpected vault status: %s"
 msgstr ""
 
-#: src/CliSendDriver.php:350
+#: src/CliSendDriver.php:354
 msgid "Unknown Bitwarden API error"
 msgstr ""
 
-#: src/CliSendDriver.php:123, src/NativeSendDriver.php:197
+#: src/CliSendDriver.php:127, src/NativeSendDriver.php:202
 msgid "Unknown Send identifier"
 msgstr ""
 
-#: templates/list.html.twig:77
+#: templates/list.html.twig:80
 msgid "Unlimited"
 msgstr ""
 
-#: ajax/form.php:46, src/Send.php:568
+#: ajax/form.php:46, src/Send.php:643
 msgid "Unsupported item type."
 msgstr ""
 
@@ -650,29 +685,29 @@ msgstr ""
 msgid "Uppercase"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:226
+#: templates/_send_form_fields.html.twig:245
 msgid "Use a GLPI followup template"
 msgstr ""
 
-#: templates/config.html.twig:351
+#: templates/config.html.twig:362
 msgid ""
 "Variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}"
 msgstr ""
 
-#: src/Config.php:290, templates/config.html.twig:172
+#: src/Config.php:291, templates/config.html.twig:172
 msgid "Web vault URL"
 msgstr ""
 
-#: templates/config.html.twig:327
+#: templates/config.html.twig:338
 msgid ""
 "When disabled, GLPI only keeps metadata: the link then exists in the followup only."
 msgstr ""
 
-#: src/Send.php:595
+#: src/Send.php:670
 msgid "You are not allowed to add a followup on this item."
 msgstr ""
 
-#: src/Send.php:767, templates/_send_form_fields.html.twig:199
+#: src/Send.php:901, templates/_send_form_fields.html.twig:218
 msgid "an unlimited number of"
 msgstr ""
 
@@ -684,11 +719,15 @@ msgstr ""
 msgid "days"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:200
+#: templates/_send_form_fields.html.twig:163
+msgid "e.g. alice@example.com, bob@example.com"
+msgstr ""
+
+#: templates/_send_form_fields.html.twig:219
 msgid "the link (created once you submit)"
 msgstr ""
 
-#: src/Send.php:74
+#: src/Send.php:76
 msgid "Bitwarden Send"
 msgid_plural "Bitwarden Sends"
 msgstr[0] ""
