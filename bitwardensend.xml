@@ -18,6 +18,7 @@
    <download>https://github.com/IT-Gouvernance/bitwardensend/releases</download>
    <issues>https://github.com/IT-Gouvernance/bitwardensend/issues</issues>
    <readme>https://raw.githubusercontent.com/IT-Gouvernance/bitwardensend/main/README.md</readme>
+   <changelog>https://raw.githubusercontent.com/IT-Gouvernance/bitwardensend/refs/heads/main/CHANGELOG.md</changelog>
    <authors>
       <author>IT Gouvernance</author>
    </authors>
