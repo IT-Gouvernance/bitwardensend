@@ -98,7 +98,7 @@ final class NativeSendDriverIntegrationTest extends TestCase
             $value = getenv($name);
             if ($value === false || $value === '') {
                 self::markTestSkipped(sprintf(
-                    'Set %s (and the other BW_TEST_* variables — see this file\'s own '
+                    "Set %s (and the other BW_TEST_* variables — see this file's own "
                     . 'header) to run the native driver against a real Bitwarden account.',
                     $name,
                 ));
