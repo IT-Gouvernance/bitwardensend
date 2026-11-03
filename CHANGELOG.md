@@ -20,6 +20,7 @@ beyond being a label).
   textarea instead of a rich text editor). Each render of the form now gets
   its own unique ids, and the JavaScript scopes its lookups to the specific
   form instance that was actually clicked or edited.
+- Simplified quote escaping in a test's skip message (no functional change).
 
 ## [1.1.1] - 2026-10-14
 
