@@ -5,6 +5,22 @@ All notable changes to this plugin are documented here. Format loosely follows
 [docs/README_TECHNICAL.md](docs/README_TECHNICAL.md) for why the version string matters
 beyond being a label).
 
+## [Unreleased]
+
+### Fixed
+
+- The Send creation form's fields (password/secret generators, followup rich
+  text editor, "recipient emails" picker) stopped working whenever the
+  ticket timeline's own inline "Bitwarden Send" answer panel and the
+  "Bitwarden Sends" tab's own modal were both present in the page at once -
+  every field shared the same hardcoded id between the two, so the
+  JavaScript ended up targeting whichever copy happened to come first in the
+  page instead of the one actually visible (most noticeably: "Generate a
+  password" appearing to do nothing, and the followup field staying a plain
+  textarea instead of a rich text editor). Each render of the form now gets
+  its own unique ids, and the JavaScript scopes its lookups to the specific
+  form instance that was actually clicked or edited.
+
 ## [1.1.1] - 2026-10-14
 
 ### Added

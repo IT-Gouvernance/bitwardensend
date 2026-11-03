@@ -60,9 +60,14 @@
 </form>
 
 <script>
-   window.pluginBitwardensendUpdateFollowupPreview();
-   window.pluginBitwardensendStartFollowupPreviewPolling();
-   window.pluginBitwardensendInitEmailsSelect();
+   // Scoped to this very <form> (its immediately preceding sibling), not the
+   // whole document: the "Bitwarden Sends" tab's own modal (see
+   // form.html.twig) can be open in the same page at the same time, and
+   // every bws_* id is now unique per render - see _send_form_fields.html.twig.
+   var bwsScope = document.currentScript.previousElementSibling;
+   window.pluginBitwardensendUpdateFollowupPreview(bwsScope);
+   window.pluginBitwardensendStartFollowupPreviewPolling(bwsScope);
+   window.pluginBitwardensendInitEmailsSelect(bwsScope);
 
    // GLPI opens this whole form via Bootstrap collapse on the surrounding
    // "new-PluginBitwardensendSend-block" element (see
