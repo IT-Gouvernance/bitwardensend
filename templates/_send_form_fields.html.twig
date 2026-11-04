@@ -38,61 +38,83 @@
 #}
 {% import 'components/form/fields_macros.html.twig' as fields %}
 
+{#
+   This partial is included more than once in the very same page: the
+   "Bitwarden Sends" tab's own modal (form.html.twig) and the ticket
+   timeline's inline answer action (answer_form.html.twig, always rendered -
+   just collapsed - as part of the timeline, regardless of which tab is
+   active) can both exist in the DOM at once. A plain hardcoded id would
+   then be duplicated, and every document.getElementById('bws_xxx') in
+   bitwardensend.js would silently resolve to whichever copy happens to
+   come first - not necessarily the one actually visible - breaking the
+   password generators and leaving the followup rich text editor
+   uninitialized (TinyMCE is itself keyed by that same id). bws_uid makes
+   each render's ids unique; the JS side scopes its lookups to the
+   .plugin-bitwardensend-form the triggering element belongs to instead of
+   searching the whole document, using the data-bws-role markers below.
+#}
+{% set bws_uid = random(100000, 999999) %}
+
 <div class="mb-3">
-   <label class="form-label" for="bws_name">
+   <label class="form-label" for="bws_name_{{ bws_uid }}">
       {{ __('Send name', 'bitwardensend') }}
       <i class="ti ti-info-circle text-secondary ms-1"
          title="{{ __('Only visible in your Bitwarden vault.', 'bitwardensend') }}"></i>
    </label>
-   <input type="text" id="bws_name" name="name" class="form-control"
+   <input type="text" id="bws_name_{{ bws_uid }}" name="name" class="form-control"
           value="{{ subitem.default_name }}" maxlength="200">
 </div>
 
 <div class="mb-4">
-   <label class="form-label required" for="bws_secret">
+   <label class="form-label required" for="bws_secret_{{ bws_uid }}">
       {{ __('Content to share', 'bitwardensend') }}
       <i class="ti ti-info-circle text-secondary ms-1"
          title="{{ __('Stored encrypted in Bitwarden. GLPI only keeps the link and its metadata.', 'bitwardensend') }}"></i>
    </label>
-   <textarea id="bws_secret" name="secret" class="form-control font-monospace" rows="4"
-             required autocomplete="off" spellcheck="false"></textarea>
+   <textarea id="bws_secret_{{ bws_uid }}" name="secret" class="form-control font-monospace" rows="4"
+             data-bws-role="secret" required autocomplete="off" spellcheck="false"></textarea>
 
    {% if subitem.conf.password_generator_enabled %}
       <div class="mt-2">
          <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary" id="bws_generate_secret">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="bws_generate_secret_{{ bws_uid }}"
+                    data-bws-role="generate-secret">
                <i class="ti ti-refresh me-1"></i>{{ __('Generate a password', 'bitwardensend') }}
             </button>
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
-                    data-bs-target="#bws_secret_gen_options"
+                    data-bs-target="#bws_secret_gen_options_{{ bws_uid }}"
                     title="{{ __('Password generator options', 'bitwardensend') }}">
                <i class="ti ti-adjustments-horizontal"></i>
             </button>
          </div>
 
-         <div class="collapse mt-2" id="bws_secret_gen_options">
+         <div class="collapse mt-2" id="bws_secret_gen_options_{{ bws_uid }}">
             <div class="d-flex flex-wrap align-items-end gap-3">
                <div>
-                  <label class="form-label mb-1" for="bws_secret_gen_length">{{ __('Length', 'bitwardensend') }}</label>
-                  <input type="number" id="bws_secret_gen_length" class="form-control form-control-sm bws-generator-length"
-                         min="4" max="128" value="20">
+                  <label class="form-label mb-1" for="bws_secret_gen_length_{{ bws_uid }}">{{ __('Length', 'bitwardensend') }}</label>
+                  <input type="number" id="bws_secret_gen_length_{{ bws_uid }}" class="form-control form-control-sm bws-generator-length"
+                         data-bws-role="secret-length" min="4" max="128" value="20">
                </div>
 
                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_upper" checked>
-                  <label class="form-check-label" for="bws_secret_gen_upper">{{ __('Uppercase', 'bitwardensend') }} (A-Z)</label>
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_upper_{{ bws_uid }}"
+                         data-bws-role="secret-upper" checked>
+                  <label class="form-check-label" for="bws_secret_gen_upper_{{ bws_uid }}">{{ __('Uppercase', 'bitwardensend') }} (A-Z)</label>
                </div>
                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_lower" checked>
-                  <label class="form-check-label" for="bws_secret_gen_lower">{{ __('Lowercase', 'bitwardensend') }} (a-z)</label>
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_lower_{{ bws_uid }}"
+                         data-bws-role="secret-lower" checked>
+                  <label class="form-check-label" for="bws_secret_gen_lower_{{ bws_uid }}">{{ __('Lowercase', 'bitwardensend') }} (a-z)</label>
                </div>
                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_numbers" checked>
-                  <label class="form-check-label" for="bws_secret_gen_numbers">{{ __('Numbers', 'bitwardensend') }} (0-9)</label>
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_numbers_{{ bws_uid }}"
+                         data-bws-role="secret-numbers" checked>
+                  <label class="form-check-label" for="bws_secret_gen_numbers_{{ bws_uid }}">{{ __('Numbers', 'bitwardensend') }} (0-9)</label>
                </div>
                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_symbols">
-                  <label class="form-check-label" for="bws_secret_gen_symbols">{{ __('Symbols', 'bitwardensend') }} (!@#)</label>
+                  <input class="form-check-input" type="checkbox" id="bws_secret_gen_symbols_{{ bws_uid }}"
+                         data-bws-role="secret-symbols">
+                  <label class="form-check-label" for="bws_secret_gen_symbols_{{ bws_uid }}">{{ __('Symbols', 'bitwardensend') }} (!@#)</label>
                </div>
             </div>
          </div>
@@ -109,8 +131,8 @@
 
    <div class="row g-3 mb-3">
       <div class="col-md-6">
-         <label class="form-label" for="bws_days">{{ __('Expires in', 'bitwardensend') }}</label>
-         <select id="bws_days" name="deletion_days" class="form-select">
+         <label class="form-label" for="bws_days_{{ bws_uid }}">{{ __('Expires in', 'bitwardensend') }}</label>
+         <select id="bws_days_{{ bws_uid }}" name="deletion_days" class="form-select" data-bws-role="days">
             {% for days in [1, 2, 3, 7, 14, 30] %}
                <option value="{{ days }}" {{ days == subitem.conf.default_deletion_days ? 'selected' : '' }}>
                   {{ days }} {{ days > 1 ? __('days', 'bitwardensend') : __('day', 'bitwardensend') }}
@@ -120,13 +142,13 @@
       </div>
 
       <div class="col-md-6">
-         <label class="form-label" for="bws_max_access">
+         <label class="form-label" for="bws_max_access_{{ bws_uid }}">
             {{ __('Maximum number of views', 'bitwardensend') }}
             <i class="ti ti-info-circle text-secondary ms-1"
                title="{{ __('0 means unlimited until expiration.', 'bitwardensend') }}"></i>
          </label>
-         <input type="number" id="bws_max_access" name="max_access_count" class="form-control"
-                min="0" max="100" value="{{ subitem.conf.default_max_access_count }}">
+         <input type="number" id="bws_max_access_{{ bws_uid }}" name="max_access_count" class="form-control"
+                data-bws-role="max-access" min="0" max="100" value="{{ subitem.conf.default_max_access_count }}">
       </div>
    </div>
 
@@ -136,12 +158,13 @@
       </summary>
 
       <div class="mb-3 mt-3">
-         <label class="form-label" for="bws_password">{{ __('Link password (optional)', 'bitwardensend') }}</label>
+         <label class="form-label" for="bws_password_{{ bws_uid }}">{{ __('Link password (optional)', 'bitwardensend') }}</label>
          <div class="input-group">
-            <input type="text" id="bws_password" name="password" class="form-control"
-                   autocomplete="off" placeholder="{{ __('Leave empty to require none', 'bitwardensend') }}">
+            <input type="text" id="bws_password_{{ bws_uid }}" name="password" class="form-control"
+                   data-bws-role="password" autocomplete="off" placeholder="{{ __('Leave empty to require none', 'bitwardensend') }}">
             {% if subitem.conf.password_generator_enabled %}
-               <button type="button" class="btn btn-outline-secondary" id="bws_generate_password"
+               <button type="button" class="btn btn-outline-secondary" id="bws_generate_password_{{ bws_uid }}"
+                       data-bws-role="generate-password"
                        title="{{ __('Generate a random password', 'bitwardensend') }}">
                   <i class="ti ti-refresh"></i>
                </button>
@@ -154,12 +177,13 @@
 
       {% if subitem.conf.email_mode_enabled %}
          <div class="mb-3">
-            <label class="form-label" for="bws_emails">
+            <label class="form-label" for="bws_emails_{{ bws_uid }}">
                {{ __('Restrict access to recipient emails (optional)', 'bitwardensend') }}
                <i class="ti ti-diamond text-secondary ms-1"
                   title="{{ __('Requires a Bitwarden Premium or Family plan. Bitwarden rejects the Send otherwise.', 'bitwardensend') }}"></i>
             </label>
-            <select id="bws_emails" name="recipient_emails[]" class="form-control" multiple
+            <select id="bws_emails_{{ bws_uid }}" name="recipient_emails[]" class="form-control" multiple
+                    data-bws-role="emails"
                     data-bws-placeholder="{{ __('e.g. alice@example.com, bob@example.com', 'bitwardensend') }}">
                {% for actor in subitem.ticket_actors %}
                   <option value="{{ actor.email }}">{{ actor.label }}</option>
@@ -207,17 +231,19 @@
             <span class="form-check-label me-3">{{ __('Post the link as a followup', 'bitwardensend') }}</span>
             <span class="form-check form-switch mb-0">
                <input type="checkbox" class="form-check-input" role="switch"
-                      name="add_followup" value="1" id="bws_add_followup" {{ subitem.conf.add_followup ? 'checked' : '' }}>
+                      name="add_followup" value="1" id="bws_add_followup_{{ bws_uid }}"
+                      data-bws-role="add-followup" {{ subitem.conf.add_followup ? 'checked' : '' }}>
             </span>
          </label>
       {% endif %}
    </div>
 
-   <div id="bws_followup_block"
+   <div id="bws_followup_block_{{ bws_uid }}"
         class="{{ followup_shown ? '' : 'bws-d-none' }}"
+        data-bws-role="followup-block"
         data-bws-unlimited="{{ __('an unlimited number of', 'bitwardensend') }}"
         data-bws-link-placeholder="{{ __('the link (created once you submit)', 'bitwardensend') }}">
-      <label class="form-label" for="bws_followup">
+      <label class="form-label" for="bws_followup_{{ bws_uid }}">
          {{ __('Followup text', 'bitwardensend') }}
          <i class="ti ti-info-circle text-secondary ms-1"
             title="{{ __('Available variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}', 'bitwardensend') }}"></i>
@@ -226,14 +252,15 @@
       <div class="d-flex flex-wrap align-items-start gap-2">
          <div class="flex-grow-1 bws-min-width-0">
             {{ fields.textareaField('followup_content', subitem.conf.followup_template, '', {
-               id: 'bws_followup',
+               id: 'bws_followup_' ~ bws_uid,
                enable_richtext: true,
                enable_fileupload: false,
                no_label: true,
                full_width: true,
                rows: 7,
-               rand: 1,
+               rand: bws_uid,
                statusbar: false,
+               additional_attributes: {'data-bws-role': 'followup'},
             }) }}
          </div>
 
@@ -243,7 +270,8 @@
                <div class="bws-side-control d-flex align-items-center gap-1">
                   <i class="ti ti-stack-2 text-secondary"
                      title="{{ __('Use a GLPI followup template', 'bitwardensend') }}"></i>
-                  <select id="bws_followup_template" class="form-select form-select-sm"
+                  <select id="bws_followup_template_{{ bws_uid }}" class="form-select form-select-sm"
+                          data-bws-role="followup-template"
                           data-bws-itemtype="{{ subitem.itemtype }}" data-bws-items-id="{{ subitem.items_id }}"
                           data-bws-confirm-replace="{{ __('Replace the current text? Your changes will be lost.', 'bitwardensend') }}"
                           data-bws-load-error="{{ __('Could not load that template.', 'bitwardensend') }}">
@@ -265,7 +293,7 @@
                </div>
             {% endif %}
 
-            <div id="bws_followup_private_row" class="bws-side-control d-flex align-items-center gap-1"
+            <div id="bws_followup_private_row_{{ bws_uid }}" class="bws-side-control d-flex align-items-center gap-1"
                  title="{{ __('Private followup (hidden from the requester)', 'bitwardensend') }}">
                <i class="ti ti-eye-off text-secondary"></i>
                <span class="form-check form-switch mb-0">
@@ -280,7 +308,8 @@
          <summary class="bws-details-summary text-secondary small">
             <i class="ti ti-eye me-1"></i>{{ __('Preview') }}
          </summary>
-         <div id="bws_followup_preview" class="border rounded p-2 small bg-body-tertiary mt-2"></div>
+         <div id="bws_followup_preview_{{ bws_uid }}" class="border rounded p-2 small bg-body-tertiary mt-2"
+              data-bws-role="followup-preview"></div>
       </details>
    </div>
 </div>

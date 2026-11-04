@@ -65,5 +65,16 @@
 </form>
 
 {# Initial render for the glpi_ajax_dialog path (innerHTML injection is handled
-   separately in pluginBitwardensendDialog's fallback branch). #}
-<script>window.pluginBitwardensendUpdateFollowupPreview();</script>
+   separately in pluginBitwardensendDialog's fallback branch). Scoped to this
+   very <form> (its immediately preceding sibling) rather than searching the
+   whole document: the ticket timeline's own inline answer form (see
+   answer_form.html.twig) can be present in the same page at the same time,
+   and every bws_* id is now unique per render - see _send_form_fields.html.twig. #}
+<script>
+   (function () {
+      var scope = document.currentScript.previousElementSibling;
+      window.pluginBitwardensendUpdateFollowupPreview(scope);
+      window.pluginBitwardensendStartFollowupPreviewPolling(scope);
+      window.pluginBitwardensendInitEmailsSelect(scope);
+   })();
+</script>

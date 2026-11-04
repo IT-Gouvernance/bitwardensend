@@ -44,14 +44,19 @@
         const title = '<i class="ti ti-shield-lock me-2"></i>Bitwarden Send';
 
         if (typeof glpi_ajax_dialog === 'function') {
+            // No initialization call here: the dialog's own content (and the
+            // <form> it will contain) does not exist yet at this point - the
+            // AJAX request above hasn't returned. form.html.twig's own
+            // trailing <script> runs that initialization once its content is
+            // actually inserted (glpi_ajax_dialog's jQuery-based insertion
+            // does execute embedded <script> tags, unlike a plain innerHTML
+            // assignment - see the fallback branch below for that case).
             glpi_ajax_dialog({
                 url: url,
                 params: { itemtype: itemtype, items_id: items_id },
                 dialogclass: 'modal-lg',
                 title: title
             });
-            window.pluginBitwardensendStartFollowupPreviewPolling();
-            window.pluginBitwardensendInitEmailsSelect();
             return;
         }
 
@@ -90,8 +95,9 @@
                 // glpi_ajax_dialog path above (also means GLPI's own TinyMCE
                 // bootstrap script for the followup field won't run here either —
                 // it stays a plain textarea in this fallback, still functional).
-                window.pluginBitwardensendStartFollowupPreviewPolling();
-                window.pluginBitwardensendInitEmailsSelect();
+                const scope = modalEl.querySelector('.plugin-bitwardensend-form');
+                window.pluginBitwardensendStartFollowupPreviewPolling(scope);
+                window.pluginBitwardensendInitEmailsSelect(scope);
             })
             .catch(() => {
                 modalEl.querySelector('.modal-body').innerHTML =
@@ -349,9 +355,14 @@
      *
      * Safe to call more than once (the dialog can be reopened): destroys
      * an existing instance first rather than erroring on a double-init.
+     *
+     * scope is the .plugin-bitwardensend-form this call applies to - not
+     * looked up document-wide, since the same form markup (and so the same
+     * data-bws-role markers) can exist more than once on the page at a time
+     * (see _send_form_fields.html.twig's own docblock).
      */
-    window.pluginBitwardensendInitEmailsSelect = function () {
-        const field = document.getElementById('bws_emails');
+    window.pluginBitwardensendInitEmailsSelect = function (scope) {
+        const field = scope ? scope.querySelector('[data-bws-role="emails"]') : null;
         if (!field || typeof window.jQuery !== 'function' || !window.jQuery.fn.select2) {
             return;
         }
@@ -423,9 +434,15 @@
      * or a text message per the field's own hint, so it excludes visually
      * ambiguous characters (0/O, 1/l/I) instead of offering the same
      * character-class options.
+     *
+     * button is the clicked element: the target field is looked up within
+     * its own .plugin-bitwardensend-form, not document-wide - the same form
+     * markup can exist more than once on the page at a time (see
+     * _send_form_fields.html.twig's own docblock).
      */
-    window.pluginBitwardensendGeneratePassword = function () {
-        const field = document.getElementById('bws_password');
+    window.pluginBitwardensendGeneratePassword = function (button) {
+        const scope = button && button.closest('.plugin-bitwardensend-form');
+        const field = scope ? scope.querySelector('[data-bws-role="password"]') : null;
         if (!field) {
             return;
         }
@@ -441,26 +458,32 @@
      * the Link password generator, this content can be anything from an API
      * key to a service password with its own character rules, so the
      * technician picks what to include rather than a fixed recipe.
+     *
+     * button is the clicked element: every field below is looked up within
+     * its own .plugin-bitwardensend-form, not document-wide - the same form
+     * markup can exist more than once on the page at a time (see
+     * _send_form_fields.html.twig's own docblock).
      */
-    window.pluginBitwardensendGenerateSecret = function () {
-        const field = document.getElementById('bws_secret');
+    window.pluginBitwardensendGenerateSecret = function (button) {
+        const scope = button && button.closest('.plugin-bitwardensend-form');
+        const field = scope ? scope.querySelector('[data-bws-role="secret"]') : null;
         if (!field) {
             return;
         }
 
-        const lengthInput = document.getElementById('bws_secret_gen_length');
+        const lengthInput = scope.querySelector('[data-bws-role="secret-length"]');
         let length = parseInt(lengthInput && lengthInput.value, 10) || 20;
         length = Math.min(128, Math.max(4, length));
 
         const classes = [
-            { id: 'bws_secret_gen_upper', chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
-            { id: 'bws_secret_gen_lower', chars: 'abcdefghijklmnopqrstuvwxyz' },
-            { id: 'bws_secret_gen_numbers', chars: '0123456789' },
-            { id: 'bws_secret_gen_symbols', chars: '!@#$%^&*()-_=+[]{}<>?' }
+            { role: 'secret-upper', chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
+            { role: 'secret-lower', chars: 'abcdefghijklmnopqrstuvwxyz' },
+            { role: 'secret-numbers', chars: '0123456789' },
+            { role: 'secret-symbols', chars: '!@#$%^&*()-_=+[]{}<>?' }
         ];
 
         let charset = classes.reduce((chars, charClass) => {
-            const checkbox = document.getElementById(charClass.id);
+            const checkbox = scope.querySelector(`[data-bws-role="${charClass.role}"]`);
             return (checkbox && checkbox.checked) ? chars + charClass.chars : chars;
         }, '');
 
@@ -545,23 +568,32 @@
      * with the current form values. {url} stays a placeholder — the real
      * link doesn't exist until the Send is created.
      *
-     * Translated strings come through data-bws-* attributes on
-     * #bws_followup_block, not hardcoded (no __() in plain JS).
+     * Translated strings come through data-bws-* attributes on the
+     * followup-block element, not hardcoded (no __() in plain JS).
      *
      * Handles both a TinyMCE editor (used as-is, already HTML) and a plain
      * <textarea> fallback (escaped first, since it's user-typed text).
+     *
+     * scope is the .plugin-bitwardensend-form this call applies to - not
+     * looked up document-wide, since the same form markup (and so the same
+     * data-bws-role markers) can exist more than once on the page at a time
+     * (see _send_form_fields.html.twig's own docblock).
      */
-    window.pluginBitwardensendUpdateFollowupPreview = function () {
-        const block = document.getElementById('bws_followup_block');
-        const preview = document.getElementById('bws_followup_preview');
-        const daysSelect = document.getElementById('bws_days');
-        const maxAccessInput = document.getElementById('bws_max_access');
-        const textarea = document.getElementById('bws_followup');
+    window.pluginBitwardensendUpdateFollowupPreview = function (scope) {
+        if (!scope) {
+            return;
+        }
+
+        const block = scope.querySelector('[data-bws-role="followup-block"]');
+        const preview = scope.querySelector('[data-bws-role="followup-preview"]');
+        const daysSelect = scope.querySelector('[data-bws-role="days"]');
+        const maxAccessInput = scope.querySelector('[data-bws-role="max-access"]');
+        const textarea = scope.querySelector('[data-bws-role="followup"]');
         if (!block || !preview || !daysSelect || !maxAccessInput || !textarea) {
             return;
         }
 
-        const editor = (window.tinymce && window.tinymce.get) ? window.tinymce.get('bws_followup') : null;
+        const editor = (window.tinymce && window.tinymce.get) ? window.tinymce.get(textarea.id) : null;
 
         const escapeHtml = function (value) {
             const div = document.createElement('div');
@@ -599,7 +631,7 @@
         // text editor is actually up (see pluginBitwardensendApplyFollowupTemplate
         // for why this only ever happens through the editor, never the plain
         // textarea fallback).
-        const templateSelect = document.getElementById('bws_followup_template');
+        const templateSelect = scope.querySelector('[data-bws-role="followup-template"]');
         if (templateSelect) {
             // The <select> itself is capped to a narrow width (see .bws-side-control
             // in css/bitwardensend.css) so a long GLPI template name gets clipped
@@ -621,8 +653,9 @@
      * would falsely look like an edit. Always read through this same
      * accessor for both sides of that comparison.
      */
-    function pluginBitwardensendGetFollowupEditorContent() {
-        const editor = (window.tinymce && window.tinymce.get) ? window.tinymce.get('bws_followup') : null;
+    function pluginBitwardensendGetFollowupEditorContent(scope) {
+        const textarea = scope ? scope.querySelector('[data-bws-role="followup"]') : null;
+        const editor = (textarea && window.tinymce && window.tinymce.get) ? window.tinymce.get(textarea.id) : null;
         return editor ? editor.getContent() : null;
     }
 
@@ -632,9 +665,9 @@
      * the part shared between the plugin-default and GLPI-template branches
      * of pluginBitwardensendApplyFollowupTemplate below.
      */
-    function pluginBitwardensendSetFollowupContent(select, content) {
-        const editor = (window.tinymce && window.tinymce.get) ? window.tinymce.get('bws_followup') : null;
-        const textarea = document.getElementById('bws_followup');
+    function pluginBitwardensendSetFollowupContent(scope, select, content) {
+        const textarea = scope ? scope.querySelector('[data-bws-role="followup"]') : null;
+        const editor = (textarea && window.tinymce && window.tinymce.get) ? window.tinymce.get(textarea.id) : null;
 
         if (editor) {
             editor.setContent(content);
@@ -643,7 +676,7 @@
             textarea.value = content;
         }
 
-        window.pluginBitwardensendUpdateFollowupPreview();
+        window.pluginBitwardensendUpdateFollowupPreview(scope);
     }
 
     /**
@@ -672,7 +705,8 @@
      * default, no special-casing needed here.
      */
     window.pluginBitwardensendApplyFollowupTemplate = function (select) {
-        const editorContent = pluginBitwardensendGetFollowupEditorContent();
+        const scope = select.closest('.plugin-bitwardensend-form');
+        const editorContent = pluginBitwardensendGetFollowupEditorContent(scope);
 
         if (editorContent !== null && select._bwsBaseline !== undefined && editorContent !== select._bwsBaseline) {
             const confirmMessage = select.dataset.bwsConfirmReplace || 'Replace the current text?';
@@ -689,7 +723,7 @@
         if (templateId === '') {
             const option = select.options[select.selectedIndex];
             const content = option ? (option.getAttribute('data-bws-content') || '') : '';
-            pluginBitwardensendSetFollowupContent(select, content);
+            pluginBitwardensendSetFollowupContent(scope, select, content);
             return;
         }
 
@@ -719,7 +753,7 @@
                     throw new Error('bitwardensend: followup template fetch failed');
                 }
 
-                pluginBitwardensendSetFollowupContent(select, result.body.content);
+                pluginBitwardensendSetFollowupContent(scope, select, result.body.content);
             })
             .catch(() => {
                 select.disabled = false;
@@ -741,17 +775,22 @@
      * finishes.
      *
      * Exported on window (unlike the other internal-only helpers below):
-     * pluginBitwardensendDialog starts it for the tab's modal, and the
-     * timeline's inline answer_form.html.twig — which never goes through
-     * that function — calls it directly from its own inline <script>.
+     * form.html.twig's own trailing <script> calls it for the tab's modal,
+     * and the timeline's inline answer_form.html.twig calls it directly
+     * from its own inline <script> — each passing its own <form> as scope,
+     * so only the instance that actually just loaded keeps polling (see
+     * pluginBitwardensendUpdateFollowupPreview's own docblock for why scope
+     * matters here at all).
      */
     let followupPreviewInterval = null;
 
-    window.pluginBitwardensendStartFollowupPreviewPolling = function () {
+    window.pluginBitwardensendStartFollowupPreviewPolling = function (scope) {
         if (followupPreviewInterval !== null) {
             window.clearInterval(followupPreviewInterval);
         }
-        followupPreviewInterval = window.setInterval(window.pluginBitwardensendUpdateFollowupPreview, 800);
+        followupPreviewInterval = window.setInterval(() => {
+            window.pluginBitwardensendUpdateFollowupPreview(scope);
+        }, 800);
     };
 
     /**
@@ -774,9 +813,10 @@
             return;
         }
 
-        if (event.target.id === 'bws_add_followup') {
-            const block = document.getElementById('bws_followup_block');
-            // #bws_followup_private_row is a child of this block now (the
+        if (event.target.matches('[data-bws-role="add-followup"]')) {
+            const scope = event.target.closest('.plugin-bitwardensend-form');
+            const block = scope ? scope.querySelector('[data-bws-role="followup-block"]') : null;
+            // The private-followup row is a child of this block now (the
             // compact icon+switch next to the followup text, not a separate
             // row above it), so hiding the block already hides it — no need to
             // toggle it separately here anymore.
@@ -791,21 +831,22 @@
             return;
         }
 
-        if (event.target.id === 'bws_followup_template') {
+        if (event.target.matches('[data-bws-role="followup-template"]')) {
             window.pluginBitwardensendApplyFollowupTemplate(event.target);
             return;
         }
 
-        if (['bws_followup', 'bws_days', 'bws_max_access'].indexOf(event.target.id) !== -1) {
-            window.pluginBitwardensendUpdateFollowupPreview();
+        if (event.target.matches('[data-bws-role="followup"], [data-bws-role="days"], [data-bws-role="max-access"]')) {
+            window.pluginBitwardensendUpdateFollowupPreview(event.target.closest('.plugin-bitwardensend-form'));
         }
     });
 
     // 'change' alone only fires on blur for text inputs/textareas: 'input' keeps
     // the preview in sync while typing.
     document.addEventListener('input', (event) => {
-        if (event.target && ['bws_followup', 'bws_days', 'bws_max_access'].indexOf(event.target.id) !== -1) {
-            window.pluginBitwardensendUpdateFollowupPreview();
+        if (event.target && event.target.matches
+            && event.target.matches('[data-bws-role="followup"], [data-bws-role="days"], [data-bws-role="max-access"]')) {
+            window.pluginBitwardensendUpdateFollowupPreview(event.target.closest('.plugin-bitwardensend-form'));
         }
     });
 
@@ -843,11 +884,13 @@
     // Delegated so a click on the icon inside a button (not the button
     // itself) still counts — closest() reaches the button either way.
     document.addEventListener('click', (event) => {
-        if (event.target.closest && event.target.closest('#bws_generate_password')) {
-            window.pluginBitwardensendGeneratePassword();
+        const passwordButton = event.target.closest && event.target.closest('[data-bws-role="generate-password"]');
+        if (passwordButton) {
+            window.pluginBitwardensendGeneratePassword(passwordButton);
         }
-        if (event.target.closest && event.target.closest('#bws_generate_secret')) {
-            window.pluginBitwardensendGenerateSecret();
+        const secretButton = event.target.closest && event.target.closest('[data-bws-role="generate-secret"]');
+        if (secretButton) {
+            window.pluginBitwardensendGenerateSecret(secretButton);
         }
     });
 })();
