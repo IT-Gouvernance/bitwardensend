@@ -34,7 +34,7 @@ msgstr ""
 msgid "(Setup > Notifications)."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:126, templates/config.html.twig:271
+#: templates/_send_form_fields.html.twig:148, templates/config.html.twig:271
 msgid "0 means unlimited until expiration."
 msgstr ""
 
@@ -58,7 +58,7 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:135
+#: templates/_send_form_fields.html.twig:157
 msgid "Advanced options"
 msgstr ""
 
@@ -75,7 +75,7 @@ msgid ""
 "Automatic deletion of revoked or expired entries is configured on the automatic action"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:223
+#: templates/_send_form_fields.html.twig:249
 msgid ""
 "Available variables: {url} (ready-to-click link), {url_raw} (just the address, for your own link), {expiration}, {max_access}"
 msgstr ""
@@ -153,7 +153,7 @@ msgstr ""
 msgid "Connected, vault unlocked. The plugin is ready to use."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:53
+#: templates/_send_form_fields.html.twig:70
 msgid "Content to share"
 msgstr ""
 
@@ -177,7 +177,7 @@ msgstr ""
 msgid "Could not encode the rendered template."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:249
+#: templates/_send_form_fields.html.twig:277
 msgid "Could not load that template."
 msgstr ""
 
@@ -263,11 +263,11 @@ msgstr ""
 msgid "Expired"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:112
+#: templates/_send_form_fields.html.twig:134
 msgid "Expires in"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:196, templates/config.html.twig:312
+#: templates/_send_form_fields.html.twig:220, templates/config.html.twig:312
 msgid "Followup configuration"
 msgstr ""
 
@@ -275,7 +275,7 @@ msgstr ""
 msgid "Followup template"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:221
+#: templates/_send_form_fields.html.twig:247
 msgid "Followup text"
 msgstr ""
 
@@ -283,7 +283,7 @@ msgstr ""
 msgid "For example http://127.0.0.1:8087 — never expose this port publicly."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:257
+#: templates/_send_form_fields.html.twig:285
 msgid "GLPI followup templates"
 msgstr ""
 
@@ -292,11 +292,11 @@ msgid ""
 "GLPI will store this account's credentials (encrypted). Use a dedicated, revocable service account — never your own."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:64
+#: templates/_send_form_fields.html.twig:82
 msgid "Generate a password"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:145
+#: templates/_send_form_fields.html.twig:168
 msgid "Generate a random password"
 msgstr ""
 
@@ -313,7 +313,7 @@ msgid ""
 "Kind regards,"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:182
+#: templates/_send_form_fields.html.twig:206
 msgid "Hide my email address from the recipient"
 msgstr ""
 
@@ -321,7 +321,7 @@ msgstr ""
 msgid "Hide the sender email address by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:176
+#: templates/_send_form_fields.html.twig:200
 msgid "Hide the text by default when opened"
 msgstr ""
 
@@ -341,11 +341,11 @@ msgstr ""
 msgid "Keep the link in the GLPI database"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:142
+#: templates/_send_form_fields.html.twig:164
 msgid "Leave empty to require none"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:76
+#: templates/_send_form_fields.html.twig:94
 msgid "Length"
 msgstr ""
 
@@ -353,11 +353,11 @@ msgstr ""
 msgid "Link defaults"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:107
+#: templates/_send_form_fields.html.twig:129
 msgid "Link options"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:139
+#: templates/_send_form_fields.html.twig:161
 msgid "Link password (optional)"
 msgstr ""
 
@@ -373,7 +373,7 @@ msgstr ""
 msgid "Local API URL"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:87
+#: templates/_send_form_fields.html.twig:107
 msgid "Lowercase"
 msgstr ""
 
@@ -385,7 +385,7 @@ msgstr ""
 msgid "Max views"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:124
+#: templates/_send_form_fields.html.twig:146
 msgid "Maximum number of views"
 msgstr ""
 
@@ -422,7 +422,7 @@ msgstr ""
 msgid "Not set"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:91
+#: templates/_send_form_fields.html.twig:112
 msgid "Numbers"
 msgstr ""
 
@@ -436,11 +436,11 @@ msgid ""
 "Only used when the API does not return the access URL. Cloud: https://send.bitwarden.com/# — self-hosted: https://vault.example.com/#/send/"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:45
+#: templates/_send_form_fields.html.twig:62
 msgid "Only visible in your Bitwarden vault."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:68
+#: templates/_send_form_fields.html.twig:86
 msgid "Password generator options"
 msgstr ""
 
@@ -448,16 +448,16 @@ msgstr ""
 msgid "Password protected"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:169
+#: templates/_send_form_fields.html.twig:193
 msgid ""
 "Pick from the item's own requesters/observers/assignees, or type any other address. Leave empty to not restrict access. Cannot be combined with a link password above."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:251
+#: templates/_send_form_fields.html.twig:279
 msgid "Plugin default template"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:207
+#: templates/_send_form_fields.html.twig:231
 msgid "Post the link as a followup"
 msgstr ""
 
@@ -465,7 +465,7 @@ msgstr ""
 msgid "Post the link as a followup by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:269
+#: templates/_send_form_fields.html.twig:297
 msgid "Private followup (hidden from the requester)"
 msgstr ""
 
@@ -473,7 +473,7 @@ msgstr ""
 msgid "Private followup by default"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:248
+#: templates/_send_form_fields.html.twig:276
 msgid "Replace the current text? Your changes will be lost."
 msgstr ""
 
@@ -482,12 +482,12 @@ msgid ""
 "Requires a Bitwarden Premium or Family plan on the account used to create the Send. Bitwarden rejects the Send otherwise."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:160
+#: templates/_send_form_fields.html.twig:183
 msgid ""
 "Requires a Bitwarden Premium or Family plan. Bitwarden rejects the Send otherwise."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:158
+#: templates/_send_form_fields.html.twig:181
 msgid "Restrict access to recipient emails (optional)"
 msgstr ""
 
@@ -535,7 +535,7 @@ msgstr ""
 msgid "Send driver"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:151
+#: templates/_send_form_fields.html.twig:174
 msgid "Send it over another channel, by phone or text message for instance."
 msgstr ""
 
@@ -543,7 +543,7 @@ msgstr ""
 msgid "Send link base URL"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:43
+#: templates/_send_form_fields.html.twig:60
 msgid "Send name"
 msgstr ""
 
@@ -555,7 +555,7 @@ msgstr ""
 msgid "Show a random password generator on the creation form"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:55
+#: templates/_send_form_fields.html.twig:72
 msgid "Stored encrypted in Bitwarden. GLPI only keeps the link and its metadata."
 msgstr ""
 
@@ -563,7 +563,7 @@ msgstr ""
 msgid "Stored — type a new one to replace it"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:95
+#: templates/_send_form_fields.html.twig:117
 msgid "Symbols"
 msgstr ""
 
@@ -681,11 +681,11 @@ msgstr ""
 msgid "Unsupported item type."
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:83
+#: templates/_send_form_fields.html.twig:102
 msgid "Uppercase"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:245
+#: templates/_send_form_fields.html.twig:272
 msgid "Use a GLPI followup template"
 msgstr ""
 
@@ -707,23 +707,23 @@ msgstr ""
 msgid "You are not allowed to add a followup on this item."
 msgstr ""
 
-#: src/Send.php:901, templates/_send_form_fields.html.twig:218
+#: src/Send.php:901, templates/_send_form_fields.html.twig:244
 msgid "an unlimited number of"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:116
+#: templates/_send_form_fields.html.twig:138
 msgid "day"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:116
+#: templates/_send_form_fields.html.twig:138
 msgid "days"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:163
+#: templates/_send_form_fields.html.twig:187
 msgid "e.g. alice@example.com, bob@example.com"
 msgstr ""
 
-#: templates/_send_form_fields.html.twig:219
+#: templates/_send_form_fields.html.twig:245
 msgid "the link (created once you submit)"
 msgstr ""
 
